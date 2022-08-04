@@ -69,6 +69,11 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
                            sit_joint_angles_);
   quad_utils::loadROSParam(nh_, "robot_driver/torque_limit", torque_limits_);
 
+
+  // ================ Testing Area =================
+  //ROS_INFO("Single Joint Command!!!!!!!!!!!!!!!!! %s", single_joint_cmd_topic);
+  std::cout << "Single Joint Command: " << single_joint_cmd_topic << std::endl;
+  
   // Setup pubs and subs
   local_plan_sub_ =
       nh_.subscribe(local_plan_topic, 1, &RobotDriver::localPlanCallback, this,
@@ -384,7 +389,8 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } else if (control_mode_ == SIT) {
+  } 
+  else if (control_mode_ == SIT) {
     for (int i = 0; i < num_feet_; ++i) {
       leg_command_array_msg_.leg_commands.at(i).motor_commands.resize(3);
       for (int j = 0; j < 3; ++j) {
@@ -393,7 +399,8 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } else if (control_mode_ == READY) {
+  } 
+  else if (control_mode_ == READY) {
     if (leg_controller_->computeLegCommandArray(last_robot_state_msg_,
                                                 leg_command_array_msg_,
                                                 grf_array_msg_) == false) {
@@ -406,16 +413,18 @@ bool RobotDriver::updateControl() {
               leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
         }
       }
-    } else {
+    } 
+    else { // This else statement states that if it is false when checking for valid compute commandn array, you can also check the traj ref state
       if (InverseDynamicsController *p =
               dynamic_cast<InverseDynamicsController *>(
-                  leg_controller_.get())) {
+                  leg_controller_.get())) { // get() is a std::shared_pointer member
         // Uncomment to publish trajectory reference state
         // quad_msgs::RobotState ref_state_msg = p->getReferenceState();
         // trajectry_robot_state_pub_.publish(ref_state_msg);
       }
     }
-  } else if (control_mode_ == SIT_TO_READY) {
+  } 
+  else if (control_mode_ == SIT_TO_READY) {
     ros::Duration duration = ros::Time::now() - transition_timestamp_;
     double t_interp = duration.toSec() / transition_duration_;
     if (t_interp >= 1) {
@@ -434,7 +443,8 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } else if (control_mode_ == READY_TO_SIT) {
+  } 
+  else if (control_mode_ == READY_TO_SIT) {
     ros::Duration duration = ros::Time::now() - transition_timestamp_;
     double t_interp = duration.toSec() / transition_duration_;
 
@@ -455,7 +465,8 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } else {
+  } 
+  else {
     ROS_WARN_THROTTLE(0.5,
                       "Invalid control mode set in ID node, "
                       "exiting updateControl()");
@@ -480,6 +491,13 @@ bool RobotDriver::updateControl() {
                     .torque_ff -
                 knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub),
             -torque_limits_[j]);
+        std::cout << "knee motor command ff torque: " << leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).torque_ff << std::endl;
+        std::cout << "kd_ub(pos-pos_ub): " << knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
+        std::cout << "ff torque & additional terms: " << leg_command_array_msg_.leg_commands.at(i)
+                    .motor_commands.at(j)
+                    .torque_ff -
+                knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
+        std::cout << "Neg Torque limit of knee: " << -torque_limits_[j] << std::endl; // Torque limit of knee is 32
       }
 
       quad_msgs::MotorCommand cmd =
@@ -490,8 +508,13 @@ bool RobotDriver::updateControl() {
           cmd.kd * (cmd.vel_setpoint - joint_velocities[joint_idx]);
       double fb_component = pos_component + vel_component;
       double effort = fb_component + cmd.torque_ff;
+      //std::cout << "ff component: " << cmd.torque_ff << std::endl;
+      //std::cout << "fb_component: " << fb_component << std::endl;
+      //std::cout << "outside loop effort: " << effort << std::endl;
       double fb_ratio =
           abs(fb_component) / (abs(fb_component) + abs(cmd.torque_ff));
+
+      //std::cout << "outside loop: " << cmd.torque_ff << std::endl; // updates too frequently... can't use as debug
 
       if (abs(cmd.torque_ff) >= torque_limits_[j]) {
         ROS_WARN(
@@ -508,6 +531,7 @@ bool RobotDriver::updateControl() {
             std::min(std::max(effort, -torque_limits_[j]), torque_limits_[j]);
       }
 
+      // Update diagnostic information
       leg_command_array_msg_.leg_commands.at(i)
           .motor_commands.at(j)
           .pos_component = pos_component;

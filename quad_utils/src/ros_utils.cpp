@@ -653,6 +653,7 @@ void vectorToEigen(const std::vector<double> &vec, Eigen::VectorXd &eigen_vec) {
   eigen_vec.resize(vec.size());
   for (int i = 0; i < vec.size(); i++) {
     eigen_vec(i) = vec[i];
+    //std::cout << vec[i] << std::endl;
   }
 }
 

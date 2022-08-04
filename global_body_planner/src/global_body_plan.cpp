@@ -77,6 +77,7 @@ void GlobalBodyPlan::addStateAndGRFToMsg(double t, int plan_index,
                                          quad_msgs::RobotPlan &msg) {
   // Represent each state as an Odometry message
   quad_msgs::RobotState state;
+  //std::cout << "t: " << t << std::endl; // starts from 0... std::bad_alloc error if printing but whatever 
   quad_utils::updateStateHeaders(state,
                                  msg.global_plan_timestamp + ros::Duration(t),
                                  msg.header.frame_id, plan_index);
@@ -112,6 +113,7 @@ void GlobalBodyPlan::convertToMsg(
 
   // Loop through the interpolated body plan and add to message
   for (int i = 0; i < body_plan_.size(); ++i) {
+    //std::cout << "primitive_id_plan: " << primitive_id_plan_[i] << std::endl; // Just curious what primitive_id is for flat terrain. RESULT: 0 (CONNECT) and end index 1 (LEAP_STANCE)
     addStateAndGRFToMsg(t_plan_[i], i, body_plan_[i], grf_plan_[i],
                         primitive_id_plan_[i], robot_plan_msg);
   }

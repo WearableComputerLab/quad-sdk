@@ -14,6 +14,7 @@ bool RRT::newConfig(State s, State s_near, StateActionResult &result,
   double best_so_far = stateDistance(s_near, s);
 
   // Try connecting directly
+  //std::cout << "Try connecting directly..." << std::endl;
   StateActionResult current_result;
   int connect_result =
       attemptConnect(s_near, s, current_result, planner_config, direction);
@@ -41,6 +42,7 @@ bool RRT::newConfig(State s, State s_near, StateActionResult &result,
 
   bool any_valid_actions = false;
   for (int i = 0; i < planner_config.num_leap_samples; ++i) {
+    //std::cout << "Trying random leaping..." << std::endl;
     bool valid_state_found = false;
 
     Action a_test;
@@ -102,6 +104,15 @@ int RRT::attemptConnect(const State &s_existing, const State &s, double t_s,
   // the stance and flight times
   State s_start = (direction == FORWARD) ? s_existing : s;
   State s_goal = (direction == FORWARD) ? s : s_existing;
+  //ROS_INFO("Direction: %d", direction);
+  if (direction == FORWARD){
+    //ROS_INFO("Forward"); // Weird that it is only forward atm during global planning
+  }
+  else{
+    //ROS_INFO("Backward");
+  }
+  //ROS_INFO("s_start x(prob): %0.5f", s_start.pos[0]);
+  //ROS_INFO("s_goal x(prob): %0.5f", s_goal.pos[0]);
   double t_f = 0;
 
   // Update the vertical component of velocities to match the terrain
@@ -113,6 +124,7 @@ int RRT::attemptConnect(const State &s_existing, const State &s, double t_s,
       -(2.0 * (3.0 * s_start.pos - 3.0 * s_goal.pos + 2.0 * s_start.vel * t_s +
                s_goal.vel * t_s)) /
       (t_s * t_s);
+  //std::cout << "acc_0:\n" << acc_0 << std::endl << std::endl;
   Eigen::Vector3d acc_f = (2.0 * (3.0 * s_start.pos - 3.0 * s_goal.pos +
                                   s_start.vel * t_s + 2.0 * s_goal.vel * t_s)) /
                           (t_s * t_s);
@@ -140,11 +152,19 @@ int RRT::attemptConnect(const State &s_existing, const State &s, double t_s,
     if (isValidStateActionPair(s_start, result.a_new, result, planner_config)) {
       return REACHED;
     } else {
+      //std::cout << "Not valid state action pair... " << std::endl;
+      //std::cout << "result.t_new: " << result.t_new << std::endl;
+
       if (attemptConnect(s_existing, result.s_new, result.t_new, result,
-                         planner_config, direction) == TRAPPED)
+                         planner_config, direction) == TRAPPED){
+        //std::cout << "Trapped" << std::endl;
         return TRAPPED;
+      }
       else
+      {
+        //std::cout << "Advanced" << std::endl;
         return ADVANCED;
+      }
     }
   }
 
@@ -164,18 +184,24 @@ int RRT::attemptConnect(const State &s_existing, const State &s,
 int RRT::extend(PlannerClass &T, const State &s,
                 const PlannerConfig &planner_config, int direction,
                 ros::Publisher &tree_pub) {
+  //std::cout << "Extend" << std::endl;
   int s_near_index = T.getNearestNeighbor(s);
   State s_near = T.getVertex(s_near_index);
+  //std::cout << "s (x pos): " << s.pos[0] << std::endl;
+  //std::cout << "s_near (x_pos): " << s_near.pos[0] << std::endl;
   StateActionResult result;
 
   if (newConfig(s, s_near, result, planner_config, direction, tree_pub)) {
     int s_new_index = T.getNumVertices();
+    //std::cout << "Num Vertices: " << s_new_index << std::endl;
     T.addVertex(s_new_index, result.s_new);
     T.addEdge(s_near_index, s_new_index, result.length);
     T.addAction(s_new_index, result.a_new);
 
+    //std::cout << "Advanced!!" << std::endl;
     return ADVANCED;
   } else {
+    //std::cout << "Trapped..." << std::endl;
     return TRAPPED;
   }
 }

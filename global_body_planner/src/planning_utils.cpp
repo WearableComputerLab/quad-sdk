@@ -314,6 +314,12 @@ double getPitchFromState(const State &s, const PlannerConfig &planner_config) {
 double getDzFromState(const State &s, const PlannerConfig &planner_config) {
   Eigen::Vector3d surf_norm = getSurfaceNormalFiltered(s, planner_config);
 
+  /*
+  std::cout << "surf_norm\n" << surf_norm << std::endl;
+  std::cout << "surf_norm[2]\n" << surf_norm[2] << std::endl;
+  std::cout << "s.vel.head<3>(): \n" << s.vel.head<3>() << std::endl;
+  std::cout << "dot product: " << -s.vel.head<2>().dot(surf_norm.head<2>()) << std::endl;
+  */
   return ((surf_norm[2] <= 0)
               ? std::numeric_limits<double>::max()
               : -(s.vel.head<2>().dot(surf_norm.head<2>()) / surf_norm[2]));
@@ -343,6 +349,10 @@ State interpStateActionPair(const State &s_in, const Action &a, double t0,
   double t_s = a.t_s_leap;
   double t_f = a.t_f;
   double t_s_land = a.t_s_land;
+
+  //std::cout << "t_s: " << t_s << std::endl; // 12.4 for flat terrain
+  //std::cout << "t_f: " << t_f << std::endl; // 0 for flat terrain
+  //std::cout << "t_s_land: " << t_s_land << std::endl; // 0 for flat terrain
 
   State s = s_in;
 
@@ -552,6 +562,7 @@ bool getRandomLeapAction(const State &s, const Eigen::Vector3d &surf_norm,
   double dz_impulse = (planner_config.dz0_max - planner_config.dz0_min) *
                           (double)rand() / RAND_MAX +
                       planner_config.dz0_min;
+  //std::cout << "random dz_impulse: " << dz_impulse << std::endl;
   a.dz_0 = getDzFromState(s, planner_config) - dz_impulse;
   a.dz_f = dz_impulse;
   a.t_s_leap = (planner_config.t_s_max - planner_config.t_s_min) *
@@ -782,7 +793,9 @@ bool isValidAction(const Action &a, const PlannerConfig &planner_config) {
   grf_0 = a.grf_0;
   grf_f = a.grf_f;
 
+  //std::cout << "a.t_f: " << a.t_f << std::endl; // This is always 0 for even terrain with flight phase???
   if (a.t_f == 0) {
+    //std::cout << "No flight..." << std::endl;
     grf_0[2] = 1.0;
     grf_f[2] = 1.0;
   }

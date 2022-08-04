@@ -184,6 +184,7 @@ std::vector<double> centralDiff(std::vector<double> data, double dt) {
 
 std::vector<double> unwrap(std::vector<double> data) {
   std::vector<double> data_unwrapped = data;
+  //std::cout << "M_PI: " << M_PI << std::endl; // Output: 3.14
   for (int i = 1; i < data.size(); i++) {
     double diff = data[i] - data[i - 1];
     if (diff > M_PI) {

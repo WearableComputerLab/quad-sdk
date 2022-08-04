@@ -32,6 +32,8 @@ State PlannerClass::randomState(const PlannerConfig &planner_config) {
   q.pos[0] = (x_max - x_min) * (double)rand() / RAND_MAX + x_min;
   q.pos[1] = (y_max - y_min) * (double)rand() / RAND_MAX + y_min;
   q.pos[2] = planner_config.h_nom + getTerrainZFromState(q, planner_config);
+  //std::cout << "rand q.pos[0] or x: " << q.pos[0] << std::endl;
+  //std::cout << "rand q.pos[1] or y: " << q.pos[1] << std::endl;
 
   double phi = (2.0 * M_PI) * (double)rand() / RAND_MAX;
   double v = (*vel_distribution_)(generator);
@@ -48,11 +50,16 @@ std::vector<int> PlannerClass::neighborhoodN(State q, int N) const {
       closest;
 
   std::unordered_map<int, State>::const_iterator itr;
+  //std::cout << "unordered_map<int, State> vertices size: " << vertices.size() << std::endl;
   for (itr = vertices.begin(); itr != vertices.end(); itr++) {
+    //std::cout << "itr->first: " << itr->first << std::endl;
     closest.push(std::make_pair(stateDistance(q, itr->second), itr->first));
   }
 
-  if (N > closest.size()) N = closest.size();
+  if (N > closest.size()){
+    N = closest.size();
+    std::cout << "PUSHED MORE THAN N...!!!!!!!!!!!!" << std::endl;
+  } 
   std::vector<int> neighbors;
   for (int i = 0; i < N; i++) {
     neighbors.push_back(closest.top().second);

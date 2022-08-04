@@ -64,7 +64,7 @@ GlobalBodyPlanner::GlobalBodyPlanner(ros::NodeHandle nh) {
 
   // Zero planning data
   start_index_ = 0;
-  triggerReset();
+  triggerReset(); // Sets to Reset mode
 }
 
 void GlobalBodyPlanner::terrainMapCallback(
@@ -121,20 +121,30 @@ void GlobalBodyPlanner::goalStateCallback(
   // immediately update plan
   if (current_plan_.getDuration() <=
       (ros::Time::now() - current_plan_.getPublishedTimestamp()).toSec()) {
+    
+    std::cout << "current_plan_.getDuration(): " << current_plan_.getDuration() << std::endl;
+    std::cout << "ros::Time::now() - current_plan_.getPublishedTimeStamp(): " << 
+        (ros::Time::now() - current_plan_.getPublishedTimestamp()).toSec() << std::endl;
     triggerReset();
   }
 }
 
 void GlobalBodyPlanner::setStartState() {
   // Reset if too far from plan
+  // std::cout << "Publish after reset delay_ " << publish_after_reset_delay_ << std::endl; // Initially weird pos number
   if (!current_plan_.isEmpty() && !publish_after_reset_delay_) {
+    //std::cout << "Plan not empty and publish after reset delay" << std::endl; // First run does not go through here
     int current_index;
     double first_element_duration;
     quad_utils::getPlanIndex(current_plan_.getPublishedTimestamp(), dt_,
                              current_index, first_element_duration);
+    //std::cout << "Current plan size if not empty etc.: " << current_plan_.getSize() << std::endl;
     current_index = std::min(current_index, current_plan_.getSize() - 1);
     FullState current_state_in_plan_ =
         current_plan_.getStateFromIndex(current_index);
+    //std::cout << "Current state in plan xyz:\n" << current_state_in_plan_.pos << std::endl;
+    //std::cout << "Robot State xyz:\n" << robot_state_.pos << std::endl; // Robot state updates somewhere... robotStateCallback which is published from state estimator plugin...
+    //std::cout << "Euclidean Pos Distance: " << poseDistance(robot_state_, current_state_in_plan_) << std::endl;
     if (poseDistance(robot_state_, current_state_in_plan_) >
         pos_error_threshold_) {
       ROS_WARN_THROTTLE(0.5, "Too far from nominal plan, resetting");
@@ -142,6 +152,7 @@ void GlobalBodyPlanner::setStartState() {
     }
   }
 
+  //std::cout << "planner_status: " << planner_status_ << std::endl; // In RESET mode from triggerReset() from initializing class
   if (planner_status_ == RESET) {
     ROS_INFO_THROTTLE(2, "In reset mode");
     start_state_ = robot_state_;
@@ -170,7 +181,7 @@ void GlobalBodyPlanner::setStartState() {
     }
 
     start_state_ = current_plan_.getStateFromIndex(start_index_);
-    replan_start_time_ = current_plan_.getTime(start_index_);
+    replan_start_time_ = current_plan_.getTime(start_index_); // Set replan_start_time_ here...
 
   } else {
     ROS_ERROR("Invalid planning status");
@@ -180,8 +191,11 @@ void GlobalBodyPlanner::setStartState() {
 void GlobalBodyPlanner::setGoalState() {}
 
 bool GlobalBodyPlanner::callPlanner() {
+  //std::cout << "replanning allowed: " << replanning_allowed_ << std::endl; // Default true... setting false still works
+  //std::cout << "publish_after_reset_delay_: " << publish_after_reset_delay_ << std::endl; // 1 until finds plan, then 0
   if (!replanning_allowed_ && !publish_after_reset_delay_) {
     newest_plan_.setComputedTimestamp(ros::Time::now());
+    //std::cout << "Replanning not allowed and cannot publish after reset delay..." << std::endl; // when replanning allowed set false... goes here forever
     return false;
   }
 
@@ -207,6 +221,7 @@ bool GlobalBodyPlanner::callPlanner() {
   GBPL gbpl;
 
   // Loop through num_calls_ planner calls
+  //std::cout << "num_calls_: " << num_calls_ << std::endl; // num calls gets called more than once (num_calls_ = 1)
   for (int i = 0; i < num_calls_; ++i) {
     // Exit if ros is down
     if (!ros::ok()) {
@@ -255,9 +270,17 @@ bool GlobalBodyPlanner::callPlanner() {
     vertices_generated_info_.push_back(vertices_generated);
 
     newest_plan_.eraseAfterIndex(start_index_);
+    //std::cout << "replan_start_time_: " << replan_start_time_ << std::endl; // Q: replan_start_time_ is initialized to 0 in reset mode, so how does it get current time
+    // While in reset mode, replan_start_time_ is 0... but then it changes to refine mode -> publish
+    // Happens bc publish_after_reset_delay_ is set to true in setStartState (does not quite work out but for now that is acceptable explanation)
+
+    // Refine is when replan_start_time is assigned to starting of plan time
     newest_plan_.loadPlanData(plan_status, start_state_, dist_to_goal,
                               state_sequence, action_sequence, dt_,
                               replan_start_time_, planner_config_);
+
+    //std::cout << "In callPlanner... replan_start_time_: " << replan_start_time_ << std::endl;
+    //std::cout << "plan_status: " << plan_status << std::endl;
 
     // Check if this plan is better:
     // 1) If valid and shorter or previous plan not valid OR
@@ -282,6 +305,10 @@ bool GlobalBodyPlanner::callPlanner() {
     if (is_updated) {
       state_sequence_ = state_sequence;
       action_sequence_ = action_sequence;
+      std::cout << "action_sequence length updated: " << action_sequence_.size() << std::endl;
+      std::cout << "state_sequence length updated: " << state_sequence_.size() << std::endl;
+      std::cout << "Action sequence index 0: \n" << action_sequence_.at(0).grf_0 << std::endl;
+      std::cout << "Action sequence at end index: \n" << action_sequence_.back().grf_0 << std::endl;
 
       std::cout << "Solve time: " << plan_time << " s" << std::endl;
       std::cout << "Vertices generated: " << vertices_generated << std::endl;
@@ -290,6 +317,7 @@ bool GlobalBodyPlanner::callPlanner() {
       std::cout << std::endl;
 
       current_plan_ = newest_plan_;
+      std::cout << "Size of plan: " << current_plan_.getSize() << std::endl;
     }
 
     return is_updated;
@@ -351,18 +379,21 @@ void GlobalBodyPlanner::publishCurrentPlan() {
 
   // Check conditions 1) and 2) return if false
   if (current_plan_.isEmpty() ||
-      ((ros::Time::now() - reset_time_).toSec() <= reset_publish_delay_))
+      ((ros::Time::now() - reset_time_).toSec() <= reset_publish_delay_)){
+    //std::cout << "Current plan empty or reset publish delay has passed..." << std::endl; // Plan is empty first so not publish
     return;
+  }
 
   // Check condition 3
   if (publish_after_reset_delay_ || newest_plan_ == current_plan_) {
     // If this is a reset, update the timestamp and switch back to refinement
     // mode
+    //std::cout << "In condition 3..." << std::endl; // Gets here after getting a plan
     if (publish_after_reset_delay_) {
       ROS_INFO("Switching to refinement mode");
       current_plan_.setPublishedTimestamp(ros::Time::now());
       planner_status_ = REFINE;
-      publish_after_reset_delay_ = false;
+      publish_after_reset_delay_ = false; // Refining -> pub after reset delay false
     }
 
     // Declare the messages for interpolated body plan and discrete states,
@@ -383,7 +414,7 @@ void GlobalBodyPlanner::publishCurrentPlan() {
     current_plan_.convertToMsg(robot_plan_msg, discrete_robot_plan_msg);
 
     // Publish both messages
-    body_plan_pub_.publish(robot_plan_msg);
+    body_plan_pub_.publish(robot_plan_msg); // PUBLISH BODY PLAN TO MSG HERE... ALREADY INTERPOLATED HERE IT SEEMS
     discrete_body_plan_pub_.publish(discrete_robot_plan_msg);
 
     ROS_WARN("New plan published, stamp = %f",
@@ -395,11 +426,14 @@ void GlobalBodyPlanner::spin() {
   ros::Rate r(update_rate_);
 
   // Wait until we get map and state data
+  //std::cout << "Waiting for data" << std::endl;
   waitForData();
+  //std::cout << "Done waiting..." << std::endl;
 
   // Enter main spin
   while (ros::ok()) {
     // Process callbacks
+    //std::cout << "Spinning" << std::endl;
     ros::spinOnce();
 
     // Set the start and goal states
@@ -411,7 +445,7 @@ void GlobalBodyPlanner::spin() {
 
     // Publish the results if valid
     publishCurrentPlan();
-
+    //std::cout << "in global plan" << std::endl;
     r.sleep();
   }
 }

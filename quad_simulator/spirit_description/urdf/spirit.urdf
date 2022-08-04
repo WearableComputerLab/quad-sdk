@@ -44,6 +44,11 @@ SOFTWARE.
     <color rgba="0.937 0.2 0.251 1.0"/>
   </material>
   <!-- Body -->
+  <link name="base"/>
+  <joint name="base_body_joint" type="fixed">
+    <parent link="base"/>
+    <child link="body"/>
+  </joint>
   <link name="body">
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -979,4 +984,3 @@ SOFTWARE.
   </joint>
   
 </robot>
-

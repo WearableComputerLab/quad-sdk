@@ -20,6 +20,7 @@ int GBPL::connect(PlannerClass &T, State s, const PlannerConfig &planner_config,
     T.addVertex(s_new_index, result.s_new);
     T.addEdge(s_near_index, s_new_index, result.length);
     T.addAction(s_new_index, result.a_new);
+    //std::cout << "Connecting..." << std::endl;
 
 #ifdef VISUALIZE_TREE
     publishStateActionPair(s_near, result.a_new, s, planner_config,
@@ -120,12 +121,14 @@ void GBPL::extractPath(PlannerClass &Ta, PlannerClass &Tb,
                        const PlannerConfig &planner_config) {
   // Get both paths, remove the back of path_b and reverse it to align with path
   // a
+  //std::cout << "In extractPath..." << std::endl;
   std::vector<int> path_a = pathFromStart(Ta, Ta.getNumVertices() - 1);
   std::vector<int> path_b = pathFromStart(Tb, Tb.getNumVertices() - 1);
 
   std::reverse(path_b.begin(), path_b.end());
   std::vector<Action> action_sequence_b = getActionSequenceReverse(Tb, path_b);
   for (int i = 0; i < action_sequence_b.size(); i++) {
+    //std::cout << "i: " << i  << std::endl; // i: [0, 1] mostly for flat terrain... so flipping might make action sequence 2-4
     flipDirection(action_sequence_b[i]);
   }
   path_b.erase(path_b.begin());
@@ -223,6 +226,7 @@ int GBPL::findPlan(const PlannerConfig &planner_config, State s_start,
 
     // Generate random s
     State s_rand = Ta.randomState(planner_config);
+    //std::cout << "Outside s_rand: " << s_rand.pos[0] << std::endl;
 
     if (isValidState(s_rand, planner_config, LEAP_STANCE)) {
       if (extend(Ta, s_rand, planner_config, FORWARD, tree_pub) != TRAPPED) {
@@ -238,6 +242,7 @@ int GBPL::findPlan(const PlannerConfig &planner_config, State s_start,
 
         if (connect(Tb, s_new, planner_config, FORWARD, tree_pub) == REACHED) {
           goal_found = true;
+          //std::cout << "Goal Found" << std::endl; // Repeatedly saying goal found... is this not the final goal?? or it only needs to find w/in specific time
 
           auto t_end = std::chrono::steady_clock::now();
           elapsed_to_first_ = t_end - t_start_total_solve;
@@ -276,6 +281,7 @@ int GBPL::findPlan(const PlannerConfig &planner_config, State s_start,
   }
 
   num_vertices_ = (Ta.getNumVertices() + Tb.getNumVertices());
+  //std::cout << "Num Vertices total: " << num_vertices_ << std::endl; // 4 for flat plane... Ta start end, Tb start end, connect
 
   if (goal_found == true) {
     extractPath(Ta, Tb, state_sequence, action_sequence, planner_config);
@@ -285,12 +291,17 @@ int GBPL::findPlan(const PlannerConfig &planner_config, State s_start,
                        planner_config);
     result = (state_sequence.size() > 1) ? VALID_PARTIAL : UNSOLVED;
   }
+  //std::cout << "state_sequence size: " << state_sequence.size() << std::endl; // Around 2 for flat terrain
+  //std::cout << "action_sequence size: " << action_sequence.size() << std::endl; // Around 1 for flat terrain
 
   auto t_end = std::chrono::steady_clock::now();
   elapsed_total_ = t_end - t_start_total_solve;
 
   path_duration_ = 0.0;
+  int counter = 0;
   for (Action a : action_sequence) {
+    //counter = counter + 1;
+    //std::cout << "For action sequence..." << counter << std::endl; // 1 loop for flat terrain
     path_duration_ += (a.t_s_leap + a.t_f + a.t_s_land);
   }
   dist_to_goal_ = poseDistance(s_goal, state_sequence.back());
