@@ -2,14 +2,14 @@
 <robot>
     <!-- ros_control plugin -->
     <gazebo>
-        <!--<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-            <robotNamespace>/go1</robotNamespace>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/robot_1</robotNamespace>
             <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-        </plugin>-->
+        </plugin>
 
-        <!-- <plugin filename="libground_truth_estimator.so" name="ground_truth_estimator">
+        <plugin filename="libground_truth_estimator.so" name="ground_truth_estimator">
             <updateRateHZ>500.0</updateRateHZ>
-        </plugin> -->
+        </plugin>
     </gazebo>
 
     <!-- Show the trajectory of trunk center. -->
@@ -220,6 +220,7 @@
         </sensor>
     </gazebo> -->
 
+    <!-- Bumper plugin for contact sensors -->
     <!-- Make a macro for this later (low priority) -->
     <gazebo reference="toe0">
         <sensor name="toe0_contact" type="contact">
@@ -314,7 +315,7 @@
     </gazebo> -->
 
     <gazebo reference="body">
-        <material>Gazebo/Grey</material>
+        <material>Gazebo/White</material>
         <turnGravityOff>false</turnGravityOff>
     </gazebo>
 

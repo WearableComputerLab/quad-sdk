@@ -33,13 +33,13 @@
   </material>
   <!-- ros_control plugin -->
   <gazebo>
-    <!--<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-            <robotNamespace>/go1</robotNamespace>
-            <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-        </plugin>-->
-    <!-- <plugin filename="libground_truth_estimator.so" name="ground_truth_estimator">
-            <updateRateHZ>500.0</updateRateHZ>
-        </plugin> -->
+    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+      <robotNamespace>/robot_1</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+    <plugin filename="libground_truth_estimator.so" name="ground_truth_estimator">
+      <updateRateHZ>500.0</updateRateHZ>
+    </plugin>
   </gazebo>
   <!-- Show the trajectory of trunk center. -->
   <!-- <gazebo>
@@ -237,6 +237,7 @@
         </contact>
         </sensor>
     </gazebo> -->
+  <!-- Bumper plugin for contact sensors -->
   <!-- Make a macro for this later (low priority) -->
   <gazebo reference="toe0">
     <sensor name="toe0_contact" type="contact">
@@ -324,7 +325,7 @@
         </visual>
     </gazebo> -->
   <gazebo reference="body">
-    <material>Gazebo/Grey</material>
+    <material>Gazebo/White</material>
     <turnGravityOff>false</turnGravityOff>
   </gazebo>
   <gazebo reference="trunk">
@@ -608,7 +609,7 @@
   <!-- Upper leg joint -->
   <joint name="0" type="revolute">
     <!-- <origin rpy="0 ${PI/2} 0" xyz="0 ${thigh_offset*mirror} 0"/> -->
-    <origin rpy="0 0 0" xyz="0 0.08 0"/>
+    <origin rpy="0 1.57079632679 0" xyz="0 0.08 0"/>
     <parent link="hip0"/>
     <child link="upper0"/>
     <axis xyz="0 1 0"/>
@@ -626,6 +627,7 @@
     </visual>
     <collision name="lower0_collision">
       <origin rpy="0 1.57079632679 0" xyz="0 0 -0.1065"/>
+      <!-- origin rpy="0 ${PI/2.0} 0" xyz="0 0 ${-calf_length/2.0}"/ -->
       <geometry>
         <box size="0.213 0.016 0.016"/>
       </geometry>
@@ -633,18 +635,19 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0.006286 0.001307 -0.122269"/>
       <mass value="0.131"/>
+      <!-- ${calf_mass} -->
       <inertia ixx="0.002939186297" ixy="1.440899e-06" ixz="-0.00010535955" iyy="0.00295576935" iyz="-2.4397752e-05" izz="3.0273372e-05"/>
     </inertial>
   </link>
   <!-- Lower leg joint -->
   <joint name="1" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper0"/>
     <child link="lower0"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-6.28318530718" upper="-6.28318530718" velocity="30.1"/>
+    <limit effort="23.7" lower="-6.28318530718" upper="6.28318530718" velocity="30.1"/>
   </joint>
   <!-- Toe/Foot -->
   <link name="toe0">
@@ -801,7 +804,7 @@
   <!-- Upper leg joint -->
   <joint name="2" type="revolute">
     <!-- <origin rpy="0 ${PI/2} 0" xyz="0 ${thigh_offset*mirror} 0"/> -->
-    <origin rpy="0 0 0" xyz="0 0.08 0"/>
+    <origin rpy="0 1.57079632679 0" xyz="0 0.08 0"/>
     <parent link="hip1"/>
     <child link="upper1"/>
     <axis xyz="0 1 0"/>
@@ -819,6 +822,7 @@
     </visual>
     <collision name="lower1_collision">
       <origin rpy="0 1.57079632679 0" xyz="0 0 -0.1065"/>
+      <!-- origin rpy="0 ${PI/2.0} 0" xyz="0 0 ${-calf_length/2.0}"/ -->
       <geometry>
         <box size="0.213 0.016 0.016"/>
       </geometry>
@@ -826,18 +830,19 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0.006286 0.001307 -0.122269"/>
       <mass value="0.131"/>
+      <!-- ${calf_mass} -->
       <inertia ixx="0.002939186297" ixy="1.440899e-06" ixz="-0.00010535955" iyy="0.00295576935" iyz="-2.4397752e-05" izz="3.0273372e-05"/>
     </inertial>
   </link>
   <!-- Lower leg joint -->
   <joint name="3" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper1"/>
     <child link="lower1"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-6.28318530718" upper="-6.28318530718" velocity="30.1"/>
+    <limit effort="23.7" lower="-6.28318530718" upper="6.28318530718" velocity="30.1"/>
   </joint>
   <!-- Toe/Foot -->
   <link name="toe1">
@@ -994,7 +999,7 @@
   <!-- Upper leg joint -->
   <joint name="4" type="revolute">
     <!-- <origin rpy="0 ${PI/2} 0" xyz="0 ${thigh_offset*mirror} 0"/> -->
-    <origin rpy="0 0 0" xyz="0 -0.08 0"/>
+    <origin rpy="0 1.57079632679 0" xyz="0 -0.08 0"/>
     <parent link="hip2"/>
     <child link="upper2"/>
     <axis xyz="0 1 0"/>
@@ -1012,6 +1017,7 @@
     </visual>
     <collision name="lower2_collision">
       <origin rpy="0 1.57079632679 0" xyz="0 0 -0.1065"/>
+      <!-- origin rpy="0 ${PI/2.0} 0" xyz="0 0 ${-calf_length/2.0}"/ -->
       <geometry>
         <box size="0.213 0.016 0.016"/>
       </geometry>
@@ -1019,18 +1025,19 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0.006286 0.001307 -0.122269"/>
       <mass value="0.131"/>
+      <!-- ${calf_mass} -->
       <inertia ixx="0.002939186297" ixy="1.440899e-06" ixz="-0.00010535955" iyy="0.00295576935" iyz="-2.4397752e-05" izz="3.0273372e-05"/>
     </inertial>
   </link>
   <!-- Lower leg joint -->
   <joint name="5" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper2"/>
     <child link="lower2"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-6.28318530718" upper="-6.28318530718" velocity="30.1"/>
+    <limit effort="23.7" lower="-6.28318530718" upper="6.28318530718" velocity="30.1"/>
   </joint>
   <!-- Toe/Foot -->
   <link name="toe2">
@@ -1187,7 +1194,7 @@
   <!-- Upper leg joint -->
   <joint name="6" type="revolute">
     <!-- <origin rpy="0 ${PI/2} 0" xyz="0 ${thigh_offset*mirror} 0"/> -->
-    <origin rpy="0 0 0" xyz="0 -0.08 0"/>
+    <origin rpy="0 1.57079632679 0" xyz="0 -0.08 0"/>
     <parent link="hip3"/>
     <child link="upper3"/>
     <axis xyz="0 1 0"/>
@@ -1205,6 +1212,7 @@
     </visual>
     <collision name="lower3_collision">
       <origin rpy="0 1.57079632679 0" xyz="0 0 -0.1065"/>
+      <!-- origin rpy="0 ${PI/2.0} 0" xyz="0 0 ${-calf_length/2.0}"/ -->
       <geometry>
         <box size="0.213 0.016 0.016"/>
       </geometry>
@@ -1212,18 +1220,19 @@
     <inertial>
       <origin rpy="0 0 0" xyz="0.006286 0.001307 -0.122269"/>
       <mass value="0.131"/>
+      <!-- ${calf_mass} -->
       <inertia ixx="0.002939186297" ixy="1.440899e-06" ixz="-0.00010535955" iyy="0.00295576935" iyz="-2.4397752e-05" izz="3.0273372e-05"/>
     </inertial>
   </link>
   <!-- Lower leg joint -->
   <joint name="7" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 0 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper3"/>
     <child link="lower3"/>
     <axis xyz="0 1 0"/>
     <dynamics damping="0.01" friction="0.2"/>
-    <limit effort="23.7" lower="-6.28318530718" upper="-6.28318530718" velocity="30.1"/>
+    <limit effort="23.7" lower="-6.28318530718" upper="6.28318530718" velocity="30.1"/>
   </joint>
   <!-- Toe/Foot -->
   <link name="toe3">

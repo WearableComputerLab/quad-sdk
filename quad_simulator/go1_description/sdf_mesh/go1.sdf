@@ -162,7 +162,7 @@
         </geometry>
         <material>
           <script>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/White</name>
             <uri>file://media/materials/scripts/gazebo.material</uri>
           </script>
         </material>
@@ -177,7 +177,7 @@
         </geometry>
         <material>
           <script>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/White</name>
             <uri>file://media/materials/scripts/gazebo.material</uri>
           </script>
         </material>
@@ -599,7 +599,7 @@
       </axis>
     </joint>
     <link name='upper2'>
-      <pose frame=''>0.1881 -0.12675 0 0 -0 0</pose>
+      <pose frame=''>0.1881 -0.12675 0 3.14159 1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>-0.003468 0.018947 -0.032736 0 -0 0</pose>
         <mass>0.92</mass>
@@ -674,7 +674,7 @@
       </axis>
     </joint>
     <link name='lower2'>
-      <pose frame=''>0.1881 -0.12675 -0.213 0 -0 0</pose>
+      <pose frame=''>-0.0249 -0.12675 -0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0.006286 0.001307 -0.122269 0 -0 0</pose>
         <mass>0.131</mass>
@@ -732,7 +732,7 @@
         <xyz>0 1 0</xyz>
         <limit>
           <lower>-6.28319</lower>
-          <upper>-6.28319</upper>
+          <upper>6.28319</upper>
           <effort>23.7</effort>
           <velocity>30.1</velocity>
         </limit>
@@ -746,7 +746,7 @@
       </axis>
     </joint>
     <link name='toe2'>
-      <pose frame=''>0.1881 -0.12675 -0.426 0 -0 0</pose>
+      <pose frame=''>0.1881 -0.12675 0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <mass>0.06</mass>
@@ -910,7 +910,7 @@
       </axis>
     </joint>
     <link name='upper3'>
-      <pose frame=''>-0.1881 -0.12675 0 0 -0 0</pose>
+      <pose frame=''>-0.1881 -0.12675 0 3.14159 1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>-0.003468 0.018947 -0.032736 0 -0 0</pose>
         <mass>0.92</mass>
@@ -985,7 +985,7 @@
       </axis>
     </joint>
     <link name='lower3'>
-      <pose frame=''>-0.1881 -0.12675 -0.213 0 -0 0</pose>
+      <pose frame=''>-0.4011 -0.12675 -0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0.006286 0.001307 -0.122269 0 -0 0</pose>
         <mass>0.131</mass>
@@ -1043,7 +1043,7 @@
         <xyz>0 1 0</xyz>
         <limit>
           <lower>-6.28319</lower>
-          <upper>-6.28319</upper>
+          <upper>6.28319</upper>
           <effort>23.7</effort>
           <velocity>30.1</velocity>
         </limit>
@@ -1057,7 +1057,7 @@
       </axis>
     </joint>
     <link name='toe3'>
-      <pose frame=''>-0.1881 -0.12675 -0.426 0 -0 0</pose>
+      <pose frame=''>-0.1881 -0.12675 0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <mass>0.06</mass>
@@ -1221,7 +1221,7 @@
       </axis>
     </joint>
     <link name='upper0'>
-      <pose frame=''>0.1881 0.12675 0 0 -0 0</pose>
+      <pose frame=''>0.1881 0.12675 0 3.14159 1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>-0.003468 -0.018947 -0.032736 0 -0 0</pose>
         <mass>0.92</mass>
@@ -1296,7 +1296,7 @@
       </axis>
     </joint>
     <link name='lower0'>
-      <pose frame=''>0.1881 0.12675 -0.213 0 -0 0</pose>
+      <pose frame=''>-0.0249 0.12675 -0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0.006286 0.001307 -0.122269 0 -0 0</pose>
         <mass>0.131</mass>
@@ -1354,7 +1354,7 @@
         <xyz>0 1 0</xyz>
         <limit>
           <lower>-6.28319</lower>
-          <upper>-6.28319</upper>
+          <upper>6.28319</upper>
           <effort>23.7</effort>
           <velocity>30.1</velocity>
         </limit>
@@ -1368,7 +1368,7 @@
       </axis>
     </joint>
     <link name='toe0'>
-      <pose frame=''>0.1881 0.12675 -0.426 0 -0 0</pose>
+      <pose frame=''>0.1881 0.12675 0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <mass>0.06</mass>
@@ -1532,7 +1532,7 @@
       </axis>
     </joint>
     <link name='upper1'>
-      <pose frame=''>-0.1881 0.12675 0 0 -0 0</pose>
+      <pose frame=''>-0.1881 0.12675 0 3.14159 1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>-0.003468 -0.018947 -0.032736 0 -0 0</pose>
         <mass>0.92</mass>
@@ -1607,7 +1607,7 @@
       </axis>
     </joint>
     <link name='lower1'>
-      <pose frame=''>-0.1881 0.12675 -0.213 0 -0 0</pose>
+      <pose frame=''>-0.4011 0.12675 -0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0.006286 0.001307 -0.122269 0 -0 0</pose>
         <mass>0.131</mass>
@@ -1665,7 +1665,7 @@
         <xyz>0 1 0</xyz>
         <limit>
           <lower>-6.28319</lower>
-          <upper>-6.28319</upper>
+          <upper>6.28319</upper>
           <effort>23.7</effort>
           <velocity>30.1</velocity>
         </limit>
@@ -1679,7 +1679,7 @@
       </axis>
     </joint>
     <link name='toe1'>
-      <pose frame=''>-0.1881 0.12675 -0.426 0 -0 0</pose>
+      <pose frame=''>-0.1881 0.12675 0 3.14159 -1.57079 3.14159</pose>
       <inertial>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <mass>0.06</mass>
@@ -1770,6 +1770,13 @@
         </ode>
       </physics>
     </joint>
+    <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
+      <robotNamespace>/robot_1</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+    <plugin name='ground_truth_estimator' filename='libground_truth_estimator.so'>
+      <updateRateHZ>500.0</updateRateHZ>
+    </plugin>
     <static>0</static>
     <plugin name='gazebo_ros_force' filename='libgazebo_ros_force.so'>
       <topicName>/apply_force/trunk</topicName>
