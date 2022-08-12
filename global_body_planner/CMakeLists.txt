@@ -56,7 +56,9 @@ set(MY_LIB_SOURCES
   src/graph_class.cpp
   src/planner_class.cpp
   src/rrt.cpp
-  src/gbpl.cpp)
+  src/gbpl.cpp
+  # AZ Added
+  src/global_body_planner_publisher.cpp)
 
 # Declare a C++ library
 add_library(${PROJECT_NAME}
@@ -72,13 +74,20 @@ add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EX
 # With catkin_make all packages are built within a single CMake context
 # The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/global_body_planner_node.cpp)
+add_executable(${PROJECT_NAME}_publisher_node src/global_body_planner_publisher_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_publisher_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(${PROJECT_NAME}_publisher_node
   ${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
