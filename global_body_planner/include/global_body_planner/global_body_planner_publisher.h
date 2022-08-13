@@ -147,7 +147,8 @@ class GlobalBodyPlannerPublisher {
     /// Planning status ID for refining (optimize current plan) // I don't think we need the status id but for framework we do
     static const int REFINE = 1;
 
-    void printHelloWorld();
+    /// Determines if there is initial plan published
+    bool published_plan;
 };
 
 #endif // GLOBAL_BODY_PLANNER_PUBLISHER_H

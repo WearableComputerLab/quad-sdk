@@ -1,5 +1,8 @@
 #include "global_body_planner/global_body_planner_publisher.h"
 
+
+int num_calls;
+
 GlobalBodyPlannerPublisher::GlobalBodyPlannerPublisher(ros::NodeHandle nh){
     ROS_INFO("Successfully initialized object GlobalBodyPlannerPublisher");
     nh_ = nh;
@@ -70,6 +73,8 @@ GlobalBodyPlannerPublisher::GlobalBodyPlannerPublisher(ros::NodeHandle nh){
     goal_state_vec.resize(12, 0);
     vectorToFullState(goal_state_vec, goal_state_);
 
+    // Set plan to not be found
+    published_plan = false;
 }
 
 
@@ -94,8 +99,24 @@ void GlobalBodyPlannerPublisher::robotStateCallback(const quad_msgs::RobotState:
     eigenToFullState(quad_utils::bodyStateMsgToEigen(msg->body), robot_state_);
 }
 
-void GlobalBodyPlannerPublisher::printHelloWorld(){
-    std::cout << "Hello World from global_body_planner_publisher.h" << std::endl;
+
+void GlobalBodyPlannerPublisher::waitForData() {
+    // Spin until terrain map message has been received and processed
+    boost::shared_ptr<grid_map_msgs::GridMap const> shared_map;
+    while ((shared_map == nullptr) && ros::ok()) {
+        shared_map = ros::topic::waitForMessage<grid_map_msgs::GridMap>(
+            terrain_map_topic_, nh_);
+        ros::spinOnce();
+    }
+
+    boost::shared_ptr<quad_msgs::RobotState const> shared_robot_state;
+    while ((shared_robot_state == nullptr) && ros::ok()) {
+        shared_robot_state = ros::topic::waitForMessage<quad_msgs::RobotState>(
+            robot_state_topic_, nh_);
+        ros::spinOnce();
+    }
+    ROS_INFO("GBP has state and map information");
+    // reset_time_ = ros::Time::now(); // Don't think I need this variable
 }
 
 bool GlobalBodyPlannerPublisher::callPlanner() {
@@ -122,7 +143,7 @@ bool GlobalBodyPlannerPublisher::callPlanner() {
     Action a_hold;
     a_hold.grf_0 = hold_grf_0;
     a_hold.grf_f = hold_grf_f;
-    a_hold.t_s_leap = 12.3925;
+    a_hold.t_s_leap = 12.3925; //12.3925; Try 15.0
     a_hold.t_f = 0.0;
     a_hold.t_s_land = 0.0;
     a_hold.dz_0 = 0.0;
@@ -140,15 +161,17 @@ bool GlobalBodyPlannerPublisher::callPlanner() {
 
     // Get additional variables for loadPlanData
     double dist_to_goal_ = poseDistance(start_state, goal_state);
-    int plan_status = VALID; // VALID := 1
-    replan_start_time_ = 0;// Start time may need to be gotten from setComputedTimestamp
+    int plan_status = VALID; // VALID := 1 to justify plan is valid
+    replan_start_time_ = 0;// Start time may need to be gotten from setComputedTimestamp... do I need this..? maybe
 
     ros::Time plan_start_timestamp_ = ros::Time::now();
 
-    FullState start_state_ = stateToFullState(start_state, 0, 0, 0, 0, 0, 0);
+    FullState start_state_ = stateToFullState(start_state, 0, 0, 0, 0, 0, 0); // Convert start state to FullState datatype
 
     // Set up Global Body Plan
-    plan_.setComputedTimestamp(plan_start_timestamp_); // eraseAfterIndex useful if need to replan
+    // std::cout << "Computed timestamp: " << plan_start_timestamp_.toSec() << std::endl;
+    // Don't think computedTimestamp is useful... only used as a way to compare if planner is equal to another?
+    plan_.setComputedTimestamp(plan_start_timestamp_); // eraseAfterIndex(int n) useful if need to replan
     plan_.loadPlanData(plan_status, start_state_, dist_to_goal_, state_sequence, action_sequence, dt_, replan_start_time_, planner_config_);
 
 
@@ -156,78 +179,62 @@ bool GlobalBodyPlannerPublisher::callPlanner() {
 }
 
 void GlobalBodyPlannerPublisher::publishPlan() {
-    // Declare the messages sfor interpolated body plan and discrete states,
+    // Declare the messages for interpolated body plan and discrete states,
     // initialize their headers
     quad_msgs::RobotPlan robot_plan_msg;
     quad_msgs::RobotPlan discrete_robot_plan_msg;
 
     robot_plan_msg.header.frame_id = map_frame_;
-    robot_plan_msg.header.stamp = ros::Time::now();
+    robot_plan_msg.header.stamp = ros::Time::now(); // Initialize timestamp for msg
+    
+    // If first and only plan has not been published, set published timestamp for plan
+    if (!published_plan) {
+        // Initializing timestamp for your plan
+        plan_.setPublishedTimestamp(ros::Time::now());
+    }
+
 
     discrete_robot_plan_msg.header = robot_plan_msg.header;
 
-    // Initialize the headers and types
+
+    // Initialize the headers and types 
     robot_plan_msg.global_plan_timestamp = plan_.getPublishedTimestamp();
     discrete_robot_plan_msg.global_plan_timestamp = plan_.getPublishedTimestamp();
 
     // Load the plan into the messages
     plan_.convertToMsg(robot_plan_msg, discrete_robot_plan_msg);
-    
+
     // Publish both messages
     body_plan_pub_.publish(robot_plan_msg); // PUBLISH BODY PLAN TO MSG HERE... ALREADY INTERPOLATED HERE IT SEEMS
     discrete_body_plan_pub_.publish(discrete_robot_plan_msg);
 
-    ROS_WARN("New plan published, stamp = %f",
-             robot_plan_msg.global_plan_timestamp.toSec());
-}
-
-void GlobalBodyPlannerPublisher::waitForData() {
-    // Spin until terrain map message has been received and processed
-    boost::shared_ptr<grid_map_msgs::GridMap const> shared_map;
-    while ((shared_map == nullptr) && ros::ok()) {
-        shared_map = ros::topic::waitForMessage<grid_map_msgs::GridMap>(
-            terrain_map_topic_, nh_);
-        ros::spinOnce();
+    if(!published_plan){
+        ROS_WARN("First plan published, stamp = %f",
+        robot_plan_msg.global_plan_timestamp.toSec());
+        published_plan = true;
     }
-
-    boost::shared_ptr<quad_msgs::RobotState const> shared_robot_state;
-    while ((shared_robot_state == nullptr) && ros::ok()) {
-        shared_robot_state = ros::topic::waitForMessage<quad_msgs::RobotState>(
-            robot_state_topic_, nh_);
-        ros::spinOnce();
-    }
-    ROS_INFO("GBP has state and map information");
-    // reset_time_ = ros::Time::now(); // Don't think I need this variable
 }
 
 void GlobalBodyPlannerPublisher::spin() {
-    ros::Rate r(update_rate_);
+    // ros::Rate r(update_rate_);
+    ros::Rate r(1);
 
     // Wait until we get map and state data
     waitForData();
     // Hardcode call planner and publish plan
-    callPlanner();
     // Doesn't seem to work w/o doing spin.. may need a server
-    // publishPlan();
-    // ROS_INFO("Finished publishing plan...");
+    callPlanner();
+    //publishPlan();
     
     // Enter main spin
     
     while (ros::ok()) {
         // Process callbacks
+        
         ros::spinOnce();
-
-        // Set the start and goal states
-        // setStartState();
-        // setGoalState();
-
-        // Call the planner
-        //callPlanner();
-
-        // Publish the results if valid
         publishPlan();
-        ROS_INFO("Publishing plan...");
-
+        // ROS_INFO("Publishing plan...");
+        
         r.sleep();
     } 
 }

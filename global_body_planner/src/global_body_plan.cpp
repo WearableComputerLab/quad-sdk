@@ -57,6 +57,7 @@ void GlobalBodyPlan::loadPlanData(int plan_status, FullState &start_state,
   // Add the final state in case it was missed by interp (GRF is undefined
   // here so just copy the last element)
   t_plan_.push_back(t0);
+  // std::cout << "t_plan_[0]: " << t_plan_[0] << std::endl; // Also 0 for output
   length_plan_.push_back(
       length_plan_.back() +
       poseDistance(state_sequence.back(), interp_reduced_plan.back()));
@@ -78,6 +79,7 @@ void GlobalBodyPlan::addStateAndGRFToMsg(double t, int plan_index,
   // Represent each state as an Odometry message
   quad_msgs::RobotState state;
   //std::cout << "t: " << t << std::endl; // starts from 0... std::bad_alloc error if printing but whatever 
+  // std::cout << "msg.global_plan_timestamp: " << msg.global_plan_timestamp << std::endl;
   quad_utils::updateStateHeaders(state,
                                  msg.global_plan_timestamp + ros::Duration(t),
                                  msg.header.frame_id, plan_index);
