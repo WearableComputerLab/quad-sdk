@@ -171,7 +171,7 @@ class RobotDriver {
   ros::Publisher robot_state_pub_;
 
   // ROS publisher for state estimate
-  ros::Publisher trajectry_robot_state_pub_;
+  ros::Publisher trajectory_robot_state_pub_;
 
   /// ROS subscriber for remote heartbeat
   ros::Subscriber remote_heartbeat_sub_;

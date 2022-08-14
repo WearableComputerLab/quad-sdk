@@ -73,6 +73,7 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
   // ================ Testing Area =================
   //ROS_INFO("Single Joint Command!!!!!!!!!!!!!!!!! %s", single_joint_cmd_topic);
   std::cout << "Single Joint Command: " << single_joint_cmd_topic << std::endl;
+  std::cout << "robot_name: " << robot_name << std::endl;
   
   // Setup pubs and subs
   local_plan_sub_ =
@@ -93,7 +94,7 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
       nh_.advertise<quad_msgs::LegCommandArray>(leg_command_array_topic, 1);
   robot_heartbeat_pub_ =
       nh_.advertise<std_msgs::Header>(robot_heartbeat_topic, 1);
-  trajectry_robot_state_pub_ =
+  trajectory_robot_state_pub_ =
       nh_.advertise<quad_msgs::RobotState>(trajectory_state_topic, 1);
 
   // Set up pubs and subs dependent on robot layer
@@ -119,6 +120,7 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
   // Initialize hardware interface
   if (is_hardware_) {
     if (robot_name == "spirit") {
+      std::cout << "Interfacing with spirit HW Interface..." << std::endl;
       hardware_interface_ = std::make_shared<SpiritInterface>();
     } else {
       ROS_ERROR_STREAM("Invalid robot name " << robot_name
@@ -133,7 +135,9 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
   // Start sitting
   control_mode_ = SIT;
   remote_heartbeat_received_time_ = std::numeric_limits<double>::max();
-  last_state_time_ = std::numeric_limits<double>::max();
+
+  // std::cout << "remote_heartbeat_received_time_: " << remote_heartbeat_received_time_ << std::endl;
+  last_state_time_ = std::numeric_limits<double>::max(); // Why initialize to be max... makes no sense
 
   // Initialize timing
   last_robot_state_msg_.header.stamp = ros::Time::now();
@@ -152,8 +156,10 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
 
 void RobotDriver::initStateEstimator() {
   if (estimator_id_ == "comp_filter") {
+    std::cout << "Initializing comp_filter..." << std::endl;
     state_estimator_ = std::make_shared<CompFilterEstimator>();
   } else if (estimator_id_ == "ekf_filter") {
+    std::cout << "Initializing ekf_filter..." << std::endl;
     state_estimator_ = std::make_shared<EKFEstimator>();
   } else {
     ROS_ERROR_STREAM("Invalid estimator id " << estimator_id_
@@ -168,10 +174,12 @@ void RobotDriver::initStateEstimator() {
 
 void RobotDriver::initLegController() {
   if (controller_id_ == "inverse_dynamics") {
+    std::cout << "Initializing inverse dynamics controller!!" << std::endl;
     leg_controller_ = std::make_shared<InverseDynamicsController>();
   } else if (controller_id_ == "grf_pid") {
     leg_controller_ = std::make_shared<GrfPidController>();
   } else if (controller_id_ == "joint") {
+    std::cout << "Initializing joint controller!!" << std::endl;
     leg_controller_ = std::make_shared<JointController>();
   } else {
     ROS_ERROR_STREAM("Invalid controller id " << controller_id_
@@ -179,6 +187,7 @@ void RobotDriver::initLegController() {
     leg_controller_ = nullptr;
   }
   if (leg_controller_ != nullptr) {
+    // std::cout << "leg_controller_ is not a nullptr..." << std::endl;
     leg_controller_->init(stance_kp_, stance_kd_, swing_kp_, swing_kd_,
                           swing_kp_cart_, swing_kd_cart_);
   }
@@ -201,6 +210,7 @@ void RobotDriver::initStateControlStructs() {
 
 void RobotDriver::controlModeCallback(const std_msgs::UInt8::ConstPtr &msg) {
   // Wait if transitioning
+  std::cout << "In control mode callback" << std::endl; // Calls when publishing to topic..
   if ((control_mode_ == SIT_TO_READY) || (control_mode_ == READY_TO_SIT))
     return;
   if ((msg->data == READY) &&
@@ -354,6 +364,7 @@ bool RobotDriver::updateControl() {
   // Check if state machine should be skipped
   bool valid_cmd = true;
   if (leg_controller_->overrideStateMachine()) {
+    // std::cout << "State machine overridden..." << std::endl; // Overriden for joint controller
     valid_cmd = leg_controller_->computeLegCommandArray(
         last_robot_state_msg_, leg_command_array_msg_, grf_array_msg_);
     return valid_cmd;
@@ -419,8 +430,8 @@ bool RobotDriver::updateControl() {
               dynamic_cast<InverseDynamicsController *>(
                   leg_controller_.get())) { // get() is a std::shared_pointer member
         // Uncomment to publish trajectory reference state
-        // quad_msgs::RobotState ref_state_msg = p->getReferenceState();
-        // trajectry_robot_state_pub_.publish(ref_state_msg);
+        quad_msgs::RobotState ref_state_msg = p->getReferenceState();
+        trajectory_robot_state_pub_.publish(ref_state_msg);
       }
     }
   } 
@@ -491,13 +502,13 @@ bool RobotDriver::updateControl() {
                     .torque_ff -
                 knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub),
             -torque_limits_[j]);
-        std::cout << "knee motor command ff torque: " << leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).torque_ff << std::endl;
-        std::cout << "kd_ub(pos-pos_ub): " << knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
-        std::cout << "ff torque & additional terms: " << leg_command_array_msg_.leg_commands.at(i)
-                    .motor_commands.at(j)
-                    .torque_ff -
-                knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
-        std::cout << "Neg Torque limit of knee: " << -torque_limits_[j] << std::endl; // Torque limit of knee is 32
+        // std::cout << "knee motor command ff torque: " << leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).torque_ff << std::endl;
+        // std::cout << "kd_ub(pos-pos_ub): " << knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
+        // std::cout << "ff torque & additional terms: " << leg_command_array_msg_.leg_commands.at(i)
+        //            .motor_commands.at(j)
+        //            .torque_ff -
+        //        knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
+        // std::cout << "Neg Torque limit of knee: " << -torque_limits_[j] << std::endl; // Torque limit of knee is 32
       }
 
       quad_msgs::MotorCommand cmd =
