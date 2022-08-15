@@ -26,6 +26,8 @@ LocalPlanner::LocalPlanner(ros::NodeHandle nh)
   quad_utils::loadROSParam(nh_, "/map_frame", map_frame_);
   quad_utils::loadROSParam(nh_, "topics/control/mode", control_mode_topic);
 
+  // Print params
+  std::cout << "robot_name_: " << robot_name_ << std::endl;
   // Setup pubs and subs
   terrain_map_sub_ = nh_.subscribe(terrain_map_topic, 1,
                                    &LocalPlanner::terrainMapCallback, this);
@@ -115,6 +117,9 @@ void LocalPlanner::initLocalBodyPlanner() {
     type = SPIRIT;
   } else if (robot_name_ == "a1") {
     type = A1;
+  } else if (robot_name_ == "go1") {
+    type = A1; // A1 for now since will be too difficult to create own
+    std::cout << "robot_name is A1" << std::endl;
   } else {
     ROS_WARN("WRONG ROBOT TYPE");
   }
