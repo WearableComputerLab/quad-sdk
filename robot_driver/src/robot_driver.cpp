@@ -412,6 +412,7 @@ bool RobotDriver::updateControl() {
     }
   } 
   else if (control_mode_ == READY) {
+    // std::cout << "Control  mode is READY" << std::endl; // When standing -> Mode is READY
     if (leg_controller_->computeLegCommandArray(last_robot_state_msg_,
                                                 leg_command_array_msg_,
                                                 grf_array_msg_) == false) {
@@ -419,19 +420,21 @@ bool RobotDriver::updateControl() {
         leg_command_array_msg_.leg_commands.at(i).motor_commands.resize(3);
         for (int j = 0; j < 3; ++j) {
           int joint_idx = 3 * i + j;
+          // std::cout << "READY joint_idx: " << joint_idx << std::endl;
           robot_driver_utils::loadMotorCommandMsg(
               stand_joint_angles_.at(j), 0, 0, stand_kp_.at(j), stand_kd_.at(j),
               leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
         }
       }
     } 
-    else { // This else statement states that if it is false when checking for valid compute commandn array, you can also check the traj ref state
+    else { // This else statement states that if it is true when checking for valid compute commandn array, you can also check the traj ref state
+      // std::cout << "Compute command array valid..." << std::endl;
       if (InverseDynamicsController *p =
               dynamic_cast<InverseDynamicsController *>(
                   leg_controller_.get())) { // get() is a std::shared_pointer member
         // Uncomment to publish trajectory reference state
-        quad_msgs::RobotState ref_state_msg = p->getReferenceState();
-        trajectory_robot_state_pub_.publish(ref_state_msg);
+        // quad_msgs::RobotState ref_state_msg = p->getReferenceState();
+        // trajectory_robot_state_pub_.publish(ref_state_msg);
       }
     }
   } 
@@ -445,6 +448,7 @@ bool RobotDriver::updateControl() {
     for (int i = 0; i < num_feet_; ++i) {
       leg_command_array_msg_.leg_commands.at(i).motor_commands.resize(3);
       for (int j = 0; j < 3; ++j) {
+        // std::cout << "Sit to ready joint_idx: " << (3 * i + j) << std::endl;
         double ang =
             (stand_joint_angles_.at(j) - sit_joint_angles_.at(j)) * t_interp +
             sit_joint_angles_.at(j);
@@ -493,6 +497,8 @@ bool RobotDriver::updateControl() {
       int joint_idx = 3 * i + j;
 
       // Add soft joint limit for knees
+      // std::cout << "joint_positions(" << joint_idx << "): " << joint_positions(joint_idx) << std::endl; // Just false w/ unitree go1 trying to stand
+      // std::cout << ((j == knee_idx && joint_positions(joint_idx) > knee_soft_ub)? "True": "False") << std::endl;
       if (j == knee_idx && joint_positions(joint_idx) > knee_soft_ub) {
         leg_command_array_msg_.leg_commands.at(i)
             .motor_commands.at(j)
@@ -519,7 +525,8 @@ bool RobotDriver::updateControl() {
           cmd.kd * (cmd.vel_setpoint - joint_velocities[joint_idx]);
       double fb_component = pos_component + vel_component;
       double effort = fb_component + cmd.torque_ff;
-      //std::cout << "ff component: " << cmd.torque_ff << std::endl;
+      // std::cout << "leg idx: " << i << "\t joint_idx: " << joint_idx << std::endl;
+      // std::cout << "fb component: " << fb_component <<"\t ff component: " << cmd.torque_ff << std::endl; // With go1, fb component goes up to 20+... something is not updating
       //std::cout << "fb_component: " << fb_component << std::endl;
       //std::cout << "outside loop effort: " << effort << std::endl;
       double fb_ratio =
@@ -556,6 +563,9 @@ bool RobotDriver::updateControl() {
           effort;
       leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).fb_ratio =
           fb_ratio;
+
+      // std::cout << "leg idx: " << i << "\t joint_idx: " << joint_idx << std::endl;
+      // std::cout << "effort: " << leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).effort << std::endl;
     }
   }
 

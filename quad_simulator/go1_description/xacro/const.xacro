@@ -34,20 +34,20 @@
     <xacro:property name="hip_offset" value="0.08"/>
 
     <!-- joint limits -->
-    <xacro:property name="damping" value="0.01"/>
-    <xacro:property name="friction" value="0.2"/>
+    <xacro:property name="damping" value="0.01"/> <!-- Original value: 0.01 -->
+    <xacro:property name="friction" value="0.2"/> <!-- Original value: 0.2 -->
     <xacro:property name="hip_max" value="60"/>
     <xacro:property name="hip_min" value="-60"/>
-    <xacro:property name="hip_velocity_max" value="30.1"/>
-    <xacro:property name="hip_torque_max" value="23.7"/>
-    <xacro:property name="thigh_max" value="170"/> <!-- Original: 170 -->
-    <xacro:property name="thigh_min" value="-38"/> <!-- Original: -38 -->
-    <xacro:property name="thigh_velocity_max" value="30.1"/>
-    <xacro:property name="thigh_torque_max" value="23.7"/>
+    <xacro:property name="hip_velocity_max" value="30.1"/> <!-- Original value: 30.1 -->
+    <xacro:property name="hip_torque_max" value="23.7"/> <!-- Original value: 23.7 -->
+    <xacro:property name="thigh_max" value="360"/> <!-- Original: 170 -->
+    <xacro:property name="thigh_min" value="-360"/> <!-- Original: -38 -->
+    <xacro:property name="thigh_velocity_max" value="30.1"/> <!-- Original value: 30.1 -->
+    <xacro:property name="thigh_torque_max" value="23.7"/> <!-- Original value: 23.7 -->
     <xacro:property name="calf_max" value="360"/> <!-- Original: -48 -->
     <xacro:property name="calf_min" value="-360"/> <!-- Original: -156 --> <!-- Question: Initial Orientation: -180 (-pi) so pass min... -->
-    <xacro:property name="calf_velocity_max" value="30.1"/>
-    <xacro:property name="calf_torque_max" value="23.7"/>
+    <xacro:property name="calf_velocity_max" value="30.1"/> <!-- Original value: 30.1 -->
+    <xacro:property name="calf_torque_max" value="23.7"/> <!-- Original value: 23.7 -->
 
     <!-- dynamics inertial value        total 12.84kg -->
     <!-- trunk -->
