@@ -1,0 +1,1020 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="pupperv2_description">
+   <!-- Include Files -->
+   <xacro:include filename="$(find pupperv2_description)/urdf/transmission.xacro"/>
+   <xacro:include filename="$(find pupperv2_description)/urdf/friction.xacro"/>
+   <xacro:include filename="$(find pupperv2_description)/urdf/accessories.xacro"/>
+
+
+   <!-- Enable Gazebo ROS Control -->
+   <gazebo>
+     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+       <legacyModeNS>true</legacyModeNS>
+       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+     </plugin>
+   </gazebo>
+
+  <!-- Accessories-->
+  <xacro:accessories base_name="base_link" base_length="${0.13641*2}" 
+                    base_height="${0.04661*2}"/>
+ 
+  
+  <gazebo>
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>10.0</updateRate>
+        <bodyName>base_link</bodyName>
+        <topicName>odom/ground_truth</topicName>
+        <gaussianNoise>0.01</gaussianNoise>
+        <frameName>world</frameName>
+        <xyzOffsets>0 0 0</xyzOffsets>
+        <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
+  </gazebo>   
+                
+  <!-- Solidworks to URDF (Mostly) -->
+  
+  <link name="base_link">
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/obj_meshes/Cube003.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/obj_meshes/Cube003.obj" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="base_inertia">
+    <inertial>
+        <origin
+          xyz="4.4516E-07 -2.0991E-07 3.7751E-06"
+          rpy="0 0 0" />
+        <mass
+          value="0.37691" />
+        <inertia
+          ixx="0.00038775"
+          ixy="1.1873E-06"
+          ixz="-9.237E-07"
+          iyy="0.00085802"
+          iyz="1.7272E-07"
+          izz="0.0010086" />
+      </inertial>
+  </link>
+  <joint name="base_link_base_inertia" type="fixed">
+      <parent link="base_link"/>
+      <child link="base_inertia"/>
+  </joint>
+
+
+
+  <link
+    name="FL_hip">
+    <inertial>
+      <origin
+        xyz="0.01877 0.0032945 0.00038989"
+        rpy="0 0 0" />
+      <mass
+        value="0.032035" />
+      <inertia
+        ixx="5.9933E-06"
+        ixy="4.4808E-07"
+        ixz="2.4371E-10"
+        iyy="2.9538E-06"
+        iyz="6.1996E-08"
+        izz="5.7278E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0.00795 0.00329 0.00039"
+        rpy="${pi/2} 0 0" />
+      <geometry>
+        <!--mesh
+          filename="package://pupperv2_description/meshes/FL_hip.STL" /-->
+        <cylinder radius="0.0152" length="0.0483"/>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <!--mesh
+          filename="package://pupperv2_description/meshes/FL_hip.STL" /-->
+        <box size="0.03569 0.0483 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_link_FL_hip"
+    type="revolute">
+    <origin
+      xyz="0.036007 0.0466 0.00461"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="FL_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.7854"
+      upper="0.7854"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="FL_upper_leg">
+    <inertial>
+      <origin
+        xyz="0.00011578 0.025203 -0.048064"
+        rpy="0 0 0" />
+      <mass
+        value="0.054665" />
+      <inertia
+        ixx="2.4386E-05"
+        ixy="1.682E-10"
+        ixz="2.6061E-07"
+        iyy="2.3437E-05"
+        iyz="2.7137E-07"
+        izz="6.6679E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FL_upper_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FL_upper_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_hip_FL_upper_leg"
+    type="revolute">
+    <origin
+      xyz="0.01525 0.02535 0"
+      rpy="0 0 0" />
+    <parent
+      link="FL_hip" />
+    <child
+      link="FL_upper_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.309"
+      upper="4.4506"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="FL_lower_leg">
+    <inertial>
+      <origin
+        xyz="0.00028051 0.0039614 -0.040452"
+        rpy="0 0 0" />
+      <mass
+        value="0.016718" />
+      <inertia
+        ixx="1.8319E-05"
+        ixy="-1.9835E-08"
+        ixz="2.3453E-07"
+        iyy="1.8546E-05"
+        iyz="6.7626E-07"
+        izz="5.5282E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FL_lower_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FL_lower_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_upper_leg_FL_lower_leg"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.08"
+      rpy="0 0 0" />
+    <parent
+      link="FL_upper_leg" />
+    <child
+      link="FL_lower_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.8798"
+      upper="2.8798"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="FL_toe">
+    <inertial>
+      <origin
+        xyz="-0.002296 2.7756E-17 -0.0027362"
+        rpy="0 0 0" />
+      <mass
+        value="0.0018099" />
+      <inertia
+        ixx="5.2131E-08"
+        ixy="-1.9882E-24"
+        ixz="1.137E-08"
+        iyy="4.259E-08"
+        iyz="-9.4483E-25"
+        izz="5.6141E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FL_toe.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.15294 0.15294 0.15294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FL_toe.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_lower_leg_FL_toe"
+    type="fixed">
+    <origin
+      xyz="0 0.008325 -0.11"
+      rpy="0 0 0" />
+    <parent
+      link="FL_lower_leg" />
+    <child
+      link="FL_toe" />
+    <axis
+      xyz="0.64279 0 0.76604" />
+  </joint>
+  <link
+    name="RL_hip">
+    <inertial>
+      <origin
+        xyz="-0.022505 0.0032945 0.00038989"
+        rpy="0 0 0" />
+      <mass
+        value="0.032035" />
+      <inertia
+        ixx="5.9933E-06"
+        ixy="4.4808E-07"
+        ixz="2.4371E-10"
+        iyy="2.9538E-06"
+        iyz="6.1996E-08"
+        izz="5.7278E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_link_RL_hip"
+    type="revolute">
+    <origin
+      xyz="-0.12272 0.0466 0.00461"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="RL_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.7854"
+      upper="0.7854"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="RL_upper_leg">
+    <inertial>
+      <origin
+        xyz="0.00011578 0.025203 -0.048064"
+        rpy="0 0 0" />
+      <mass
+        value="0.054665" />
+      <inertia
+        ixx="2.4386E-05"
+        ixy="1.682E-10"
+        ixz="2.6061E-07"
+        iyy="2.3437E-05"
+        iyz="2.7137E-07"
+        izz="6.6679E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_upper_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_upper_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_hip_RL_upper_leg"
+    type="revolute">
+    <origin
+      xyz="-0.026025 0.02535 0"
+      rpy="0 0.0011305 0" />
+    <parent
+      link="RL_hip" />
+    <child
+      link="RL_upper_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-1.309"
+      upper="4.4506"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="RL_lower_leg">
+    <inertial>
+      <origin
+        xyz="0.00028051 0.0039614 -0.040452"
+        rpy="0 0 0" />
+      <mass
+        value="0.016718" />
+      <inertia
+        ixx="1.8319E-05"
+        ixy="-1.9835E-08"
+        ixz="2.3453E-07"
+        iyy="1.8546E-05"
+        iyz="6.7626E-07"
+        izz="5.5282E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_lower_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_lower_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_upper_leg_RL_lower_leg"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.08"
+      rpy="0 -0.0011305 0" />
+    <parent
+      link="RL_upper_leg" />
+    <child
+      link="RL_lower_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.8798"
+      upper="2.8798"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="RL_toe">
+    <inertial>
+      <origin
+        xyz="-0.002296 0 -0.0027362"
+        rpy="0 0 0" />
+      <mass
+        value="0.0018099" />
+      <inertia
+        ixx="5.2131E-08"
+        ixy="-1.082E-24"
+        ixz="1.137E-08"
+        iyy="4.259E-08"
+        iyz="-9.2836E-25"
+        izz="5.6141E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_toe.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.15294 0.15294 0.15294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RL_toe.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_lower_leg_RL_toe"
+    type="fixed">
+    <origin
+      xyz="0 0.008325 -0.11"
+      rpy="0 0 0" />
+    <parent
+      link="RL_lower_leg" />
+    <child
+      link="RL_toe" />
+    <axis
+      xyz="0.64279 0 0.76604" />
+  </joint>
+  <link
+    name="FR_hip">
+    <inertial>
+      <origin
+        xyz="0.018798 -0.0032741 0.00039709"
+        rpy="0 0 0" />
+      <mass
+        value="0.032069" />
+      <inertia
+        ixx="5.9912E-06"
+        ixy="-4.4714E-07"
+        ixz="1.8534E-10"
+        iyy="2.954E-06"
+        iyz="-6.2909E-08"
+        izz="5.7295E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_link_FR_hip"
+    type="revolute">
+    <origin
+      xyz="0.035885 -0.0474 0.00461"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="FR_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.7854"
+      upper="0.7854"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="FR_upper_leg">
+    <inertial>
+      <origin
+        xyz="-0.00011578 -0.025203 -0.048064"
+        rpy="0 0 0" />
+      <mass
+        value="0.054665" />
+      <inertia
+        ixx="2.4386E-05"
+        ixy="1.682E-10"
+        ixz="-2.6061E-07"
+        iyy="2.3437E-05"
+        iyz="-2.7137E-07"
+        izz="6.6679E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_upper_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_upper_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_hip_FR_upper_leg"
+    type="revolute">
+    <origin
+      xyz="0.015252 -0.02535 0"
+      rpy="0 0 0" />
+    <parent
+      link="FR_hip" />
+    <child
+      link="FR_upper_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-4.4506"
+      upper="1.309"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="FR_lower_leg">
+    <inertial>
+      <origin
+        xyz="0.00028375 -0.0039771 -0.040393"
+        rpy="0 0 0" />
+      <mass
+        value="0.016741" />
+      <inertia
+        ixx="1.8313E-05"
+        ixy="1.9858E-08"
+        ixz="2.3431E-07"
+        iyy="1.854E-05"
+        iyz="-6.769E-07"
+        izz="5.5333E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_lower_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_lower_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_upper_leg_FR_lower_leg"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.08"
+      rpy="0 0 0" />
+    <parent
+      link="FR_upper_leg" />
+    <child
+      link="FR_lower_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.8798"
+      upper="2.8798"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="FR_toe">
+    <inertial>
+      <origin
+        xyz="-0.002296 6.9389E-18 -0.0027362"
+        rpy="0 0 0" />
+      <mass
+        value="0.0018099" />
+      <inertia
+        ixx="5.2131E-08"
+        ixy="6.2047E-25"
+        ixz="1.137E-08"
+        iyy="4.259E-08"
+        iyz="9.8352E-25"
+        izz="5.6141E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_toe.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.15294 0.15294 0.15294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/FR_toe.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_lower_leg_FR_toe"
+    type="fixed">
+    <origin
+      xyz="0 -0.008325 -0.11"
+      rpy="0 0 0" />
+    <parent
+      link="FR_lower_leg" />
+    <child
+      link="FR_toe" />
+    <axis
+      xyz="0.64279 0 0.76604" />
+  </joint>
+  <link
+    name="RR_hip">
+    <inertial>
+      <origin
+        xyz="-0.022479 -0.0032741 0.00039709"
+        rpy="0 0 0" />
+      <mass
+        value="0.032069" />
+      <inertia
+        ixx="5.9912E-06"
+        ixy="-4.4714E-07"
+        ixz="1.8534E-10"
+        iyy="2.954E-06"
+        iyz="-6.2909E-08"
+        izz="5.7295E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_link_RR_hip"
+    type="revolute">
+    <origin
+      xyz="-0.12284 -0.0474 0.00461"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="RR_hip" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.7854"
+      upper="0.7854"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="RR_upper_leg">
+    <inertial>
+      <origin
+        xyz="-0.00011578 -0.025203 -0.048064"
+        rpy="0 0 0" />
+      <mass
+        value="0.054665" />
+      <inertia
+        ixx="2.4386E-05"
+        ixy="1.682E-10"
+        ixz="-2.6061E-07"
+        iyy="2.3437E-05"
+        iyz="-2.7137E-07"
+        izz="6.6679E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_upper_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_upper_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_hip_RR_upper_leg"
+    type="revolute">
+    <origin
+      xyz="-0.026025 -0.02535 0"
+      rpy="0 0 0" />
+    <parent
+      link="RR_hip" />
+    <child
+      link="RR_upper_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-4.4506"
+      upper="1.309"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="RR_lower_leg">
+    <inertial>
+      <origin
+        xyz="0.00028375 -0.0039771 -0.040393"
+        rpy="0 0 0" />
+      <mass
+        value="0.016741" />
+      <inertia
+        ixx="1.8313E-05"
+        ixy="1.9858E-08"
+        ixz="2.3431E-07"
+        iyy="1.854E-05"
+        iyz="-6.769E-07"
+        izz="5.5333E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_lower_leg.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_lower_leg.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_upper_leg_RR_lower_leg"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.08"
+      rpy="0 0 0" />
+    <parent
+      link="RR_upper_leg" />
+    <child
+      link="RR_lower_leg" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-2.8798"
+      upper="2.8798"
+      effort="100"
+      velocity="2.5" />
+  </joint>
+  <link
+    name="RR_toe">
+    <inertial>
+      <origin
+        xyz="-0.002296 0 -0.0027362"
+        rpy="0 0 0" />
+      <mass
+        value="0.0018099" />
+      <inertia
+        ixx="5.2131E-08"
+        ixy="6.6018E-25"
+        ixz="1.137E-08"
+        iyy="4.259E-08"
+        iyz="2.4451E-24"
+        izz="5.6141E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_toe.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.15294 0.15294 0.15294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pupperv2_description/meshes/RR_toe.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_lower_leg_RR_toe"
+    type="fixed">
+    <origin
+      xyz="0 -0.008325 -0.11"
+      rpy="0 0 0" />
+    <parent
+      link="RR_lower_leg" />
+    <child
+      link="RR_toe" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+
+  <!--################Transmission Tags######################-->
+  <xacro:quadruped_transmission joint="base_link_FL_hip"/>
+  <xacro:quadruped_transmission joint="FL_hip_FL_upper_leg"/>
+  <xacro:quadruped_transmission joint="FL_upper_leg_FL_lower_leg"/>
+  <xacro:quadruped_transmission joint="base_link_FR_hip"/>
+  <xacro:quadruped_transmission joint="FR_hip_FR_upper_leg"/>
+  <xacro:quadruped_transmission joint="FR_upper_leg_FR_lower_leg"/>
+  <xacro:quadruped_transmission joint="base_link_RL_hip"/>
+  <xacro:quadruped_transmission joint="RL_hip_RL_upper_leg"/>
+  <xacro:quadruped_transmission joint="RL_upper_leg_RL_lower_leg"/>
+  <xacro:quadruped_transmission joint="base_link_RR_hip"/>
+  <xacro:quadruped_transmission joint="RR_hip_RR_upper_leg"/>
+  <xacro:quadruped_transmission joint="RR_upper_leg_RR_lower_leg"/>
+
+  <!-- Gazebo Reference for foot/toe -->
+  <xacro:quadruped_foot_friction toe="FL_toe"/>
+  <xacro:quadruped_foot_friction toe="RL_toe"/>
+  <xacro:quadruped_foot_friction toe="FR_toe"/>
+  <xacro:quadruped_foot_friction toe="RR_toe"/>
+</robot>
