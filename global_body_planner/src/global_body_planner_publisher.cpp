@@ -22,7 +22,7 @@ GlobalBodyPlannerPublisher::GlobalBodyPlannerPublisher(ros::NodeHandle nh){
                             body_plan_tree_topic);
     quad_utils::loadROSParam(nh_, "/map_frame", map_frame_);
     quad_utils::loadROSParam(nh_, "/global_body_planner/update_rate",
-                            update_rate_);
+                            update_rate_); // Don't think this is needed
     
     // Don't think I need any of this, but maybe startup delay
     /*
@@ -123,7 +123,7 @@ bool GlobalBodyPlannerPublisher::callPlanner() {
     // Define start state and goal state
     // start_state_ = robot_state_;
     Eigen::Vector3d start_pos, goal_pos, start_vel, goal_vel;
-    start_pos << -1.0, 0.0, 0.270;
+    start_pos << 0.0, 0.0, 0.270; // Make this robust to actual robot starting state
     goal_pos << 5.0, 1.5, 0.3;
     start_vel << 0.0, 0.0, 0.0;
     goal_vel << 0.0, 0.0, 0.0;
@@ -221,10 +221,10 @@ void GlobalBodyPlannerPublisher::spin() {
 
     // Wait until we get map and state data
     waitForData();
-    // Hardcode call planner and publish plan
-    // Doesn't seem to work w/o doing spin.. may need a server
+
+    // Call planner once (Only need once for offline planner)
     callPlanner();
-    //publishPlan();
+
     
     // Enter main spin
     

@@ -54,6 +54,8 @@ include_directories(
 # Declare a C++ library
 add_library(${PROJECT_NAME}
   src/offline_global_body_planner.cpp
+  src/offline_global_body_plan.cpp
+  src/offline_planning_utils.cpp
 )
 
 ## Add cmake target dependencies of the library

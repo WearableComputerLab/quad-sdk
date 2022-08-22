@@ -34,6 +34,10 @@ GlobalBodyPlanner::GlobalBodyPlanner(ros::NodeHandle nh) {
   quad_utils::loadROSParam(nh_, "/global_body_planner/goal_state",
                            goal_state_vec);
 
+  // Testing out what is in the params
+  // std::cout << "body_plan_topic: " << body_plan_topic << std::endl; // quad_utils config -> global_plan
+  // std::cout << "global_state_vec size: [" << goal_state_vec[0] << ", " << goal_state_vec[1] << "]" << std::endl;
+
   // Setup pubs and subs
   terrain_map_sub_ = nh_.subscribe(
       terrain_map_topic_, 1, &GlobalBodyPlanner::terrainMapCallback, this);
@@ -59,7 +63,7 @@ GlobalBodyPlanner::GlobalBodyPlanner(ros::NodeHandle nh) {
   }
 
   // Fill in the goal state information
-  goal_state_vec.resize(12, 0);
+  goal_state_vec.resize(12, 0); // The rest are assigned 0 when resize
   vectorToFullState(goal_state_vec, goal_state_);
 
   // Zero planning data
@@ -271,13 +275,14 @@ bool GlobalBodyPlanner::callPlanner() {
 
     newest_plan_.eraseAfterIndex(start_index_);
     //std::cout << "replan_start_time_: " << replan_start_time_ << std::endl; // Q: replan_start_time_ is initialized to 0 in reset mode, so how does it get current time
-    // While in reset mode, replan_start_time_ is 0... but then it changes to refine mode -> publish
+    // While in reset mode, replan_start_time_ is 0... but then it changes to refine mode -> publish (I don't think so)
     // Happens bc publish_after_reset_delay_ is set to true in setStartState (does not quite work out but for now that is acceptable explanation)
+    // FROM setComputedTimestamp and adds to t = 0, dt, 2*dt, ...
 
     // Refine is when replan_start_time is assigned to starting of plan time
     newest_plan_.loadPlanData(plan_status, start_state_, dist_to_goal,
                               state_sequence, action_sequence, dt_,
-                              replan_start_time_, planner_config_);
+                              replan_start_time_, planner_config_); // Crucial to interpolating data and loading full body plan
 
     //std::cout << "In callPlanner... replan_start_time_: " << replan_start_time_ << std::endl;
     //std::cout << "plan_status: " << plan_status << std::endl;
@@ -307,8 +312,16 @@ bool GlobalBodyPlanner::callPlanner() {
       action_sequence_ = action_sequence;
       std::cout << "action_sequence length updated: " << action_sequence_.size() << std::endl;
       std::cout << "state_sequence length updated: " << state_sequence_.size() << std::endl;
-      std::cout << "Action sequence index 0: \n" << action_sequence_.at(0).grf_0 << std::endl;
-      std::cout << "Action sequence at end index: \n" << action_sequence_.back().grf_0 << std::endl;
+      /*
+      std::cout << "State sequence index 0:\n";
+      printStateNewline(state_sequence_.at(0));
+      std::cout << "State sequence at end index:\n";
+      printStateNewline(state_sequence_.back());
+      std::cout << "Action sequence index 0: " << std::endl;
+      printActionNewline(action_sequence_.at(0));
+      std::cout << "Action sequence at end index: \n";
+      printActionNewline(action_sequence_.back());
+      */
 
       std::cout << "Solve time: " << plan_time << " s" << std::endl;
       std::cout << "Vertices generated: " << vertices_generated << std::endl;
@@ -411,7 +424,7 @@ void GlobalBodyPlanner::publishCurrentPlan() {
         current_plan_.getPublishedTimestamp();
 
     // Load the plan into the messages
-    current_plan_.convertToMsg(robot_plan_msg, discrete_robot_plan_msg);
+    current_plan_.convertToMsg(robot_plan_msg, discrete_robot_plan_msg); // Converting to msg, get timestamp from setComputedTimeStamp
 
     // Publish both messages
     body_plan_pub_.publish(robot_plan_msg); // PUBLISH BODY PLAN TO MSG HERE... ALREADY INTERPOLATED HERE IT SEEMS
