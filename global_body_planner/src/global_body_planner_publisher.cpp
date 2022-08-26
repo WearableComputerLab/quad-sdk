@@ -190,7 +190,7 @@ void GlobalBodyPlannerPublisher::publishPlan() {
     // If first and only plan has not been published, set published timestamp for plan
     if (!published_plan) {
         // Initializing timestamp for your plan
-        plan_.setPublishedTimestamp(ros::Time::now());
+        plan_.setPublishedTimestamp(ros::Time::now()); // RN FIGURE OUT WHY TIMESTAMP DON'T MATCH UP
     }
 
 
@@ -217,7 +217,7 @@ void GlobalBodyPlannerPublisher::publishPlan() {
 
 void GlobalBodyPlannerPublisher::spin() {
     // ros::Rate r(update_rate_);
-    ros::Rate r(1);
+    ros::Rate r(20);
 
     // Wait until we get map and state data
     waitForData();
