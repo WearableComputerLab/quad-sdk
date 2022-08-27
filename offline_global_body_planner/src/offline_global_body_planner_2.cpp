@@ -91,6 +91,8 @@ void OfflineGlobalBodyPlanner2::terrainMapCallback(const grid_map_msgs::GridMap:
 void OfflineGlobalBodyPlanner2::robotStateCallback(
     const quad_msgs::RobotState::ConstPtr& msg) {
   eigenToFullState(quad_utils::bodyStateMsgToEigen(msg->body), robot_state_);
+    // ROS_WARN("In robotStateCallback");
+    // printFullState(robot_state_);
 }
 
 void OfflineGlobalBodyPlanner2::goalStateCallback(
@@ -266,13 +268,14 @@ void OfflineGlobalBodyPlanner2::spin() {
     // Wait until map and state data retrieved
     waitForData();
 
+    setStartState(); // TODO: online set in loop... current bug: btwn waitForData and callPlanner, start_state_ changes so moving setStartState before callPlanner
+    // Maybe it is due to a shared ptr issue?? prob not but can't be too sure since it happened btwn callPlanner and setStartState
+    setGoalState();
     // Load data
     callPlanner();
 
     while(ros::ok()) {
         ros::spinOnce();
-        setStartState();
-        setGoalState();
 
         // Publish the results
         publishPlan();

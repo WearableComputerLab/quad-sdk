@@ -204,6 +204,29 @@ namespace offline_planning_utils {
                                             const PlannerConfig &planner_config) {
         return getTerrainZFiltered(s.pos, planner_config);
     }
+
+    inline Eigen::Vector3d getSurfaceNormalFiltered(const State &s,
+                const PlannerConfig &planner_config) {
+        // Uncomment to use grid_map
+        // Eigen::Vector3d surf_norm;
+        // surf_norm.x() = planner_config.terrain_grid_map.atPosition(
+        //     "normal_vectors_x", s.pos.head<2>(), INTER_TYPE);
+        // surf_norm.y() = planner_config.terrain_grid_map.atPosition(
+        //     "normal_vectors_y", s.pos.head<2>(), INTER_TYPE);
+        // surf_norm.z() = planner_config.terrain_grid_map.atPosition(
+        //     "normal_vectors_z", s.pos.head<2>(), INTER_TYPE);
+        // return surf_norm;
+        return planner_config.terrain.getSurfaceNormalFilteredEigen(s.pos[0],
+                                                                    s.pos[1]);
+    }
+
+    /**
+     * @brief Get the body pitch from state
+     * @param s State
+     * @param planner_config Configuration parameters
+     * @return Pitch of current state
+     */
+    double getPitchFromState(const State &s, const PlannerConfig &planner_config);
     
 
 

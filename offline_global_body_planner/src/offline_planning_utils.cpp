@@ -51,7 +51,7 @@ namespace offline_planning_utils {
             double weight = pow(gamma, i);
             State body_state = reduced_plan[i];
             z[i] = body_state.pos[2]; // weight * z[0] + (1 - weight) * body_state.pos[2];
-            pitch[i] = weight * pitch[0]; // +
+            pitch[i] = getPitchFromState(body_state, planner_config); // weight * pitch[0] +
                     // (1 - weight) * getPitchFromState(body_state, planner_config); // TODO
             //unwrapped_yaw[i] =
             //    weight * unwrapped_yaw[0] + (1 - weight) * unwrapped_yaw[i]; // Uncomment to apply filtering
@@ -90,7 +90,7 @@ namespace offline_planning_utils {
                 stateToFullState(body_state, roll, pitch[i], filtered_yaw[i], roll_rate,
                                 filtered_pitch_rate[i], filtered_yaw_rate[i]);
 
-            printFullState(body_full_state);
+            // printFullState(body_full_state);
             full_plan.push_back(body_full_state);
             // x_vec.push_back(body_state.pos[0]);
             // y_vec.push_back(body_state.pos[1]);
@@ -128,6 +128,21 @@ namespace offline_planning_utils {
         s.ang = s_eig.segment(3, 3);
         s.vel = s_eig.segment(6, 3);
         s.ang_vel = s_eig.segment(9, 3);
+    }
+
+    double getPitchFromState(const State &s, const PlannerConfig &planner_config) {
+        Eigen::Vector3d surf_norm = getSurfaceNormalFiltered(s, planner_config);
+
+        // Get magnitude of lateral velociy
+        double vel = s.vel.head<2>().norm();
+
+        // If velocity is zero or surf norm undefined, assume v is in +x direction
+        double v_proj = (vel == 0 || surf_norm[2] <= 0)
+                            ? surf_norm[0]
+                            : s.vel.head<2>().dot(surf_norm.head<2>()) / vel;
+
+        // set pitch to angle that aligns v_proj with surface normal
+        return atan2(v_proj, surf_norm[2]);
     }
 
     void printState(const State &s) {

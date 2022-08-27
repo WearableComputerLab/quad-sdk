@@ -18,7 +18,7 @@ void OfflineGlobalBodyPlan::clear() {
 }
 
 void OfflineGlobalBodyPlan::getNominalHeight(State &s, const PlannerConfig &planner_config) {
-    s.pos(2) = 0.25 + getTerrainZFilteredFromState(s, planner_config);
+    s.pos(2) = planner_config.h_nom + getTerrainZFilteredFromState(s, planner_config);
 }
 
 void OfflineGlobalBodyPlan::addMG(GRF &grf, const PlannerConfig &planner_config) {
