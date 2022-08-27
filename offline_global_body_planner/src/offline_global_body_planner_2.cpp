@@ -18,17 +18,21 @@ OfflineGlobalBodyPlanner2::OfflineGlobalBodyPlanner2(ros::NodeHandle nh) {
     quad_utils::loadROSParam(nh_, "topics/global_plan_tree",
                             body_plan_tree_topic);
     quad_utils::loadROSParam(nh_, "/map_frame", map_frame_);
-    quad_utils::loadROSParam(nh_, "/global_body_planner/update_rate",
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/update_rate",
                             update_rate_);
-    quad_utils::loadROSParam(nh_, "/global_body_planner/pos_error_threshold",
-                            pos_error_threshold_);
-    quad_utils::loadROSParam(nh_, "/global_body_planner/startup_delay",
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/pos_error_threshold",
+                            pos_error_threshold_); // TODO: Use when online
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/startup_delay",
                             reset_publish_delay_);
-    quad_utils::loadROSParam(nh_, "/global_body_planner/replanning",
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/replanning",
                             replanning_allowed_);
     quad_utils::loadROSParam(nh_, "/local_planner/timestep", dt_);
-    quad_utils::loadROSParam(nh_, "/global_body_planner/goal_state",
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/goal_state",
                             goal_state_vec);
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/state_file_path",
+                            state_file_path_);
+    quad_utils::loadROSParam(nh_, "/offline_global_body_planner/state_file_path",
+                            ctrl_file_path_);
 
     // Setup pubs and subs
     terrain_map_sub_ = nh_.subscribe(
@@ -50,7 +54,7 @@ OfflineGlobalBodyPlanner2::OfflineGlobalBodyPlanner2(ros::NodeHandle nh) {
     goal_state_vec.resize(12, 0);
     vectorToFullState(goal_state_vec, goal_state_);
 
-    start_index_ = 0; // TODO: not needed
+    start_index_ = 0; // TODO: Use when online
     triggerReset();
 }
 
@@ -127,9 +131,6 @@ void OfflineGlobalBodyPlanner2::callPlanner() {
     // Call planner by getting plan (loading from csv) or use other offline plan class
 
     // In this case, get plan from CSV
-    state_file_path_ = "/home/andrewzheng1011/quad_sdk_ws/src/quad-sdk/offline_global_body_planner/data/states_traj.csv"; // TODO: Load from param
-    ctrl_file_path_ = "/home/andrewzheng1011/quad_sdk_ws/src/quad-sdk/offline_global_body_planner/data/ctrl_traj.csv";
-
     loadCSVData(state_file_path_, ctrl_file_path_, 4, 2); // Load from params
     plan_.loadPlanData(0.0, dt_, start_state_, state_sequence_, grf_sequence_, planner_config_); // TODO: Should just be 0.0 as start, might delete t0
 }
