@@ -79,7 +79,6 @@ class OfflineGlobalBodyPlanner {
 
     /**
      * @brief Get dist to goal from control and state trajectory
-     * 
      */
     void getDistToGoal();
 
@@ -103,12 +102,12 @@ class OfflineGlobalBodyPlanner {
 
     /**
      * @brief 
-     * @param t 
-     * @param plan_index 
-     * @param body_state 
-     * @param grf 
-     * @param primitive_id 
-     * @param msg 
+     * @param t Time at which this data occurs
+     * @param plan_index Index in the plan for which this data will be inserted
+     * @param body_state Body state data
+     * @param grf GRF data
+     * @param primitive_id ID for stance (LEAP), FLIGHT, or LAND (0 for stance)
+     * @param[out] msg Robot plan message with data added 
      */
     void addStateAndGRFToMsg(double t, int plan_index,
                             const FullState &body_state, const GRF &grf,
@@ -178,11 +177,6 @@ class OfflineGlobalBodyPlanner {
     void setMiscPlans(double t0, double dt, std::vector<State> &state_sequence, std::vector<GRF> &grf_plan,
                     std::vector<double> &t_plan, std::vector<int> &primitive_id_plan, std::vector<double> &length_plan,
                     const PlannerConfig &planner_config);
-    /**
-     * @brief Convert reduced double integrator states to FullState
-     * 
-     */
-    void addFullState(); // Probably want my own struct FullState later
 
     /**
      * @brief Resets the body plan to 0

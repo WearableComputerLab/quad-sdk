@@ -32,6 +32,7 @@ namespace offline_planning_utils {
         // Define dynamic parameters
         double mass; // Robot mass, kg
         double g; // Gravity constant, m/s^2
+        double mu; // TODO: need when online planner
 
         // Define planning parameters
         double dt;
@@ -41,6 +42,46 @@ namespace offline_planning_utils {
         double robot_l; // Length of robot body, m
         double robot_w; // Width of robot body, m
         double robot_h; // Vertical distance between leg base and bottom of robot, m
+
+        void loadParamsFromServer(ros::NodeHandle nh) {
+            // Load robot parameters
+            quad_utils::loadROSParam(nh, "global_body_planner/h_max", h_max);
+            quad_utils::loadROSParam(nh, "global_body_planner/h_min", h_min);
+            quad_utils::loadROSParam(nh, "global_body_planner/h_nom", h_nom);
+            quad_utils::loadROSParam(nh, "global_body_planner/v_max", v_max);
+            // quad_utils::loadROSParam(nh, "global_body_planner/v_nom", v_nom);
+            quad_utils::loadROSParam(nh, "global_body_planner/robot_l", robot_l);
+            quad_utils::loadROSParam(nh, "global_body_planner/robot_w", robot_w);
+            quad_utils::loadROSParam(nh, "global_body_planner/robot_h", robot_h);
+
+            quad_utils::loadROSParam(nh, "global_body_planner/mass", mass);
+            // quad_utils::loadROSParam(nh, "global_body_planner/grf_min", grf_min);
+            // quad_utils::loadROSParam(nh, "global_body_planner/grf_max", grf_max);
+            // quad_utils::loadROSParam(nh,
+            //                         "/global_body_planner/traversability_threshold",
+            //                         traversability_threshold);
+
+            // Load global parameters
+            quad_utils::loadROSParam(nh, "/global_body_planner/g", g);
+            quad_utils::loadROSParam(nh, "/global_body_planner/mu", mu);
+            // quad_utils::loadROSParam(nh, "/global_body_planner/t_s_min", t_s_min);
+            // quad_utils::loadROSParam(nh, "/global_body_planner/t_s_max", t_s_max);
+            // quad_utils::loadROSParam(nh, "/global_body_planner/dz0_min", dz0_min);
+            // quad_utils::loadROSParam(nh, "/global_body_planner/dz0_max", dz0_max);
+            quad_utils::loadROSParam(nh, "/global_body_planner/dt", dt); // Might not need this... dt is for resolution of kinematic feasibility check
+            // quad_utils::loadROSParam(nh, "/global_body_planner/backup_ratio",
+            //                         backup_ratio); // TODO: Might need for online planner
+            // quad_utils::loadROSParam(nh, "/global_body_planner/trapped_buffer_factor",
+            //                         trapped_buffer_factor);
+            // quad_utils::loadROSParam(nh, "/global_body_planner/num_leap_samples",
+            //                         num_leap_samples);
+            // quad_utils::loadROSParam(nh, "/global_body_planner/max_planning_time",
+            //                         max_planning_time);
+
+            // Load the scalar parameters into Eigen vectors
+            // loadEigenVectorsFromParams(); // Reachibility test and collision test not needed
+            g_vec << 0, 0, -g;
+        }
     };
 
     /**
@@ -111,6 +152,13 @@ namespace offline_planning_utils {
     Eigen::VectorXd fullStateToEigen(const FullState &s);
 
     /**
+     * @brief Reformat STL vector to FullState
+     * @param[in] v STL vector
+     * @param[out] s FullState obtained from STL vector
+     */
+    void vectorToFullState(const std::vector<double> &v, FullState &s);
+
+    /**
      * @brief Print State
      * @param s State
      */
@@ -131,6 +179,31 @@ namespace offline_planning_utils {
      * @param s FullState
      */
     void printFullState(const FullState &s);
+
+    /**
+     * @brief Inline function to get the terrain z filtered at a point from a position 
+     * @param pos Position
+     * @param planner_config Configuration parameters
+     * @return double Height of terrain at a point
+     */
+    inline double getTerrainZFiltered(const Eigen::Vector3d &pos, 
+                                    const PlannerConfig &planner_config) {
+        // Uncomment to use grid_map
+        // return planner_config.terrain_grid_map.atPosition("z_smooth",
+        // pos.head<2>(),
+        //                                             INTER_TYPE);
+        return (planner_config.terrain.getGroundHeightFiltered(pos[0], pos[1]));
+    }
+
+    /**
+     * @brief Inline function to get the filtered terrain height at a point from state
+     * @param pos State position
+     * @param planner_config Configuration parameters
+     */
+    inline double getTerrainZFilteredFromState(const State &s,
+                                            const PlannerConfig &planner_config) {
+        return getTerrainZFiltered(s.pos, planner_config);
+    }
     
 
 

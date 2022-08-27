@@ -10,6 +10,7 @@ void printHelloWorld()
 OfflineGlobalBodyPlanner::OfflineGlobalBodyPlanner(ros::NodeHandle nh) {
     nh_ = nh;
 
+    std::cout << "OfflineGlobalBodyPlanner Object Initialized" << std::endl;
     // Don't think there is much use of constructor atm
     // Load rosparam from parameter server
     /*
@@ -37,6 +38,9 @@ OfflineGlobalBodyPlanner::OfflineGlobalBodyPlanner(ros::NodeHandle nh) {
     setComputedTimestamp(ros::Time::now());
 
     std::cout << "Length of plan: " << getLengthOfPlan() << std::endl;
+    std::cout << "Size of length plan: " << length_plan_.size() << std::endl;
+    std::cout << "Size of state_sequence_: " << state_sequence_.size() << std::endl;
+    std::cout << "Size of action_sequence_: " << grf_sequence_.size() << std::endl; // TODO: May have to hold pose.. for end action
     //std::cout << "Full State Plan: " << std::endl;
     // printFullStatePlan(body_plan_);
 }
@@ -80,9 +84,9 @@ void OfflineGlobalBodyPlanner::setMiscPlans(double t0, double dt, std::vector<St
 
     // Lift from reduced plan into full body plan
     State start_state = state_sequence.at(0); // Start state should be obtain from gazebo sim TODO
-    FullState start_state_ = stateToFullState(start_state, 0, 0, 0, 0, 0, 0); // TODO: Get from gazebo
+    FullState start_state_ = stateToFullState(start_state, 0, M_PI + 14*180/M_PI, 0, 0, 0, 0); // TODO: Get from gazebo
 
-    addFullStates(start_state_, state_sequence, 01, body_plan_, planner_config);
+    addFullStates(start_state_, state_sequence, 0.01, body_plan_, planner_config);
     
 }
 
@@ -129,6 +133,7 @@ void OfflineGlobalBodyPlanner::addStateAndGRFToMsg(double t, int plan_index, con
                                         const GRF &grf, int primitive_id, quad_msgs::RobotPlan &msg) {
     // Represent each state as an Odometry message
     quad_msgs::RobotState state;
+    // std::cout << "msg.global_plan_timestamp: " << msg.global_plan_timestamp.toSec() << std::endl;
     quad_utils::updateStateHeaders(state,
                                     msg.global_plan_timestamp + ros::Duration(t),
                                     msg.header.frame_id, plan_index);
@@ -155,9 +160,6 @@ void OfflineGlobalBodyPlanner::addStateAndGRFToMsg(double t, int plan_index, con
     msg.grfs.push_back(grf_msg);
     msg.plan_indices.push_back(plan_index);
     msg.primitive_ids.push_back(primitive_id);
-
-
-
 }
 
 void OfflineGlobalBodyPlanner::convertPlanToMsg(quad_msgs::RobotPlan &robot_plan_msg, quad_msgs::RobotPlan &discrete_robot_plan_msg) {
@@ -290,18 +292,21 @@ void OfflineGlobalBodyPlanner::publishPlan() {
     quad_msgs::RobotPlan robot_plan_msg;
     quad_msgs::RobotPlan discrete_robot_plan_msg;
 
+    // Need sleep for some reason
+    ros::Duration(2.0).sleep(); // Sleep to make rostopic echo line up with nmpc timestamp
     robot_plan_msg.header.frame_id = "map";
+    robot_plan_msg.header.stamp = ros::Time::now(); // Initialize timestamp for msg (This if finicky)
 
-    robot_plan_msg.header.stamp = ros::Time::now(); // Initialize timestamp for msg
-    discrete_robot_plan_msg.header = robot_plan_msg.header;
 
     // If first and only plan has not been published, set published timestamp for plan
     if (!published_plan_) {
         // Initializing timestamp for your plan
         // plan_.setPublishedTimestamp(ros::Time::now());
         published_timestamp_ = ros::Time::now();
+        // ROS_WARN("Published timestamp: %0.2f", published_timestamp_.toSec());
     }
 
+    discrete_robot_plan_msg.header = robot_plan_msg.header;
     // Initialize the headers and types 
     robot_plan_msg.global_plan_timestamp = published_timestamp_;
     discrete_robot_plan_msg.global_plan_timestamp = published_timestamp_;
@@ -310,11 +315,11 @@ void OfflineGlobalBodyPlanner::publishPlan() {
     convertPlanToMsg(robot_plan_msg, discrete_robot_plan_msg);
 
     // Publish both messages
-    body_plan_pub_.publish(robot_plan_msg); // PUBLISH BODY PLAN TO MSG HERE... ALREADY INTERPOLATED HERE IT SEEMS
+    body_plan_pub_.publish(robot_plan_msg);
     discrete_body_plan_pub_.publish(discrete_robot_plan_msg);
 
     if(!published_plan_){
-        ROS_WARN("First plan published, stamp = %f",
+        ROS_WARN("First plan published, stamp = %0.5f",
         robot_plan_msg.global_plan_timestamp.toSec());
         published_plan_ = true;
     }
@@ -322,7 +327,7 @@ void OfflineGlobalBodyPlanner::publishPlan() {
 
 void OfflineGlobalBodyPlanner::spin() {
     // ros::Rate r(update_rate_);
-    ros::Rate r(1);
+    ros::Rate r(20);
 
     // Should do readCSVData and setMiscPlan as callPlanner
 

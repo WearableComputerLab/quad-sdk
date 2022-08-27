@@ -51,9 +51,17 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+#AZ added
+set(MY_LIB_SOURCES
+   src/offline_global_body_planner_2.cpp
+   src/offline_global_body_plan.cpp
+   src/offline_planning_utils.cpp
+)
+
 # Declare a C++ library
 add_library(${PROJECT_NAME}
   src/offline_global_body_planner.cpp
+  src/offline_global_body_planner_2.cpp
   src/offline_global_body_plan.cpp
   src/offline_planning_utils.cpp
 )

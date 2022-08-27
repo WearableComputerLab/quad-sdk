@@ -39,12 +39,18 @@ namespace offline_planning_utils {
         // Unwrap yaw for filtering / calculating rate (need for calculating rate atm)
         unwrapped_yaw = math_utils::unwrap(wrapped_yaw);
 
+        /*
+        for (int i = 0; i < unwrapped_yaw.size(); i++) {
+            std::cout << "unwrapped_yaw[" << i << "]: " << unwrapped_yaw[i] << std::endl;
+        }
+        */
+
         // Compute pitch to align with the terrain (may want to add first order filter on init state)
         double gamma = 1.0; // Original: 0.98
         for (int i = 1; i < num_discrete_pts; i++) {
             double weight = pow(gamma, i);
             State body_state = reduced_plan[i];
-            z[i] = 0.25; // weight * z[0] + (1 - weight) * body_state.pos[2];
+            z[i] = body_state.pos[2]; // weight * z[0] + (1 - weight) * body_state.pos[2];
             pitch[i] = weight * pitch[0]; // +
                     // (1 - weight) * getPitchFromState(body_state, planner_config); // TODO
             //unwrapped_yaw[i] =
@@ -65,7 +71,7 @@ namespace offline_planning_utils {
             math_utils::movingAverageFilter(pitch_rate, window_size);
 
         // Filter z with a much tighter window
-        int z_window_size = 5;
+        int z_window_size = 1; // Original value: 5
         filtered_z = math_utils::movingAverageFilter(z, z_window_size);
         z_rate = math_utils::centralDiff(filtered_z, dt);
         filtered_z_rate = math_utils::movingAverageFilter(z_rate, z_window_size);
@@ -74,7 +80,7 @@ namespace offline_planning_utils {
         wrapped_yaw = math_utils::wrapToPi(unwrapped_yaw);
         filtered_yaw = math_utils::wrapToPi(filtered_yaw);
 
-          // Add full state data into the array
+        // Add full state data into the array
         std::vector<double> x_vec, y_vec, z_vec;
         for (int i = 0; i < num_discrete_pts; i++) {
             State body_state = reduced_plan[i];
@@ -84,6 +90,7 @@ namespace offline_planning_utils {
                 stateToFullState(body_state, roll, pitch[i], filtered_yaw[i], roll_rate,
                                 filtered_pitch_rate[i], filtered_yaw_rate[i]);
 
+            printFullState(body_full_state);
             full_plan.push_back(body_full_state);
             // x_vec.push_back(body_state.pos[0]);
             // y_vec.push_back(body_state.pos[1]);
@@ -136,6 +143,24 @@ namespace offline_planning_utils {
         s_eig.segment(9, 3) = s.ang_vel;
         return s_eig;
     }
+
+    void vectorToFullState(const std::vector<double> &v, FullState &s) {
+        if (v.size() != 12) {
+            ROS_ERROR("std::vector<double> is incorrect size");
+        }
+        s.pos[0] = v[0];
+        s.pos[1] = v[1];
+        s.pos[2] = v[2];
+        s.ang[0] = v[3];
+        s.ang[1] = v[4];
+        s.ang[2] = v[5];
+        s.vel[0] = v[6];
+        s.vel[1] = v[7];
+        s.vel[2] = v[8];
+        s.ang_vel[0] = v[9];
+        s.ang_vel[1] = v[10];
+        s.ang_vel[2] = v[11];
+    }
     
     void printGRF(const GRF &grf) {
         std::cout << "GRF: " << grf.transpose() << std::endl;
@@ -147,7 +172,6 @@ namespace offline_planning_utils {
         std::cout << "ang = " << s.ang.transpose()
             << ", ang_vel = " << s.ang_vel.transpose() << std::endl;
     }
-
 
     
 } // namespace planning_utils
