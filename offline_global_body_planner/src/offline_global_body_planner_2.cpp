@@ -118,9 +118,9 @@ void OfflineGlobalBodyPlanner2::triggerReset() {
 void OfflineGlobalBodyPlanner2::setStartState() {
     // TODO: Edit when need for online planner
     if (!published_plan_) {
-        // ROS_INFO("Setting current robot state to start state");
         start_state_ = robot_state_;
         // Comment out to print start state
+        // ROS_WARN("Setting current robot state to start state");
         // printFullState(start_state_);
     }
 }
@@ -269,15 +269,14 @@ void OfflineGlobalBodyPlanner2::spin() {
     // Wait until map and state data retrieved
     waitForData();
 
-    setStartState(); // TODO: online set in loop... current bug: btwn waitForData and callPlanner, start_state_ changes so moving setStartState before callPlanner
-    // Maybe it is due to a shared ptr issue?? prob not but can't be too sure since it happened btwn callPlanner and setStartState
-    setGoalState();
     // Load data
+    setStartState();
+    setGoalState();
     callPlanner();
 
     while(ros::ok()) {
         ros::spinOnce();
-
+        
         // Publish the results
         publishPlan();
         r.sleep();
