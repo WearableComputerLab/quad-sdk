@@ -45,6 +45,7 @@ namespace offline_planning_utils {
 
         void loadParamsFromServer(ros::NodeHandle nh) {
             // Load robot parameters
+            // TODO: Find way to load these params nicely that are loaded from robot yaml
             quad_utils::loadROSParam(nh, "global_body_planner/h_max", h_max);
             quad_utils::loadROSParam(nh, "global_body_planner/h_min", h_min);
             quad_utils::loadROSParam(nh, "global_body_planner/h_nom", h_nom);
@@ -62,8 +63,8 @@ namespace offline_planning_utils {
             //                         traversability_threshold);
 
             // Load global parameters
-            quad_utils::loadROSParam(nh, "/global_body_planner/g", g);
-            quad_utils::loadROSParam(nh, "/global_body_planner/mu", mu);
+            quad_utils::loadROSParam(nh, "/offline_global_body_planner/g", g);
+            quad_utils::loadROSParam(nh, "/offline_global_body_planner/mu", mu);
             // quad_utils::loadROSParam(nh, "/global_body_planner/t_s_min", t_s_min);
             // quad_utils::loadROSParam(nh, "/global_body_planner/t_s_max", t_s_max);
             // quad_utils::loadROSParam(nh, "/global_body_planner/dz0_min", dz0_min);
