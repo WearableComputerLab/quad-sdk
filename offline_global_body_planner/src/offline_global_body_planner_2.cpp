@@ -264,6 +264,10 @@ void OfflineGlobalBodyPlanner2::publishPlan() {
 
 
 void OfflineGlobalBodyPlanner2::spin() {
+    // Currently: Robot does not act well with when going in -180 or 180 yaw direction
+    // Assuming it has to do w/ nmpc as wrap and unwrap works fine, but not sure if there is that layer for nmpc
+
+
     ros::Rate r(update_rate_);
 
     // Wait until map and state data retrieved
