@@ -34,7 +34,7 @@
     <include file="$(find quad_utils)/launch/quad_spawn.launch">
       <arg name="robot_type" value="$(arg robot_type)" />
       <arg name="controller" default="$(arg controller)" />
-      <arg name="init_pose" value="-x 4.0 -y 1.0 -z 0.5 -Y 3.3865"/> <!-- -Y 3.1415926535897" /-->
+      <arg name="init_pose" value="-x -2.0 -y 0.0 -z 0.5 -Y 0.0"/> <!-- -Y 3.1415926535897" /-->
       <arg name="namespace" value="robot_1" />
     </include>
     <param name="robot_type" value="$(arg robot_type)" />
