@@ -37,6 +37,9 @@
 #include "nmpc_controller/gen/eval_jac_g_leg_simple.h"
 #include "nmpc_controller/gen/eval_jac_g_leg_simple_to_complex.h"
 #include "nmpc_controller/gen/eval_jac_g_spirit.h"
+#include "nmpc_controller/gen/eval_g_go1.h"
+#include "nmpc_controller/gen/eval_jac_g_go1.h"
+#include "nmpc_controller/gen/eval_hess_g_go1.h"
 #include "quad_utils/function_timer.h"
 #include "quad_utils/quad_kd.h"
 

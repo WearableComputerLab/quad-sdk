@@ -202,7 +202,7 @@ NMPCController::NMPCController(ros::NodeHandle &nh, int robot_id) {
               << fixed_complexity_schedule.transpose() << std::endl;
   }
 
-  std::cout << "fixed complexity schedule:\n" << fixed_complexity_schedule << std::endl;
+  // std::cout << "fixed complexity schedule:\n" << fixed_complexity_schedule.transpose() << std::endl;
   mynlp_ = new quadNLP(default_system, N_, dt_, mu, panic_weights,
                        constraint_panic_weights, Q_temporal_factor,
                        R_temporal_factor, fixed_complexity_schedule, config_);

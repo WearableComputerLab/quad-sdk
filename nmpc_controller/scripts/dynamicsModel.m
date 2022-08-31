@@ -2,6 +2,7 @@ function dynamicsModel(parameter)
 
 mkdir('generated_codes/matlab');
 mkdir('generated_codes/cpp');
+mkdir('utils/casadi');
 
 generateLegDynamics(parameter);
 loadDynamics(parameter);
