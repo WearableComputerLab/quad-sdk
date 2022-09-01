@@ -55,6 +55,19 @@ namespace offline_planning_utils {
             quad_utils::loadROSParam(nh, "offline_global_body_planner/robot_l", robot_l);
             quad_utils::loadROSParam(nh, "offline_global_body_planner/robot_w", robot_w);
             quad_utils::loadROSParam(nh, "offline_global_body_planner/robot_h", robot_h);
+            /*
+            std::cout << "List of parameter names: " << std::endl;
+            
+            std::vector<std::string> keys;
+            nh.getParamNames(keys);
+            for(std::size_t i = 0; i < keys.size(); ++i) {
+                std::cout << keys[i] << "\n";
+            }
+            */
+            // std::cout << "h_nom from loading planner_config: " << h_nom << std::endl;
+            // std::cout << "h_max: " << h_max << std::endl;
+            
+
 
             quad_utils::loadROSParam(nh, "offline_global_body_planner/mass", mass);
             // quad_utils::loadROSParam(nh, "global_body_planner/grf_min", grf_min);

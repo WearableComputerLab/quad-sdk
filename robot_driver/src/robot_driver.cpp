@@ -72,8 +72,8 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
 
   // ================ Testing Area =================
   //ROS_INFO("Single Joint Command!!!!!!!!!!!!!!!!! %s", single_joint_cmd_topic);
-  std::cout << "Single Joint Command: " << single_joint_cmd_topic << std::endl;
-  std::cout << "robot_name: " << robot_name << std::endl;
+  // std::cout << "Single Joint Command: " << single_joint_cmd_topic << std::endl;
+  // std::cout << "robot_name: " << robot_name << std::endl;
   
   // Setup pubs and subs
   local_plan_sub_ =

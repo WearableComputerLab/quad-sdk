@@ -18,6 +18,7 @@ void OfflineGlobalBodyPlan::clear() {
 }
 
 void OfflineGlobalBodyPlan::getNominalHeight(State &s, const PlannerConfig &planner_config) {
+    // std::cout << "planner_config.h_nom: " << planner_config.h_nom << std::endl;
     s.pos(2) = planner_config.h_nom + getTerrainZFilteredFromState(s, planner_config);
 }
 
