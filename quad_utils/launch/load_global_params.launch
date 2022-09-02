@@ -3,6 +3,7 @@
     <arg name="load_robot_params" default="false"/>
 
     <rosparam command="load" file="$(find global_body_planner)/global_body_planner.yaml" />
+    <rosparam command="load" file="$(find offline_global_body_planner)/offline_global_body_planner.yaml" />
     <rosparam command="load" file="$(find local_planner)/local_planner.yaml" />
     <rosparam command="load" file="$(find nmpc_controller)/nmpc_controller.yaml" />
     <rosparam command="load" file="$(find robot_driver)/robot_driver.yaml" />
@@ -13,6 +14,7 @@
     <rosparam command="load" file="$(find quad_utils)/config/rviz_interface.yaml" />
     <rosparam command="load" file="$(find quad_utils)/config/trajectory_publisher.yaml" />
     <rosparam command="load" file="$(find quad_utils)/config/topics_global.yaml" />
+    <param name="robot_type?" type="str" value="$(arg robot_type)"/>
 
     <group if="$(eval arg('robot_type') == 'spirit')">
         <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit.sdf" />
@@ -22,6 +24,12 @@
     <group if="$(eval arg('robot_type') == 'a1')">
         <param name="robot_description_sdf" textfile="$(find a1_description)/sdf_mesh/a1.sdf" />
         <param name="robot_description" command="cat $(find a1_description)/urdf/a1.urdf" />
+    </group>
+
+    <!-- Andrew added-->
+    <group if="$(eval arg('robot_type') == 'go1')">
+        <param name="robot_description_sdf" textfile="$(find go1_description)/sdf_mesh/go1.sdf" />
+        <param name="robot_description" command="cat $(find go1_description)/urdf/go1.urdf" />
     </group>
 
     <group if="$(arg load_robot_params)">

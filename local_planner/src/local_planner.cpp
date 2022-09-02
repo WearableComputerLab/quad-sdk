@@ -115,6 +115,8 @@ void LocalPlanner::initLocalBodyPlanner() {
     type = SPIRIT;
   } else if (robot_name_ == "a1") {
     type = A1;
+  } else if (robot_name_ == "go1") {
+    type = GO1;
   } else {
     ROS_WARN("WRONG ROBOT TYPE");
   }

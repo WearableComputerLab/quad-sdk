@@ -33,6 +33,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_vec_[A1][FUNC] = eval_g_a1;
   eval_vec_[A1][JAC] = eval_jac_g_a1;
   eval_vec_[A1][HESS] = eval_hess_g_a1;
+  eval_vec_[GO1][FUNC] = eval_g_go1;
+  eval_vec_[GO1][JAC] = eval_jac_g_go1;
+  eval_vec_[GO1][HESS] = eval_hess_g_go1;
 
   // Load work map
   eval_work_vec_[SPIRIT][FUNC] = eval_g_spirit_work;
@@ -41,6 +44,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_work_vec_[A1][FUNC] = eval_g_a1_work;
   eval_work_vec_[A1][JAC] = eval_jac_g_a1_work;
   eval_work_vec_[A1][HESS] = eval_hess_g_a1_work;
+  eval_work_vec_[GO1][FUNC] = eval_g_go1_work;
+  eval_work_vec_[GO1][JAC] = eval_jac_g_go1_work;
+  eval_work_vec_[GO1][HESS] = eval_hess_g_go1_work;
 
   // Load incref map
   eval_incref_vec_[SPIRIT][FUNC] = eval_g_spirit_incref;
@@ -49,6 +55,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_incref_vec_[A1][FUNC] = eval_g_a1_incref;
   eval_incref_vec_[A1][JAC] = eval_jac_g_a1_incref;
   eval_incref_vec_[A1][HESS] = eval_hess_g_a1_incref;
+  eval_incref_vec_[GO1][FUNC] = eval_g_go1_incref;
+  eval_incref_vec_[GO1][JAC] = eval_jac_g_go1_incref;
+  eval_incref_vec_[GO1][HESS] = eval_hess_g_go1_incref;
 
   // Load decref map
   eval_decref_vec_[SPIRIT][FUNC] = eval_g_spirit_decref;
@@ -57,6 +66,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_decref_vec_[A1][FUNC] = eval_g_a1_decref;
   eval_decref_vec_[A1][JAC] = eval_jac_g_a1_decref;
   eval_decref_vec_[A1][HESS] = eval_hess_g_a1_decref;
+  eval_decref_vec_[GO1][FUNC] = eval_g_go1_decref;
+  eval_decref_vec_[GO1][JAC] = eval_jac_g_go1_decref;
+  eval_decref_vec_[GO1][HESS] = eval_hess_g_go1_decref;
 
   // Load checkout map
   eval_checkout_vec_[SPIRIT][FUNC] = eval_g_spirit_checkout;
@@ -65,6 +77,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_checkout_vec_[A1][FUNC] = eval_g_a1_checkout;
   eval_checkout_vec_[A1][JAC] = eval_jac_g_a1_checkout;
   eval_checkout_vec_[A1][HESS] = eval_hess_g_a1_checkout;
+  eval_checkout_vec_[GO1][FUNC] = eval_g_go1_checkout;
+  eval_checkout_vec_[GO1][JAC] = eval_jac_g_go1_checkout;
+  eval_checkout_vec_[GO1][HESS] = eval_hess_g_go1_checkout;
 
   // Load release map
   eval_release_vec_[SPIRIT][FUNC] = eval_g_spirit_release;
@@ -73,6 +88,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_release_vec_[A1][FUNC] = eval_g_a1_release;
   eval_release_vec_[A1][JAC] = eval_jac_g_a1_release;
   eval_release_vec_[A1][HESS] = eval_hess_g_a1_release;
+  eval_release_vec_[GO1][FUNC] = eval_g_go1_release;
+  eval_release_vec_[GO1][JAC] = eval_jac_g_go1_release;
+  eval_release_vec_[GO1][HESS] = eval_hess_g_go1_release;
 
   // Load sparsity map
   eval_sparsity_vec_[SPIRIT][FUNC] = eval_g_spirit_sparsity_out;
@@ -81,6 +99,9 @@ void quadNLP::loadCasadiFuncs() {
   eval_sparsity_vec_[A1][FUNC] = eval_g_a1_sparsity_out;
   eval_sparsity_vec_[A1][JAC] = eval_jac_g_a1_sparsity_out;
   eval_sparsity_vec_[A1][HESS] = eval_hess_g_a1_sparsity_out;
+  eval_sparsity_vec_[GO1][FUNC] = eval_g_go1_sparsity_out;
+  eval_sparsity_vec_[GO1][JAC] = eval_jac_g_go1_sparsity_out;
+  eval_sparsity_vec_[GO1][HESS] = eval_hess_g_go1_sparsity_out;
 
   // These functions are auto generated for adaptive complexity implementation
   eval_vec_[SIMPLE][FUNC] = eval_g_leg_simple;
