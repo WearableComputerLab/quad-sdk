@@ -346,7 +346,7 @@
     <gazebo reference="upper0">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -354,12 +354,12 @@
     <gazebo reference="lower0">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
     </gazebo>
     <gazebo reference="toe0">
         <mu1>0.6</mu1>
         <mu2>0.6</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -374,7 +374,7 @@
     <gazebo reference="upper1">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -382,12 +382,12 @@
     <gazebo reference="lower1">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
     </gazebo>
     <gazebo reference="toe1">
         <mu1>0.6</mu1>
         <mu2>0.6</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -402,7 +402,7 @@
     <gazebo reference="upper2">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -410,12 +410,12 @@
     <gazebo reference="lower2">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
     </gazebo>
     <gazebo reference="toe2">
         <mu1>0.6</mu1>
         <mu2>0.6</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -430,7 +430,7 @@
     <gazebo reference="upper3">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>
@@ -438,12 +438,12 @@
     <gazebo reference="lower3">
         <mu1>0.2</mu1>
         <mu2>0.2</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
     </gazebo>
     <gazebo reference="toe3">
         <mu1>0.6</mu1>
         <mu2>0.6</mu2>
-        <self_collide>1</self_collide>
+        <self_collide>0</self_collide>
         <material>Gazebo/DarkGrey</material>
         <kp  value="1000000.0"/>
         <kd  value="1.0"/>

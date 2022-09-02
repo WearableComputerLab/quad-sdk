@@ -353,7 +353,7 @@
   <gazebo reference="upper0">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -361,12 +361,12 @@
   <gazebo reference="lower0">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
   </gazebo>
   <gazebo reference="toe0">
     <mu1>0.6</mu1>
     <mu2>0.6</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -380,7 +380,7 @@
   <gazebo reference="upper1">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -388,12 +388,12 @@
   <gazebo reference="lower1">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
   </gazebo>
   <gazebo reference="toe1">
     <mu1>0.6</mu1>
     <mu2>0.6</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -407,7 +407,7 @@
   <gazebo reference="upper2">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -415,12 +415,12 @@
   <gazebo reference="lower2">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
   </gazebo>
   <gazebo reference="toe2">
     <mu1>0.6</mu1>
     <mu2>0.6</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -434,7 +434,7 @@
   <gazebo reference="upper3">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -442,12 +442,12 @@
   <gazebo reference="lower3">
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
   </gazebo>
   <gazebo reference="toe3">
     <mu1>0.6</mu1>
     <mu2>0.6</mu2>
-    <self_collide>1</self_collide>
+    <self_collide>0</self_collide>
     <material>Gazebo/DarkGrey</material>
     <kp value="1000000.0"/>
     <kd value="1.0"/>
@@ -642,7 +642,7 @@
   <!-- Lower leg joint -->
   <joint name="1" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 -3.05008995494 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper0"/>
     <child link="lower0"/>
     <axis xyz="0 1 0"/>
@@ -837,7 +837,7 @@
   <!-- Lower leg joint -->
   <joint name="3" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 -3.05008995494 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper1"/>
     <child link="lower1"/>
     <axis xyz="0 1 0"/>
@@ -1032,7 +1032,7 @@
   <!-- Lower leg joint -->
   <joint name="5" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 -3.05008995494 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper2"/>
     <child link="lower2"/>
     <axis xyz="0 1 0"/>
@@ -1227,7 +1227,7 @@
   <!-- Lower leg joint -->
   <joint name="7" type="revolute">
     <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-    <origin rpy="0 -3.05008995494 0" xyz="0 0 -0.213"/>
+    <origin rpy="0 -3.14159265359 0" xyz="0 0 -0.213"/>
     <parent link="upper3"/>
     <child link="lower3"/>
     <axis xyz="0 1 0"/>

@@ -1,7 +1,7 @@
 global_body_planner:
   h_max: 0.375                            # Maximum height of leg base, m
   h_min: 0.075                            # Minimum ground clearance of body corners, m
-  h_nom: 0.26                             # Nominal ground clearance of body, m
+  h_nom: 0.27                             # Nominal ground clearance of body, m
   v_max: 2.0                              # Maximum robot velocity, m/s
   v_nom: 0.75                             # Nominal velocity, m/s (used during connect function)
   robot_l: 0.3                            # Length of robot body, m
@@ -14,7 +14,7 @@ global_body_planner:
 offline_global_body_planner:
   h_max: 0.375                            # Maximum height of leg base, m
   h_min: 0.075                            # Minimum ground clearance of body corners, m
-  h_nom: 0.26                             # Nominal ground clearance of body, m
+  h_nom: 0.27                             # Nominal ground clearance of body, m
   v_max: 2.0                              # Maximum robot velocity, m/s
   v_nom: 0.75                             # Nominal velocity, m/s (used during connect function)
   robot_l: 0.3                            # Length of robot body, m
@@ -85,6 +85,6 @@ robot_driver:
   swing_kd_cart: [0, 0, 0] # N/m
   safety_kp: [0, 0, 0]
   safety_kd: [2, 2, 2]
-  stand_joint_angles: [0.0, 0.76, 1.49]
+  stand_joint_angles: [0.0, 0.76, 1.52]
   sit_joint_angles: [0.0, 0.0, 0.0]
   torque_limit: [23.7, 23.7, 23.7]

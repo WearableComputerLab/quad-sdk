@@ -145,7 +145,7 @@
         <!-- Lower leg joint -->
         <joint name="${kneeJointName}" type="revolute">
             <!-- <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/> -->
-            <origin rpy="0 ${-PI/1.03} 0" xyz="0 0 ${-thigh_length}"/>
+            <origin rpy="0 ${-PI} 0" xyz="0 0 ${-thigh_length}"/>
             <parent link="upper${suffix}"/>
             <child link="lower${suffix}"/>
             <axis xyz="0 1 0"/>
