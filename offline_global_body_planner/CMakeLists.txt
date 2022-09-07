@@ -102,6 +102,10 @@ target_link_libraries(${PROJECT_NAME}_node
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
+catkin_add_gtest(${PROJECT_NAME}-test
+  test/test_offline_global_body_planner.cpp)
+
+target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} ${catkin_LIBRARIES})
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
