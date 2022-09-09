@@ -40,7 +40,7 @@ NMPCController::NMPCController(ros::NodeHandle &nh, int robot_id) {
   quad_utils::loadROSParam(nh_, "/nmpc_controller/R_temporal_factor",
                            R_temporal_factor);
   Q_temporal_factor = std::pow(Q_temporal_factor, 1.0 / (N_ - 2));
-  //std::cout << "Q_temporal_factor: " << Q_temporal_factor << std::endl;
+  // std::cout << "Q_temporal_factor: " << Q_temporal_factor << std::endl;
   R_temporal_factor = std::pow(R_temporal_factor, 1.0 / (N_ - 2));
 
   // Determine whether to let horizon length vary or not
@@ -205,7 +205,8 @@ NMPCController::NMPCController(ros::NodeHandle &nh, int robot_id) {
               << fixed_complexity_schedule.transpose() << std::endl;
   }
 
-  // std::cout << "fixed complexity schedule:\n" << fixed_complexity_schedule.transpose() << std::endl;
+  // std::cout << "fixed complexity schedule:\n" <<
+  // fixed_complexity_schedule.transpose() << std::endl;
   mynlp_ = new quadNLP(default_system, N_, dt_, mu, panic_weights,
                        constraint_panic_weights, Q_temporal_factor,
                        R_temporal_factor, fixed_complexity_schedule, config_);
@@ -278,8 +279,9 @@ bool NMPCController::computePlan(
     const std::vector<std::vector<bool>> &contact_schedule,
     Eigen::MatrixXd &foot_positions, Eigen::MatrixXd &foot_velocities,
     Eigen::MatrixXd &state_traj, Eigen::MatrixXd &control_traj) {
-  //std::cout << "ref traj size: " << ref_traj.rows() << ", " << ref_traj.cols() << std::endl;
-  
+  // std::cout << "ref traj size: " << ref_traj.rows() << ", " <<
+  // ref_traj.cols() << std::endl;
+
   // Update solver settings
   ApplicationReturnStatus status;
   app_->Options()->SetNumericValue("mu_init", mynlp_->mu0_);

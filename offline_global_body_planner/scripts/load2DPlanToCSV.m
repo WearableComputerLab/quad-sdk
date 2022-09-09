@@ -4,7 +4,7 @@
 clear;clc;close all
 
 %% Load matlab data
-fileName = "4_1.mat";
+fileName = "0_7.mat";
 variableToLoad = {'x_true', 'x_true_second', 'u_second_value'}; % Load state pos first, then vel, then controls
 
 state_filename = 'states_traj.csv';

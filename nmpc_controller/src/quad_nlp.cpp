@@ -1597,7 +1597,7 @@ void quadNLP::update_structure() {
       adaptive_complexity_schedule_.head(N_).cwiseMax(
           fixed_complexity_schedule_.head(N_));
 
-  //std::cout << "complexity_schedule = " << complexity_schedule.transpose()
+  // std::cout << "complexity_schedule = " << complexity_schedule.transpose()
   //          << std::endl;
 
   // Resize vectors appropriately

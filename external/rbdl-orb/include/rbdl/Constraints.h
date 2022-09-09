@@ -10,20 +10,17 @@
 
 #include <memory>
 
-#include <rbdl/rbdl_math.h>
-#include <rbdl/rbdl_mathutils.h>
-#include <rbdl/Kinematics.h>
+#include <assert.h>
 #include <rbdl/Constraint.h>
 #include <rbdl/Constraint_Contact.h>
 #include <rbdl/Constraint_Loop.h>
+#include <rbdl/Kinematics.h>
+#include <rbdl/rbdl_math.h>
+#include <rbdl/rbdl_mathutils.h>
 #include <string.h>
-#include <assert.h>
 #include <map>
 
 namespace RigidBodyDynamics {
-
-
-
 
 /** \page constraints_page Constraints
  *
@@ -49,7 +46,7 @@ namespace RigidBodyDynamics {
  *
  * The values in the vectors ConstraintSet::force and
  * ConstraintSet::impulse contain the Lagrange multipliers or
- * change in Lagrange multipliers for each constraint when returning from one 
+ * change in Lagrange multipliers for each constraint when returning from one
  * of the contact functions.
  *
  * \section solution_constraint_system Solution of the Constraint System
@@ -103,7 +100,7 @@ namespace RigidBodyDynamics {
  \left(
    \begin{array}{c}
      H \dot{q}^{-} \\
-    v^{+} 
+    v^{+}
    \end{array}
  \right)
  * \f] where \f$H\f$ is the joint space inertia matrix computed with the
@@ -137,10 +134,10 @@ namespace RigidBodyDynamics {
  * different trade-offs as factors such as model topology, number of
  * constraints, constrained bodies, numerical stability, and performance
  * vary and evaluation has to be made on a case-by-case basis.
- * 
- * \subsection solving_constraints_dynamics Methods for Solving Constrained 
+ *
+ * \subsection solving_constraints_dynamics Methods for Solving Constrained
  * Dynamics
- * 
+ *
  * RBDL provides the following methods to compute the acceleration of a
  * constrained system:
  *
@@ -157,14 +154,18 @@ namespace RigidBodyDynamics {
  * - ComputeConstraintImpulsesRangeSpaceSparse()
  * - ComputeConstraintImpulsesNullSpace()
  *
- * \subsection assembly_q_qdot Computing generalized joint positions and velocities
+ * \subsection assembly_q_qdot Computing generalized joint positions and
+ velocities
  * satisfying the constraint equations.
  *
  * When considering a model subject position level constraints expressed by the
- * equation \f$\phi (q) = 0\f$, it is often necessary to compute generalized joint
+ * equation \f$\phi (q) = 0\f$, it is often necessary to compute generalized
+ joint
  * position and velocities which satisfy the constraints. Even velocity-level
- * constraints may have position-level assembly constraints:  a rolling-without-slipping
- * constraint is a velocity-level constraint, but during assembly it might be desireable
+ * constraints may have position-level assembly constraints:  a
+ rolling-without-slipping
+ * constraint is a velocity-level constraint, but during assembly it might be
+ desireable
  * to put the rolling surfaces in contact with eachother.
  *
  * In order to compute a vector of generalized joint positions that satisfy
@@ -174,17 +175,19 @@ namespace RigidBodyDynamics {
  * \text{over} && q \\
  * \text{subject to} && \phi (q) = 0
  * \f}
- * 
+ *
  * In order to compute a vector of generalized joint velocities that satisfy
  * the constraints it is necessary to solve the following optimization problem:
  * \f{eqnarray*}{
- * \text{minimize} && \sum_{i = 0}^{n} (\dot{q} - \dot{q}_{0})^T W (\dot{q} - \dot{q}_{0}) \\
+ * \text{minimize} && \sum_{i = 0}^{n} (\dot{q} - \dot{q}_{0})^T W (\dot{q} -
+ \dot{q}_{0}) \\
  * \text{over} && \dot{q} \\
  * \text{subject to} && \dot{\phi} (q) = \phi _{q}(q) \dot{q} + \phi _{t}(q) = 0
  * \f}
  *
  * \f$q_{0}\f$ and \f$\dot{q}_{0}\f$ are initial guesses, \f$\phi _{q}\f$ is the
- * constraints Jacobian (partial derivative of \f$\phi\f$ with respect to \f$q\f$),
+ * constraints Jacobian (partial derivative of \f$\phi\f$ with respect to
+ \f$q\f$),
  * and \f$\phi _{t}(q)\f$ is the partial derivative of \f$\phi\f$ with respect
  * to time.  \f$W\f$ is a diagonal weighting matrix, which can be exploited
  * to prioritize changes in the position/ velocity of specific joints.
@@ -195,26 +198,28 @@ namespace RigidBodyDynamics {
  *
  * These problems are solved using the Lagrange multipliers method. For the
  * velocity problem the solution is exact. For the position problem the
- * constraints are linearized in the form 
+ * constraints are linearized in the form
  * \f$ \phi (q_{0}) + \phi _{t}(q0) + \phi _{q_0}(q) (q - q_{0}) \f$
- * and the linearized problem is solved iteratively until the constraint position
+ * and the linearized problem is solved iteratively until the constraint
+ position
  * errors are smaller than a given threshold.
  *
- * RBDL provides two functions to compute feasible joint position and velocities:
+ * RBDL provides two functions to compute feasible joint position and
+ velocities:
  * - CalcAssemblyQ()
  * - CalcAssemblyQDot()
  *
  * \subsection baumgarte_stabilization Baumgarte Stabilization
  *
  * The constrained dynamic equations are correct at the acceleration level
- * but will drift at the velocity and position level during numerical 
+ * but will drift at the velocity and position level during numerical
  * integration. RBDL implements Baumgarte stabilization to avoid
  * the accumulation of position and velocity errors for loop constraints and
  * custom constraints. Contact constraints do not have Baumgarte stabilization
- * because they are a special case which does not typically suffer from drift. 
- * The stabilization term can be enabled/disabled using the appropriate 
- * ConstraintSet::AddLoopConstraint and ConstraintSet::AddCustomConstraint 
- * functions. 
+ * because they are a special case which does not typically suffer from drift.
+ * The stabilization term can be enabled/disabled using the appropriate
+ * ConstraintSet::AddLoopConstraint and ConstraintSet::AddCustomConstraint
+ * functions.
  *
  * The dynamic equations are changed to the following form: \f[
  \left(
@@ -239,7 +244,7 @@ namespace RigidBodyDynamics {
  * \f] A term \f$\gamma _{stab}\f$ is added to the right hand side of the
  * equation, defined in the following way: \f[
    \gamma _{stab} = - 2 \alpha \dot{\phi} (q) - \beta^2 \phi (q)
- * \f] where \f$\phi (q)\f$ are the position level constraint errors and 
+ * \f] where \f$\phi (q)\f$ are the position level constraint errors and
  * \f$\alpha\f$ and \f$\beta\f$ are tuning coefficients. There is
  * no clear and simple rule on how to choose them as good values also
  * depend on the used integration method and time step. If the values are
@@ -264,12 +269,10 @@ namespace RigidBodyDynamics {
 
 struct Model;
 
+// class RBDL_DLLAPI Constraint;
 
-
-//class RBDL_DLLAPI Constraint;
-
-
-/** \brief Structure that contains both constraint information and workspace memory.
+/** \brief Structure that contains both constraint information and workspace
+ * memory.
  *
  * This structure is used to reduce the amount of memory allocations that
  * are needed when computing constraint forces.
@@ -279,18 +282,15 @@ struct Model;
  * ForwardDynamicsContacts \endlink.
  */
 struct RBDL_DLLAPI ConstraintSet {
-  ConstraintSet() :
-    linear_solver (Math::LinearSolverColPivHouseholderQR),
-    bound (false) {}
-
-
+  ConstraintSet()
+      : linear_solver(Math::LinearSolverColPivHouseholderQR), bound(false) {}
 
   /**
       @brief getGroupIndex returns the index to a constraints that have been
              grouped because they are of the same type, apply to the same
              bodies, and apply to the same local frames on each body.
 
-      @note Internally this function makes a temporary string. If speed is 
+      @note Internally this function makes a temporary string. If speed is
             a concern then do not call this function in a loop: either save
             the index locally, use the userDefinedId (which is an integer),
             or use the assigned id (also an integer).
@@ -301,7 +301,7 @@ struct RBDL_DLLAPI ConstraintSet {
       @return: the group index of the constraint
   */
 
-  unsigned int getGroupIndexByName(const char* userDefinedName){
+  unsigned int getGroupIndexByName(const char *userDefinedName) {
     std::string conName(userDefinedName);
     return nameGroupMap.at(conName);
   }
@@ -317,7 +317,7 @@ struct RBDL_DLLAPI ConstraintSet {
       @return: the group index of the constraint
   */
 
-  unsigned int getGroupIndexById(unsigned int userDefinedId){
+  unsigned int getGroupIndexById(unsigned int userDefinedId) {
     return userDefinedIdGroupMap.at(userDefinedId);
   }
 
@@ -334,10 +334,9 @@ struct RBDL_DLLAPI ConstraintSet {
       @return: the group index of the constraint
   */
 
-  unsigned int getGroupIndexByAssignedId(unsigned int assignedId){
+  unsigned int getGroupIndexByAssignedId(unsigned int assignedId) {
     return idGroupMap.at(assignedId);
   }
-
 
   /**
       @brief getGroupIndexMax returns the maximum valid constraint
@@ -345,9 +344,7 @@ struct RBDL_DLLAPI ConstraintSet {
       be iterated over if desired.
       @return the largest group index
    */
-  unsigned int getGroupIndexMax(){
-    return unsigned(constraints.size()-1);
-  }
+  unsigned int getGroupIndexMax() { return unsigned(constraints.size() - 1); }
 
   /**
       @brief Returns the name of the constraint group, which may differ from
@@ -365,7 +362,7 @@ struct RBDL_DLLAPI ConstraintSet {
              set (e.g. when AddCustomConstraint was called).
 
    */
-  const char* getGroupName(unsigned int groupIndex){
+  const char *getGroupName(unsigned int groupIndex) {
     return constraints[groupIndex]->getName();
   }
 
@@ -377,7 +374,7 @@ struct RBDL_DLLAPI ConstraintSet {
               contact and loop constraints) the size might be larger than you
               expect.
    */
-  unsigned int getGroupSize(unsigned int groupIndex){
+  unsigned int getGroupSize(unsigned int groupIndex) {
     return constraints[groupIndex]->getConstraintSize();
   }
 
@@ -387,7 +384,7 @@ struct RBDL_DLLAPI ConstraintSet {
       @return the integer that corresponds to the ConstraintType of this
               constraint group.
    */
-  unsigned int getGroupType(unsigned int groupIndex){
+  unsigned int getGroupType(unsigned int groupIndex) {
     return constraints[groupIndex]->getConstraintType();
   }
 
@@ -408,10 +405,9 @@ struct RBDL_DLLAPI ConstraintSet {
               constraint was added to the constraint set (e.g. when
               AddCustomConstraint was called).
    */
-  unsigned int getGroupId(unsigned int groupIndex){  
+  unsigned int getGroupId(unsigned int groupIndex) {
     return constraints[groupIndex]->getUserDefinedId();
   }
-
 
   /**
       @brief Returns assigned id of the constraint group which will be the first
@@ -429,21 +425,21 @@ struct RBDL_DLLAPI ConstraintSet {
               to the constraint set (e.g. when AddCustomConstraint was called).
    */
 
-  unsigned int getGroupAssignedId(unsigned int groupIndex){
-    unsigned int assignedId=std::numeric_limits<unsigned int>::max();
+  unsigned int getGroupAssignedId(unsigned int groupIndex) {
+    unsigned int assignedId = std::numeric_limits<unsigned int>::max();
     auto it = idGroupMap.begin();
     bool found = false;
-    while(it != idGroupMap.end() && found == false){
-      if(it->second == groupIndex){
+    while (it != idGroupMap.end() && found == false) {
+      if (it->second == groupIndex) {
         assignedId = it->first;
         found = true;
       }
       it++;
     }
-    if(found==false){
+    if (found == false) {
       std::cerr << "Error: a groupIndex of " << groupIndex
                 << " could not be found. Valid groupIndex range between 0 and "
-                << unsigned(constraints.size()-1);
+                << unsigned(constraints.size() - 1);
       assert(0);
       abort();
     }
@@ -477,7 +473,7 @@ struct RBDL_DLLAPI ConstraintSet {
               in which the spatial forces are resolved into. The ordering for
               the standard constraints are as follows :
               - ContactConstraint
-                - [0] : body 
+                - [0] : body
                 - [1] : ground
               - Loop Constraint
                 - [0] : predecessor body
@@ -487,30 +483,30 @@ struct RBDL_DLLAPI ConstraintSet {
               in which the spatial forces are resolved. The \f$i^{th}\f$ frame
               is located in the \f$i^{th}\f$ body id listed in
               constraintBodyIdsOutput.
- 
+
       @param constraintForcesOutputUpd: a reference to a vector of spatial
               forces generated by this constraint. The \f$i^{th}\f$ spatial
               force is resolved into the \f$i^{th}\f$ frame listed in
               constraintBodyFramesOutput.
 
-      @param resolveAllInRootFrame: 
-              - false: spatial forces are resolved into the local frames attached to the bodies involved in this constraint
-              - true: spatial forces are resolved into the base frame. Note that this means that all entires in constraintBodyIdsOutput will be 0, the frames in constraintFramesOutput will have their origins at the contact frames but with directions that match the base frame.
+      @param resolveAllInRootFrame:
+              - false: spatial forces are resolved into the local frames
+     attached to the bodies involved in this constraint
+              - true: spatial forces are resolved into the base frame. Note that
+     this means that all entires in constraintBodyIdsOutput will be 0, the
+     frames in constraintFramesOutput will have their origins at the contact
+     frames but with directions that match the base frame.
 
       @param updateKinematics: setting this flag to true will trigger the
             kinematic transforms of the model to be updated.
    */
   void calcForces(
-      unsigned int groupIndex,
-      Model& model,
-      const Math::VectorNd &Q,
+      unsigned int groupIndex, Model &model, const Math::VectorNd &Q,
       const Math::VectorNd &QDot,
-      std::vector< unsigned int > &updConstraintBodyIdsOutput,
-      std::vector< Math::SpatialTransform > &updConstraintBodyFramesOutput,
-      std::vector< Math::SpatialVector > &updConstraintForcesOutput,
-      bool resolveAllInRootFrame = false,
-      bool updateKinematics = false);
-
+      std::vector<unsigned int> &updConstraintBodyIdsOutput,
+      std::vector<Math::SpatialTransform> &updConstraintBodyFramesOutput,
+      std::vector<Math::SpatialVector> &updConstraintForcesOutput,
+      bool resolveAllInRootFrame = false, bool updateKinematics = false);
 
   /**
       @brief  calcImpulses resolves the generalized impluses generated by
@@ -521,7 +517,7 @@ struct RBDL_DLLAPI ConstraintSet {
       @note <b>Important:</b> The values returned by this function are only
             valid <b>after</b> one of the impulse methods
             (ComputeConstraintImpulsesDirect,
-            ComputeConstraintImpulsesNullSpace, etc) have been evaluated. 
+            ComputeConstraintImpulsesNullSpace, etc) have been evaluated.
             Why? This function makes use of the
             Lagrange multipliers which are only evaluated when these
             dynamics-level functions are called.
@@ -539,7 +535,7 @@ struct RBDL_DLLAPI ConstraintSet {
               in which the spatial forces are resolved into. The ordering for
               the standard constraints are as follows :
               - ContactConstraint
-                - [0] : body 
+                - [0] : body
                 - [1] : ground
               - Loop Constraint
                 - [0] : predecessor body
@@ -549,29 +545,30 @@ struct RBDL_DLLAPI ConstraintSet {
               in which the spatial forces are resolved. The \f$i^{th}\f$ frame
               is located in the \f$i^{th}\f$ body id listed in
               constraintBodyIdsOutput.
- 
+
       @param constraintImpulsesOutput: a vector of spatial
               impulses generated by this constraint. The \f$i^{th}\f$ spatial
               impulse is resolved into the \f$i^{th}\f$ frame listed in
               constraintBodyFramesOutput.
 
-      @param resolveAllInRootFrame: 
-              - false: spatial impulses are resolved into the local frames attached to the bodies involved in this constraint
-              - true: spatial impulses are resolved into the base frame. Note that this means that all entires in constraintBodyIdsOutput will be 0, the frames in constraintFramesOutput will have their origins at the contact frames but with directions that match the base frame.
+      @param resolveAllInRootFrame:
+              - false: spatial impulses are resolved into the local frames
+     attached to the bodies involved in this constraint
+              - true: spatial impulses are resolved into the base frame. Note
+     that this means that all entires in constraintBodyIdsOutput will be 0, the
+     frames in constraintFramesOutput will have their origins at the contact
+     frames but with directions that match the base frame.
 
       @param updateKinematics: setting this flag to true will trigger the
             kinematic transforms of the model to be updated.
    */
   void calcImpulses(
-      unsigned int groupIndex,
-      Model& model,
-      const Math::VectorNd &Q,
+      unsigned int groupIndex, Model &model, const Math::VectorNd &Q,
       const Math::VectorNd &QDot,
-      std::vector< unsigned int > &constraintBodyIdsOutput,
-      std::vector< Math::SpatialTransform > &constraintBodyFramesOutput,
-      std::vector< Math::SpatialVector > &constraintImpulsesOutput,
-      bool resolveAllInRootFrame = false,
-      bool updateKinematics = false);
+      std::vector<unsigned int> &constraintBodyIdsOutput,
+      std::vector<Math::SpatialTransform> &constraintBodyFramesOutput,
+      std::vector<Math::SpatialVector> &constraintImpulsesOutput,
+      bool resolveAllInRootFrame = false, bool updateKinematics = false);
 
   /**
       @brief calcPositionError calculates the vector of position
@@ -586,19 +583,16 @@ struct RBDL_DLLAPI ConstraintSet {
 
       @param Q: the generalized positions of the model
 
-      @param positionErrorOutput: (output) a reference to the vector of constraint
-            errors
+      @param positionErrorOutput: (output) a reference to the vector of
+     constraint errors
 
       @param updateKinematics: setting this flag to true will trigger the
             kinematic transforms of the model to be updated.
    */
-  void calcPositionError(
-      unsigned int groupIndex,
-      Model& model,
-      const Math::VectorNd &Q,
-      Math::VectorNd &positionErrorOutput,
-      bool updateKinematics = false);
-
+  void calcPositionError(unsigned int groupIndex, Model &model,
+                         const Math::VectorNd &Q,
+                         Math::VectorNd &positionErrorOutput,
+                         bool updateKinematics = false);
 
   /**
       @brief calcVelocityError calculates the vector of position
@@ -615,20 +609,16 @@ struct RBDL_DLLAPI ConstraintSet {
 
       @param QDot: the generalized velocities of the model
 
-      @param velocityErrorOutput: (output) the vector of constraint errors at the
-              velocity level
+      @param velocityErrorOutput: (output) the vector of constraint errors at
+     the velocity level
 
       @param updateKinematics: setting this flag to true will trigger the
             kinematic transforms of the model to be updated.
    */
-  void calcVelocityError(
-      unsigned int groupIndex,
-      Model& model,
-      const Math::VectorNd &Q,
-      const Math::VectorNd &QDot,
-      Math::VectorNd &velocityErrorOutput,
-      bool updateKinematics = false);
-
+  void calcVelocityError(unsigned int groupIndex, Model &model,
+                         const Math::VectorNd &Q, const Math::VectorNd &QDot,
+                         Math::VectorNd &velocityErrorOutput,
+                         bool updateKinematics = false);
 
   /**
 
@@ -648,20 +638,17 @@ struct RBDL_DLLAPI ConstraintSet {
       @param baumgarteForcesOutput: (output) a reference to the vector of
               baumgarte stabilization forces applied to this this constraint.
    */
-  void calcBaumgarteStabilizationForces(
-      unsigned int groupIndex,
-      Model& model,
-      const Math::VectorNd &positionError,
-      const Math::VectorNd &velocityError,
-      Math::VectorNd &baumgarteForcesOutput);
+  void calcBaumgarteStabilizationForces(unsigned int groupIndex, Model &model,
+                                        const Math::VectorNd &positionError,
+                                        const Math::VectorNd &velocityError,
+                                        Math::VectorNd &baumgarteForcesOutput);
 
   /**
      @param groupIndex: the index number of this constraint (see getGroupIndex
             index functions)
      @return true if Baumgarte stabilization is enabled
   */
-  bool isBaumgarteStabilizationEnabled(
-      unsigned int groupIndex){
+  bool isBaumgarteStabilizationEnabled(unsigned int groupIndex) {
     return constraints[groupIndex]->isBaumgarteStabilizationEnabled();
   }
 
@@ -669,8 +656,7 @@ struct RBDL_DLLAPI ConstraintSet {
      @param groupIndex: the index number of this constraint (see getGroupIndex
             index functions)
   */
-  void enableBaumgarteStabilization(
-      unsigned int groupIndex){
+  void enableBaumgarteStabilization(unsigned int groupIndex) {
     return constraints[groupIndex]->setEnableBaumgarteStabilization(true);
   }
 
@@ -678,17 +664,15 @@ struct RBDL_DLLAPI ConstraintSet {
      @param groupIndex: the index number of this constraint (see getGroupIndex
             index functions)
   */
-  void disableBaumgarteStabilization(
-      unsigned int groupIndex){
+  void disableBaumgarteStabilization(unsigned int groupIndex) {
     return constraints[groupIndex]->setEnableBaumgarteStabilization(false);
   }
 
-
   void getBaumgarteStabilizationCoefficients(
       unsigned int groupIndex,
-      Math::Vector2d& baumgartePositionVelocityCoefficientsOutput){
-      constraints[groupIndex]->getBaumgarteStabilizationParameters(
-                                baumgartePositionVelocityCoefficientsOutput);
+      Math::Vector2d &baumgartePositionVelocityCoefficientsOutput) {
+    constraints[groupIndex]->getBaumgarteStabilizationParameters(
+        baumgartePositionVelocityCoefficientsOutput);
   }
 
   /** @brief Adds a single contact constraint (point-ground) to the
@@ -709,47 +693,44 @@ struct RBDL_DLLAPI ConstraintSet {
             the function GetConstraintIndex can find it.
 
      @param userDefinedId a user defined id (optional, defaults to max()).
-            Set this field to a unique number (within this ConstraintSet) so that
-            the function GetConstraintIndex can find it.
+            Set this field to a unique number (within this ConstraintSet) so
+     that the function GetConstraintIndex can find it.
    */
-  unsigned int AddContactConstraint (
-    unsigned int bodyId,
-    const Math::Vector3d &bodyPoint,
-    const Math::Vector3d &worldNormal,
-    const char *constraintName = NULL,
-    unsigned int userDefinedId = std::numeric_limits<unsigned int>::max());
-
+  unsigned int AddContactConstraint(
+      unsigned int bodyId, const Math::Vector3d &bodyPoint,
+      const Math::Vector3d &worldNormal, const char *constraintName = NULL,
+      unsigned int userDefinedId = std::numeric_limits<unsigned int>::max());
 
   /** \brief Adds a loop constraint to the constraint set.
-   
+
     This type of constraints ensures that the relative orientation and position,
     spatial velocity, and spatial acceleration between two frames in two bodies
     are null along a specified spatial constraint axis.
-   
+
     @param bodyIdPredecessor the identifier of the predecessor body
 
     @param bodyIdSuccessor the identifier of the successor body
 
     @param XPredecessor a spatial transform localizing the constrained
-            frames on the predecessor body, expressed with respect to the 
+            frames on the predecessor body, expressed with respect to the
             predecessor body frame. Note the position vector should be
             the r_BPB (from the body's origin, to the predessor frame, in the
             coordinates of the body's frame) and E_BP (the rotation matrix that
-            will rotate vectors from the coordinates of the P frame to the 
+            will rotate vectors from the coordinates of the P frame to the
             coordinates of the body's frame).
-    
+
     @param XSuccessor a spatial transform localizing the constrained
           frames on the successor body, expressed with respect to the successor
           body frame. Note the position vector should be
             the r_BSB (from the body's origin, to the successor frame, in the
             coordinates of the body's frame) and E_BS (the rotation matrix that
-            will rotate vectors from the coordinates of the S frame to the 
+            will rotate vectors from the coordinates of the S frame to the
             coordinates of the body's frame).
-    
-    @param constraintAxisInPredecessor a spatial vector, resolved in the frame of
-            the predecessor frame, indicating the axis along which the 
-            constraint acts
-    
+
+    @param constraintAxisInPredecessor a spatial vector, resolved in the frame
+    of the predecessor frame, indicating the axis along which the constraint
+    acts
+
      @param enableBaumgarteStabilization (optional, default false) setting this
             flag to true will modify the right hand side of the acceleration
             equation with a penaltiy term that is proportional to the constraint
@@ -764,24 +745,19 @@ struct RBDL_DLLAPI ConstraintSet {
             the function GetConstraintIndex can find it.
 
      @param userDefinedId a user defined id (optional, defaults to max()).
-            Set this field to a unique number (within this ConstraintSet) so that
-            the function GetConstraintIndex can find it.
+            Set this field to a unique number (within this ConstraintSet) so
+    that the function GetConstraintIndex can find it.
 
 
    */
-    unsigned int AddLoopConstraint(
-      unsigned int bodyIdPredecessor,
-      unsigned int bodyIdSuccessor,
+  unsigned int AddLoopConstraint(
+      unsigned int bodyIdPredecessor, unsigned int bodyIdSuccessor,
       const Math::SpatialTransform &XPredecessor,
       const Math::SpatialTransform &XSuccessor,
       const Math::SpatialVector &constraintAxisInPredecessor,
       bool enableBaumgarteStabilization = false,
-      double stabilizationTimeConstant = 0.1,
-      const char *constraintName = NULL,
+      double stabilizationTimeConstant = 0.1, const char *constraintName = NULL,
       unsigned int userDefinedId = std::numeric_limits<unsigned int>::max());
-
-
-
 
   /** \brief Adds a custom constraint to the constraint set.
    *
@@ -796,17 +772,16 @@ struct RBDL_DLLAPI ConstraintSet {
    * flag.
    */
   ConstraintSet Copy() {
-    ConstraintSet result (*this);
+    ConstraintSet result(*this);
     result.bound = false;
 
     return result;
   }
 
-  /** \brief Specifies which method should be used for solving undelying linear systems.
+  /** \brief Specifies which method should be used for solving undelying linear
+   * systems.
    */
-  void SetSolver (Math::LinearSolver solver) {
-    linear_solver = solver;
-  }
+  void SetSolver(Math::LinearSolver solver) { linear_solver = solver; }
 
   /** \brief Initializes and allocates memory for the constraint set.
    *
@@ -820,38 +795,36 @@ struct RBDL_DLLAPI ConstraintSet {
    * modified after the set is bound to the model.
    *
    */
-  bool Bind (const Model &model);
+  bool Bind(const Model &model);
 
   /**
-    \brief Initializes and allocates memory needed for 
+    \brief Initializes and allocates memory needed for
             InverseDynamicsConstraints and InverseDynamicsConstraintsRelaxed
 
     This function allocates the temporary vectors and matrices needed
-    for the RigidBodyDynamics::InverseDynamicsConstraints and RigidBodyDynamics::InverseDynamicsConstraintsRelaxed
-    methods. In addition, the constant matrices S and P are set here. 
-    This function needs to be called once
-    before calling either RigidBodyDynamics::InverseDynamicsConstraints or
-    RigidBodyDynamics::InverseDynamicsConstraintsRelaxed. It does not ever need be called
-    again, unless the actuated degrees of freedom change, or the constraint
-    set changes.
+    for the RigidBodyDynamics::InverseDynamicsConstraints and
+    RigidBodyDynamics::InverseDynamicsConstraintsRelaxed methods. In addition,
+    the constant matrices S and P are set here. This function needs to be called
+    once before calling either RigidBodyDynamics::InverseDynamicsConstraints or
+    RigidBodyDynamics::InverseDynamicsConstraintsRelaxed. It does not ever need
+    be called again, unless the actuated degrees of freedom change, or the
+    constraint set changes.
 
-    \param model rigid body model   
-    \param actuatedDof : a vector that is q_size in length (or dof_count in 
-                         length) which has a 'true' entry for every generalized 
-                         degree-of freedom that is driven by an actuator and 
-                         'false' for every degree-of-freedom that is not. 
+    \param model rigid body model
+    \param actuatedDof : a vector that is q_size in length (or dof_count in
+                         length) which has a 'true' entry for every generalized
+                         degree-of freedom that is driven by an actuator and
+                         'false' for every degree-of-freedom that is not.
 
   */
   void SetActuationMap(const Model &model,
-                          const std::vector<bool> &actuatedDof);
+                       const std::vector<bool> &actuatedDof);
 
   /** \brief Returns the number of constraints. */
-  size_t size() const {
-    return constraintType.size();
-  }
+  size_t size() const { return constraintType.size(); }
 
   /** \brief Clears all variables in the constraint set. */
-  void clear ();
+  void clear();
 
   /// Method that should be used to solve internal linear systems.
   Math::LinearSolver linear_solver;
@@ -863,13 +836,14 @@ struct RBDL_DLLAPI ConstraintSet {
 
   std::vector<std::string> name;
 
-  std::map < std::string, unsigned int > nameGroupMap;
-  std::map < unsigned int, unsigned int> userDefinedIdGroupMap;
-  std::map < unsigned int, unsigned int> idGroupMap;
+  std::map<std::string, unsigned int> nameGroupMap;
+  std::map<unsigned int, unsigned int> userDefinedIdGroupMap;
+  std::map<unsigned int, unsigned int> idGroupMap;
 
-  //A shared_ptr (MM 28 May 2019)
+  // A shared_ptr (MM 28 May 2019)
   //  :is 2x as expensive (with the optimize flags turned on) as a regular
-  //   pointer (https://www.modernescpp.com/index.php/memory-and-performance-overhead-of-smart-pointer)
+  //   pointer
+  //   (https://www.modernescpp.com/index.php/memory-and-performance-overhead-of-smart-pointer)
   //  :But
   //    -The memory is deleted automatically when all references are deleted.
   //    -A shared_ptr works with the existing Copy function
@@ -880,13 +854,12 @@ struct RBDL_DLLAPI ConstraintSet {
   //   included in C++14, while shared_ptr is available in C++11. While this
   //   is clearly the better option, this will require me to make more
   //   edits to ConstraintSet: I don't have the time for this at the moment
-  std::vector< std::shared_ptr<Constraint> > constraints;
+  std::vector<std::shared_ptr<Constraint> > constraints;
 
-  std::vector< std::shared_ptr<ContactConstraint> > contactConstraints;
+  std::vector<std::shared_ptr<ContactConstraint> > contactConstraints;
 
-  std::vector< std::shared_ptr<LoopConstraint> > loopConstraints;
+  std::vector<std::shared_ptr<LoopConstraint> > loopConstraints;
 
-  
   /** Position error for the Baumgarte stabilization */
   Math::VectorNd err;
   /** Velocity error for the Baumgarte stabilization */
@@ -895,9 +868,9 @@ struct RBDL_DLLAPI ConstraintSet {
   /// The Lagrange multipliers, which due to some careful normalization
   /// in the formulation of constraints are the constraint forces.
   Math::VectorNd force;
-  /// Constraint impulses along the constraint directions. 
+  /// Constraint impulses along the constraint directions.
   Math::VectorNd impulse;
-  /// The velocities we want to have along the constraint directions 
+  /// The velocities we want to have along the constraint directions
   Math::VectorNd v_plus;
 
   // Variables used by the Lagrangian methods
@@ -933,10 +906,10 @@ struct RBDL_DLLAPI ConstraintSet {
   Math::VectorNd v;
 
   Math::MatrixNd F;
-  Math::MatrixNd Ful,Fur,Fll,Flr; //blocks of f for SimpleMath
+  Math::MatrixNd Ful, Fur, Fll, Flr;  // blocks of f for SimpleMath
 
   Math::MatrixNd GT;
-  Math::MatrixNd GTu, GTl;//blocks of GT for SimpleMath
+  Math::MatrixNd GTu, GTl;  // blocks of GT for SimpleMath
   Math::VectorNd g;
   Math::MatrixNd Ru;
   Math::VectorNd py;
@@ -950,7 +923,7 @@ struct RBDL_DLLAPI ConstraintSet {
   Math::MatrixNd GPT;
   Math::MatrixNd Y;
   Math::MatrixNd Z;
-  Math::MatrixNd R;  
+  Math::MatrixNd R;
   Math::VectorNd qddot_y;
   Math::VectorNd qddot_z;
 
@@ -986,33 +959,25 @@ struct RBDL_DLLAPI ConstraintSet {
   std::vector<Math::Vector3d> d_multdof3_u;
 
   ConstraintCache cache;
-
-
-
-  
 };
 
 /** \brief Computes the position errors for the given ConstraintSet.
-  *
-  * \param model the model
-  * \param Q the generalized positions of the joints
-  * \param CS the constraint set for which the error should be computed
-  * \param errOutput vector where the error will be stored in (should have
-  * the size of CS).
-  * \param update_kinematics whether the kinematics of the model should be
-  * updated from Q.
-  *
-  * \note the position error is always 0 for contact constraints.
-  *
-  */
+ *
+ * \param model the model
+ * \param Q the generalized positions of the joints
+ * \param CS the constraint set for which the error should be computed
+ * \param errOutput vector where the error will be stored in (should have
+ * the size of CS).
+ * \param update_kinematics whether the kinematics of the model should be
+ * updated from Q.
+ *
+ * \note the position error is always 0 for contact constraints.
+ *
+ */
 RBDL_DLLAPI
-void CalcConstraintsPositionError(
-  Model& model,
-  const Math::VectorNd &Q,
-  ConstraintSet &CS,
-  Math::VectorNd& errOutput,
-  bool update_kinematics = true
-);
+void CalcConstraintsPositionError(Model &model, const Math::VectorNd &Q,
+                                  ConstraintSet &CS, Math::VectorNd &errOutput,
+                                  bool update_kinematics = true);
 
 /** \brief Computes the Jacobian for the given ConstraintSet
  *
@@ -1020,119 +985,99 @@ void CalcConstraintsPositionError(
  * \param Q     the generalized positions of the joints
  * \param CS    the constraint set for which the Jacobian should be computed
  * \param GOutput  matrix where the output will be stored in
- * \param update_kinematics whether the kinematics of the model should be 
+ * \param update_kinematics whether the kinematics of the model should be
  * updated from Q
  *
  */
 RBDL_DLLAPI
-void CalcConstraintsJacobian(
-  Model &model,
-  const Math::VectorNd &Q,
-  ConstraintSet &CS,
-  Math::MatrixNd &GOutput,
-  bool update_kinematics = true
-);
+void CalcConstraintsJacobian(Model &model, const Math::VectorNd &Q,
+                             ConstraintSet &CS, Math::MatrixNd &GOutput,
+                             bool update_kinematics = true);
 
 /** \brief Computes the velocity errors for the given ConstraintSet.
-  *
-  *
-  * \param model the model
-  * \param Q the generalized positions of the joints
-  * \param QDot the generalized velocities of the joints
-  * \param CS the constraint set for which the error should be computed
-  * \param errOutput vector where the error will be stored in (should have
-  * the size of CS).
-  * \param update_kinematics whether the kinematics of the model should be
-  * updated from Q.
-  *
-  * \note this is equivalent to multiplying the constraint Jacobian by the
-  * generalized velocities of the joints.
-  *
-  */
+ *
+ *
+ * \param model the model
+ * \param Q the generalized positions of the joints
+ * \param QDot the generalized velocities of the joints
+ * \param CS the constraint set for which the error should be computed
+ * \param errOutput vector where the error will be stored in (should have
+ * the size of CS).
+ * \param update_kinematics whether the kinematics of the model should be
+ * updated from Q.
+ *
+ * \note this is equivalent to multiplying the constraint Jacobian by the
+ * generalized velocities of the joints.
+ *
+ */
 RBDL_DLLAPI
-void CalcConstraintsVelocityError(
-  Model& model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDot,
-  ConstraintSet &CS,
-  Math::VectorNd& errOutput,
-  bool update_kinematics = true
-);
+void CalcConstraintsVelocityError(Model &model, const Math::VectorNd &Q,
+                                  const Math::VectorNd &QDot, ConstraintSet &CS,
+                                  Math::VectorNd &errOutput,
+                                  bool update_kinematics = true);
 
-/** \brief Computes the terms \f$H\f$, \f$G\f$, and \f$\gamma\f$ of the 
-  * constrained dynamic problem and stores them in the ConstraintSet.
-  *
-  *
-  * \param model the model
-  * \param Q the generalized positions of the joints
-  * \param QDot the generalized velocities of the joints
-  * \param Tau the generalized forces of the joints
-  * \param CSOutput the constraint set for which the error should be computed
-  * \param f_ext External forces acting on the body in base coordinates (optional, defaults to NULL)
-  *
-  * \note This function is normally called automatically in the various
-  * constrained dynamics functions, the user normally does not have to call it.
-  *
-  */
+/** \brief Computes the terms \f$H\f$, \f$G\f$, and \f$\gamma\f$ of the
+ * constrained dynamic problem and stores them in the ConstraintSet.
+ *
+ *
+ * \param model the model
+ * \param Q the generalized positions of the joints
+ * \param QDot the generalized velocities of the joints
+ * \param Tau the generalized forces of the joints
+ * \param CSOutput the constraint set for which the error should be computed
+ * \param f_ext External forces acting on the body in base coordinates
+ * (optional, defaults to NULL)
+ *
+ * \note This function is normally called automatically in the various
+ * constrained dynamics functions, the user normally does not have to call it.
+ *
+ */
 RBDL_DLLAPI
-void CalcConstrainedSystemVariables (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDot,
-  const Math::VectorNd &Tau,
-  ConstraintSet &CSOutput,
-  std::vector<Math::SpatialVector> *f_ext = NULL
-);
+void CalcConstrainedSystemVariables(
+    Model &model, const Math::VectorNd &Q, const Math::VectorNd &QDot,
+    const Math::VectorNd &Tau, ConstraintSet &CSOutput,
+    std::vector<Math::SpatialVector> *f_ext = NULL);
 
 /** \brief Computes a feasible initial value of the generalized joint positions.
-  * 
-  * \param model the model
-  * \param QInit initial guess for the generalized positions of the joints
-  * \param CS the constraint set for which the error should be computed
-  * \param QOutput vector of the generalized joint positions.
-  * \param weights weighting coefficients for the different joint positions.
-  * \param tolerance the function will return successfully if the constraint
-  * position error norm is lower than this value.
-  * \param max_iter the funciton will return unsuccessfully after performing
-  * this number of iterations.
-  * 
-  * \return true if the generalized joint positions were computed successfully,
-  * false otherwise.f
-  *
-  */
+ *
+ * \param model the model
+ * \param QInit initial guess for the generalized positions of the joints
+ * \param CS the constraint set for which the error should be computed
+ * \param QOutput vector of the generalized joint positions.
+ * \param weights weighting coefficients for the different joint positions.
+ * \param tolerance the function will return successfully if the constraint
+ * position error norm is lower than this value.
+ * \param max_iter the funciton will return unsuccessfully after performing
+ * this number of iterations.
+ *
+ * \return true if the generalized joint positions were computed successfully,
+ * false otherwise.f
+ *
+ */
 RBDL_DLLAPI
-bool CalcAssemblyQ(
-  Model &model,
-  Math::VectorNd QInit,
-  ConstraintSet &CS,
-  Math::VectorNd &QOutput,
-  const Math::VectorNd &weights,
-  double tolerance = 1e-12,
-  unsigned int max_iter = 100
-);
+bool CalcAssemblyQ(Model &model, Math::VectorNd QInit, ConstraintSet &CS,
+                   Math::VectorNd &QOutput, const Math::VectorNd &weights,
+                   double tolerance = 1e-12, unsigned int max_iter = 100);
 
-/** \brief Computes a feasible initial value of the generalized joint velocities.
-  * 
-  * \param model the model
-  * \param Q the generalized joint position of the joints. It is assumed that
-  * this vector satisfies the position level assemblt constraints.
-  * \param QDotInit initial guess for the generalized velocities of the joints
-  * \param CS the constraint set for which the error should be computed
-  * \param QDotOutput vector of the generalized joint velocities.
-  * \param weights weighting coefficients for the different joint positions.
-  *
-  */
+/** \brief Computes a feasible initial value of the generalized joint
+ * velocities.
+ *
+ * \param model the model
+ * \param Q the generalized joint position of the joints. It is assumed that
+ * this vector satisfies the position level assemblt constraints.
+ * \param QDotInit initial guess for the generalized velocities of the joints
+ * \param CS the constraint set for which the error should be computed
+ * \param QDotOutput vector of the generalized joint velocities.
+ * \param weights weighting coefficients for the different joint positions.
+ *
+ */
 RBDL_DLLAPI
-void CalcAssemblyQDot(
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDotInit,
-  ConstraintSet &CS,
-  Math::VectorNd &QDotOutput,
-  const Math::VectorNd &weights
-);
+void CalcAssemblyQDot(Model &model, const Math::VectorNd &Q,
+                      const Math::VectorNd &QDotInit, ConstraintSet &CS,
+                      Math::VectorNd &QDotOutput,
+                      const Math::VectorNd &weights);
 
-/** \brief Computes forward dynamics with contact by constructing and solving 
+/** \brief Computes forward dynamics with contact by constructing and solving
  *  the full lagrangian equation
  *
  * This method builds and solves the linear system \f[
@@ -1164,8 +1109,8 @@ void CalcAssemblyQDot(
  * \note This function works with ContactConstraints, LoopConstraints and
  * Custom Constraints. Nonetheless, this method will not tolerate redundant
  * constraints.
- * 
- * \par 
+ *
+ * \par
  *
  * \note To increase performance group constraints body and pointwise such
  * that constraints acting on the same body point are sequentially in
@@ -1177,53 +1122,40 @@ void CalcAssemblyQDot(
  * \param Tau   actuations of the internal joints
  * \param CS    the description of all acting constraints
  * \param QDDotOutput accelerations of the internals joints
- * \param f_ext External forces acting on the body in base coordinates (optional, defaults to NULL)
+ * \param f_ext External forces acting on the body in base coordinates
+ (optional, defaults to NULL)
  * \note During execution of this function values such as
  * ConstraintSet::force get modified and will contain the value
  * of the force acting along the normal.
  *
  */
 RBDL_DLLAPI
-void ForwardDynamicsConstraintsDirect (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDot,
-  const Math::VectorNd &Tau,
-  ConstraintSet &CS,
-  Math::VectorNd &QDDotOutput,
-  std::vector<Math::SpatialVector> *f_ext = NULL
-);
+void ForwardDynamicsConstraintsDirect(
+    Model &model, const Math::VectorNd &Q, const Math::VectorNd &QDot,
+    const Math::VectorNd &Tau, ConstraintSet &CS, Math::VectorNd &QDDotOutput,
+    std::vector<Math::SpatialVector> *f_ext = NULL);
 
 RBDL_DLLAPI
-void ForwardDynamicsConstraintsRangeSpaceSparse (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDot,
-  const Math::VectorNd &Tau,
-  ConstraintSet &CS,
-  Math::VectorNd &QDDotOutput,
-  std::vector<Math::SpatialVector> *f_ext = NULL
-);
+void ForwardDynamicsConstraintsRangeSpaceSparse(
+    Model &model, const Math::VectorNd &Q, const Math::VectorNd &QDot,
+    const Math::VectorNd &Tau, ConstraintSet &CS, Math::VectorNd &QDDotOutput,
+    std::vector<Math::SpatialVector> *f_ext = NULL);
 
 RBDL_DLLAPI
-void ForwardDynamicsConstraintsNullSpace (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDot,
-  const Math::VectorNd &Tau,
-  ConstraintSet &CS,
-  Math::VectorNd &QDDotOutput,
-  std::vector<Math::SpatialVector> *f_ext = NULL
-);
+void ForwardDynamicsConstraintsNullSpace(
+    Model &model, const Math::VectorNd &Q, const Math::VectorNd &QDot,
+    const Math::VectorNd &Tau, ConstraintSet &CS, Math::VectorNd &QDDotOutput,
+    std::vector<Math::SpatialVector> *f_ext = NULL);
 
-/** \brief Computes forward dynamics that accounts for active contacts in 
+/** \brief Computes forward dynamics that accounts for active contacts in
  *  ConstraintSet.
  *
  * The method used here is the one described by Kokkevis and Metaxas in the
  * Paper "Practical Physics for Articulated Characters", Game Developers
  * Conference, 2004.
  *
- * It does this by recursively computing the inverse articulated-body inertia (IABI)
+ * It does this by recursively computing the inverse articulated-body inertia
+ (IABI)
  * \f$\Phi_{i,j}\f$ which is then used to build and solve a system of the form:
  \f[
  \left(
@@ -1240,7 +1172,7 @@ void ForwardDynamicsConstraintsNullSpace (
      \Phi_{1,1} & \Phi_{1,2} & \cdots & \Phi{1,n} \\
      \Phi_{2,1} & \Phi_{2,2} & \cdots & \Phi{2,n} \\
      \cdots & \cdots & \cdots & \vdots \\
-     \Phi_{n,1} & \Phi_{n,2} & \cdots & \Phi{n,n} 
+     \Phi_{n,1} & \Phi_{n,2} & \cdots & \Phi{n,n}
    \end{array}
  \right)
  \left(
@@ -1251,7 +1183,7 @@ void ForwardDynamicsConstraintsNullSpace (
      f_n
    \end{array}
  \right)
- + 
+ +
  \left(
    \begin{array}{c}
    \phi_1 \\
@@ -1261,10 +1193,11 @@ void ForwardDynamicsConstraintsNullSpace (
    \end{array}
  \right).
  \f]
- Here \f$n\f$ is the number of constraints and the method for building the system
- uses the Articulated Body Algorithm to efficiently compute entries of the system. The
- values \f$\dot{v}_i\f$ are the constraint accelerations, \f$f_i\f$ the constraint forces,
- and \f$\phi_i\f$ are the constraint bias forces.
+ Here \f$n\f$ is the number of constraints and the method for building the
+ system uses the Articulated Body Algorithm to efficiently compute entries of
+ the system. The values \f$\dot{v}_i\f$ are the constraint accelerations,
+ \f$f_i\f$ the constraint forces, and \f$\phi_i\f$ are the constraint bias
+ forces.
  *
  * \param model rigid body model
  * \param Q     state vector of the internal joints
@@ -1282,67 +1215,55 @@ void ForwardDynamicsConstraintsNullSpace (
  * \todo Allow for external forces
  */
 RBDL_DLLAPI
-void ForwardDynamicsContactsKokkevis (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDot,
-  const Math::VectorNd &Tau,
-  ConstraintSet &CS,
-  Math::VectorNd &QDDotOutput
-);
-
-
+void ForwardDynamicsContactsKokkevis(Model &model, const Math::VectorNd &Q,
+                                     const Math::VectorNd &QDot,
+                                     const Math::VectorNd &Tau,
+                                     ConstraintSet &CS,
+                                     Math::VectorNd &QDDotOutput);
 
 /**
  @brief A relaxed inverse-dynamics operator that can be applied to
         under-actuated or fully-actuated constrained multibody systems.
   \par
   <b>Important</b>
-  Set the actuated degrees-of-freedom using RigidBodyDynamics::ConstraintSet::SetActuationMap
-  <b>prior</b> to calling this function.
-  \par
-  This function implements the relaxed inverse-dynamics operator defined by
-  Koch [1] and Kudruss [2]. When given a vector of
-  generalized positions, generalized velocities, and desired generalized
-  accelerations will solve for a set of generalized accelerations and forces
-  which satisfy the constrained equations of motion such that the solution 
-  is close to a vector of desired acceleration controls \f$x\f$ 
-  \f[
-   \min{\ddot{q}} \dfrac{1}{2} \ddot{q}^T H \ddot{q} + C^T \ddot{q} + \dfrac{1}{2}(Sx-S\ddot{q})^{T} W (Sx-S\ddot{q})
-  \f]
-  s.t.
-  \f[
-   G \ddot{q} = \gamma.
-  \f]
-  In contrast to the
+  Set the actuated degrees-of-freedom using
+ RigidBodyDynamics::ConstraintSet::SetActuationMap <b>prior</b> to calling this
+ function. \par This function implements the relaxed inverse-dynamics operator
+ defined by Koch [1] and Kudruss [2]. When given a vector of generalized
+ positions, generalized velocities, and desired generalized accelerations will
+ solve for a set of generalized accelerations and forces which satisfy the
+ constrained equations of motion such that the solution is close to a vector of
+ desired acceleration controls \f$x\f$ \f[ \min{\ddot{q}} \dfrac{1}{2}
+ \ddot{q}^T H \ddot{q} + C^T \ddot{q} + \dfrac{1}{2}(Sx-S\ddot{q})^{T} W
+ (Sx-S\ddot{q}) \f] s.t. \f[ G \ddot{q} = \gamma. \f] In contrast to the
   RigidBodyDynamics::InverseDynamicsConstraints method, this method can work
   with underactuated systems. Mathematically this method does not depend on
   \f[
     \text{rank}(GP^T) < n-n_a
   \f]
   where \f$n\f$ is the number of degrees of freedom and \f$n_a\f$ is the
-  number of actuated degrees of freedom. 
+  number of actuated degrees of freedom.
   \par
-  For those readers who are unfamiliar with quadratic programs (QP), like the 
+  For those readers who are unfamiliar with quadratic programs (QP), like the
   constrained minimization problem above, read the following important notes.
-  One consequence of this additional flexibility is that the term \f$x\f$ should 
-  now be interpreted as a control vector: 
+  One consequence of this additional flexibility is that the term \f$x\f$ should
+  now be interpreted as a control vector:
 
-  -# The minimum of the above constrained QP may not be \f$x = S\ddot{q}^*\f$ 
-  where \f$\ddot{q}^*\f$ is the vector of desired accelerations. The terms 
+  -# The minimum of the above constrained QP may not be \f$x = S\ddot{q}^*\f$
+  where \f$\ddot{q}^*\f$ is the vector of desired accelerations. The terms
   \f$\dfrac{1}{2} \ddot{q}^T H \ddot{q}\f$ will \f$C^T \ddot{q}\f$ pull
   the solution away from this value and the constraint \f$G \ddot{q} = \gamma\f$
-  may make it impossible to exactly satisfy \f$S\ddot{q}*=S\ddot{q}\f$.   
-  -# Koch's original formulation has been modifed so that setting 
-  \f$x = \ddot{q}^*\f$ will yield a solution for \f$\ddot{q}\f$ that is close 
-  to \f$\ddot{q}^*\f$. However, even if an exact solution for 
+  may make it impossible to exactly satisfy \f$S\ddot{q}*=S\ddot{q}\f$.
+  -# Koch's original formulation has been modifed so that setting
+  \f$x = \ddot{q}^*\f$ will yield a solution for \f$\ddot{q}\f$ that is close
+  to \f$\ddot{q}^*\f$. However, even if an exact solution for
   \f$\ddot{q} = \ddot{q}^*\f$ exists it will may not be realized using
   \f$x = \ddot{q}*\f$. Iteration may be required.
 
   To solve the above constrained minimization problem we take the derivative
   of the above system of equations w.r.t. \f$\ddot{q}\f$ and \f$\lambda\f$
   set the result to zero and solve. This results in the KKT system
- \f[ 
+ \f[
     \left( \begin{array}{cc}
       H+K & G^T \\
       G & 0
@@ -1360,11 +1281,11 @@ void ForwardDynamicsContactsKokkevis (
   \f]
   This system of linear equations is not solved directly, but instead
   the null-space formulation presented in Sec. 2.5 of
-  Koch as it is much faster. 
+  Koch as it is much faster.
   As with the RigidBodyDynamics::InverseDynamicsConstraints method the
   matrices \f$S\f$ and \f$P\f$ select the actuated and unactuated parts of
   \f[\ddot{q} = S^T u + P^T v
-  \f], 
+  \f],
   and
   \f[u^* = S^T x
   \f],
@@ -1397,13 +1318,13 @@ void ForwardDynamicsContactsKokkevis (
   \f]
   This system has an upper block triangular structure which can be seen by
   noting that
-  \f[ 
+  \f[
     J^T = \left( \begin{array}{c} S G^T \\ P G^T \end{array} \right),
   \f]
   by grouping the upper \f$2 \times 2\f$ block into
   \f[
-  F = \left( \begin{array}{cc} 
-              SMS^T + W & SMP^T \\ 
+  F = \left( \begin{array}{cc}
+              SMS^T + W & SMP^T \\
               PMS^T & PMP^T \end{array} \right),
   \f]
   and by grouping the right hand side into
@@ -1419,46 +1340,41 @@ void ForwardDynamicsContactsKokkevis (
     \right)
     \left( \begin{array}{c}
               p \\
-             -\lambda 
+             -\lambda
             \end{array}
     \right)
     =
   \left( \begin{array}{c}
               -g \\
-              \gamma 
+              \gamma
             \end{array}
-    \right)        
+    \right)
   \f]
   This system can be triangularized by projecting the system into the null
   space of \f$G^T\f$. First we begin with a QR decomposition of \f$G^T\f$ into
-  \f[ 
-    J^T = \left( Y \, Z \right)\left( \begin{array}{c} R \\ 0 \end{array} \right)
-  \f]
-  and projecting \f$(u,v)\f$ into the space \f$[Y,Z]\f$ 
   \f[
-    p = Y p_Y + Z p_Z.
-  \f]
-  This allows us to express the previous KKT system as
-  \f[
-    \left( \begin{array}{ccc}
+    J^T = \left( Y \, Z \right)\left( \begin{array}{c} R \\ 0 \end{array}
+ \right) \f] and projecting \f$(u,v)\f$ into the space \f$[Y,Z]\f$ \f[ p = Y p_Y
+ + Z p_Z. \f] This allows us to express the previous KKT system as \f[ \left(
+ \begin{array}{ccc}
             Y^T F Y & Y^T F Z & R \\
             Z^T F Y & Z^T F Z & 0 \\
-            R^T & 0 & 0  
+            R^T & 0 & 0
             \end{array}
     \right)
     \left( \begin{array}{c}
               p_Y \\
               p_Z \\
-             -\lambda 
+             -\lambda
             \end{array}
     \right)
     =
   \left( \begin{array}{c}
               -Y^T g \\
-             -Z^T g \\ 
-             \gamma 
+             -Z^T g \\
+             \gamma
             \end{array}
-    \right)        
+    \right)
   \f]
   Though this system is still \f$(n+c) \times (n+c)\f$ it can be solved in parts
   for \f$p_Y\f$
@@ -1469,20 +1385,20 @@ void ForwardDynamicsContactsKokkevis (
   \f[
     (Z^T F Z) p_Z = -(Z^T F Y)p_Y - Z^T g
   \f]
-  which is enough to yield a solution for 
+  which is enough to yield a solution for
   \f[\left(
      \begin{array}{c}
-      u \\ 
+      u \\
       v
      \end{array} \right) = (Y p_Y + Z p_Z)
   \f]
-  and finally 
+  and finally
   \f[
     \ddot{q} = S^T u + P^T v.
   \f]
-  This method is less computationally expensive than the KKT system directly since  
-  \f$R\f$ is of size \f$ c \times c \f$ and \f$ (Z^T F Z)\f$ is of size
-  \f$ (n-c) \times (n-c) \f$ which is far smaller than the \f$ (n+c) \times (n+c) \f$ 
+  This method is less computationally expensive than the KKT system directly
+ since \f$R\f$ is of size \f$ c \times c \f$ and \f$ (Z^T F Z)\f$ is of size \f$
+ (n-c) \times (n-c) \f$ which is far smaller than the \f$ (n+c) \times (n+c) \f$
   matrix used in the direct method. As it is relatively inexpensive, the
   dual variables are also evaluated
   \f[
@@ -1496,8 +1412,12 @@ void ForwardDynamicsContactsKokkevis (
 
  \note Two modifications have been made to this implementation to bring the
        solution to \f$S \ddot{q}\f$ much closer to \f$S x\f$
-       -# The vector \f$u^*\f$ has been modifed to \f$u^* = Sx + (S^T W^{-1} S)C\f$ so that the term \f$SC\f$ in the upper right hand side is compensated
-       -# The weighting matrix \f$W\f$ has a main diagional that is scaled to be uniformly 100 times larger than the biggest element in M. This will drive the solution closer to \f$S x\f$ without hurting the scaling of the matrix too badly.
+       -# The vector \f$u^*\f$ has been modifed to \f$u^* = Sx + (S^T W^{-1}
+ S)C\f$ so that the term \f$SC\f$ in the upper right hand side is compensated
+       -# The weighting matrix \f$W\f$ has a main diagional that is scaled to be
+ uniformly 100 times larger than the biggest element in M. This will drive the
+ solution closer to \f$S x\f$ without hurting the scaling of the matrix too
+ badly.
 
  \note The Lagrange multipliers are solved for and stored in the `force' field
        of the ConstraintSet structure.
@@ -1510,8 +1430,12 @@ void ForwardDynamicsContactsKokkevis (
 
 
  <b>References</b>
-  -# Koch KH (2015). Using model-based optimal control for conceptional motion generation for the humannoid robot hrp-2 and design investigations for exo-skeletons. Heidelberg University (Doctoral dissertation).
-  -# Kudruss M (under review as of May 2019). Nonlinear model-predictive control for the motion generation of humanoids. Heidelberg University  (Doctoral dissertation)
+  -# Koch KH (2015). Using model-based optimal control for conceptional motion
+ generation for the humannoid robot hrp-2 and design investigations for
+ exo-skeletons. Heidelberg University (Doctoral dissertation).
+  -# Kudruss M (under review as of May 2019). Nonlinear model-predictive control
+ for the motion generation of humanoids. Heidelberg University  (Doctoral
+ dissertation)
 
  \param model: rigid body model
  \param Q:     N-element vector of generalized positions
@@ -1531,29 +1455,26 @@ void ForwardDynamicsContactsKokkevis (
                       satisfy the kinematic constraints (\f$\ddot{q}\f$ in the
                       above equation)
  \param TauOutput: N-element vector of generalized forces which satisfy the
-                   the equations of motion for this constrained system.                   
+                   the equations of motion for this constrained system.
  \param f_ext External forces acting on the body in base coordinates
         (optional, defaults to NULL)
 
  */
 RBDL_DLLAPI
 void InverseDynamicsConstraintsRelaxed(
-    Model &model,
-    const Math::VectorNd &Q,
-    const Math::VectorNd &QDot,
-    const Math::VectorNd &QDDotControls,
-    ConstraintSet &CS,
-    Math::VectorNd &QDDotOutput,
-    Math::VectorNd &TauOutput,
-    std::vector<Math::SpatialVector> *f_ext  = NULL);
+    Model &model, const Math::VectorNd &Q, const Math::VectorNd &QDot,
+    const Math::VectorNd &QDDotControls, ConstraintSet &CS,
+    Math::VectorNd &QDDotOutput, Math::VectorNd &TauOutput,
+    std::vector<Math::SpatialVector> *f_ext = NULL);
 
 /**
  @brief An inverse-dynamics operator that can be applied to fully-actuated
         constrained systems.
   \par
   <b>Important</b>
-  -# Set the actuated degrees-of-freedom using RigidBodyDynamics::ConstraintSet::SetActuationMap
-  <b>prior</b> to calling this function.
+  -# Set the actuated degrees-of-freedom using
+RigidBodyDynamics::ConstraintSet::SetActuationMap <b>prior</b> to calling this
+function.
   -# Use the function RigidBodyDynamics::isConstrainedSystemFullyActuated to
      determine if a system is fully actuated or not.
  \par
@@ -1583,10 +1504,8 @@ void InverseDynamicsConstraintsRelaxed(
   v = P \ddot{q}
   \f]
   where \f$P\f$ is an  \f$n_u=n-n_a\f$ (number of unactuated degrees-of-freedom)
-  by  \f$n\f$ selection matrix that picks out the unactuated indices in \f$\ddot{q}\f$.
-  By construction
-  \f[
-    \left(\begin{array}{cc}
+  by  \f$n\f$ selection matrix that picks out the unactuated indices in
+\f$\ddot{q}\f$. By construction \f[ \left(\begin{array}{cc}
       PP^T & 0 \\
       0 & SS^T
     \end{array}\right) = I_{n}
@@ -1676,7 +1595,9 @@ By projecting this onto the onto the \f$S\f$ and \f$P\f$ spaces
 
 
  <b>References</b>
-  -# Koch KH (2015). Using model-based optimal control for conceptional motion generation for the humannoid robot hrp-2 and design investigations for exo-skeletons. Heidelberg University (Doctoral dissertation).
+  -# Koch KH (2015). Using model-based optimal control for conceptional motion
+generation for the humannoid robot hrp-2 and design investigations for
+exo-skeletons. Heidelberg University (Doctoral dissertation).
 
 
  \param model: rigid body model
@@ -1700,25 +1621,23 @@ By projecting this onto the onto the \f$S\f$ and \f$P\f$ spaces
 
 */
 RBDL_DLLAPI
-void InverseDynamicsConstraints(
-    Model &model,
-    const Math::VectorNd &Q,
-    const Math::VectorNd &QDot,
-    const Math::VectorNd &QDDotDesired,
-    ConstraintSet &CS,
-    Math::VectorNd &QDDotOutput,
-    Math::VectorNd &TauOutput,
-    std::vector<Math::SpatialVector> *f_ext  = NULL);
+void InverseDynamicsConstraints(Model &model, const Math::VectorNd &Q,
+                                const Math::VectorNd &QDot,
+                                const Math::VectorNd &QDDotDesired,
+                                ConstraintSet &CS, Math::VectorNd &QDDotOutput,
+                                Math::VectorNd &TauOutput,
+                                std::vector<Math::SpatialVector> *f_ext = NULL);
 
 /**
   \brief A method to evaluate if the constrained system is fully actuated.
 
-  \par 
+  \par
    This method will evaluate the rank of \f$(GP^T)\f$
    in order to assess if the constrained system is fully
    actuated or is under actuated. If the system is fully actuated the
-   exact method RigidBodyDynamics::InverseDynamicsConstraints can be used, otherwise only
-   relaxed method RigidBodyDynamics::InverseDynamicsConstraintsRelaxed can be used.
+   exact method RigidBodyDynamics::InverseDynamicsConstraints can be used,
+ otherwise only relaxed method
+ RigidBodyDynamics::InverseDynamicsConstraintsRelaxed can be used.
 
   \note This method uses a relatively slow but accurate method to
         evaluate the rank.
@@ -1731,15 +1650,12 @@ void InverseDynamicsConstraints(
  \param f_ext External forces acting on the body in base coordinates
         (optional, defaults to NULL)
 */
-RBDL_DLLAPI 
+RBDL_DLLAPI
 bool isConstrainedSystemFullyActuated(
-    Model &model,
-    const Math::VectorNd &Q,
-    const Math::VectorNd &QDot,
-    ConstraintSet &CS,
-    std::vector<Math::SpatialVector> *f_ext  = NULL);
+    Model &model, const Math::VectorNd &Q, const Math::VectorNd &QDot,
+    ConstraintSet &CS, std::vector<Math::SpatialVector> *f_ext = NULL);
 
-/** \brief Computes contact gain by constructing and solving the full lagrangian 
+/** \brief Computes contact gain by constructing and solving the full lagrangian
  *  equation
  *
  * This method builds and solves the linear system \f[
@@ -1759,7 +1675,7 @@ bool isConstrainedSystemFullyActuated(
  \left(
    \begin{array}{c}
      H \dot{q}^{-} \\
-    v^{+} 
+    v^{+}
    \end{array}
  \right)
  * \f] where \f$H\f$ is the joint space inertia matrix computed with the
@@ -1774,8 +1690,8 @@ bool isConstrainedSystemFullyActuated(
  * \note So far, only constraints acting along cartesian coordinate axes
  * are allowed (i.e. (1, 0, 0), (0, 1, 0), and (0, 0, 1)). Also, one must
  * not specify redundant constraints!
- * 
- * \par 
+ *
+ * \par
  *
  * \note To increase performance group constraints body and pointwise such
  * that constraints acting on the same body point are sequentially in
@@ -1788,13 +1704,10 @@ bool isConstrainedSystemFullyActuated(
  * \param QDotPlusOutput velocities of the internals joints after the impact
  */
 RBDL_DLLAPI
-void ComputeConstraintImpulsesDirect (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDotMinus,
-  ConstraintSet &CS,
-  Math::VectorNd &QDotPlusOutput
-);
+void ComputeConstraintImpulsesDirect(Model &model, const Math::VectorNd &Q,
+                                     const Math::VectorNd &QDotMinus,
+                                     ConstraintSet &CS,
+                                     Math::VectorNd &QDotPlusOutput);
 
 /** \brief Resolves contact gain using SolveContactSystemRangeSpaceSparse()
  * \param model rigid body model
@@ -1804,13 +1717,11 @@ void ComputeConstraintImpulsesDirect (
  * \param QDotPlusOutput velocities of the internals joints after the impact
  */
 RBDL_DLLAPI
-void ComputeConstraintImpulsesRangeSpaceSparse (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDotMinus,
-  ConstraintSet &CS,
-  Math::VectorNd &QDotPlusOutput
-);
+void ComputeConstraintImpulsesRangeSpaceSparse(Model &model,
+                                               const Math::VectorNd &Q,
+                                               const Math::VectorNd &QDotMinus,
+                                               ConstraintSet &CS,
+                                               Math::VectorNd &QDotPlusOutput);
 
 /** \brief Resolves contact gain using SolveContactSystemNullSpace()
  * \param model rigid body model
@@ -1820,15 +1731,12 @@ void ComputeConstraintImpulsesRangeSpaceSparse (
  * \param QDotPlusOutput velocities of the internals joints after the impact
  */
 RBDL_DLLAPI
-void ComputeConstraintImpulsesNullSpace (
-  Model &model,
-  const Math::VectorNd &Q,
-  const Math::VectorNd &QDotMinus,
-  ConstraintSet &CS,
-  Math::VectorNd &QDotPlusOutput
-);
+void ComputeConstraintImpulsesNullSpace(Model &model, const Math::VectorNd &Q,
+                                        const Math::VectorNd &QDotMinus,
+                                        ConstraintSet &CS,
+                                        Math::VectorNd &QDotPlusOutput);
 
-/** \brief Solves the full contact system directly, i.e. simultaneously for 
+/** \brief Solves the full contact system directly, i.e. simultaneously for
  *  contact forces and joint accelerations.
  *
  * This solves a \f$ (n_\textit{dof} +
@@ -1836,31 +1744,26 @@ void ComputeConstraintImpulsesNullSpace (
  *
  * \param H the joint space inertia matrix
  * \param G the constraint Jacobian
- * \param c the \f$ \mathbb{R}^{n_\textit{dof}}\f$ vector of the upper part of 
+ * \param c the \f$ \mathbb{R}^{n_\textit{dof}}\f$ vector of the upper part of
  * the right hand side of the system
- * \param gamma the \f$ \mathbb{R}^{n_c}\f$ vector of the lower part of the 
+ * \param gamma the \f$ \mathbb{R}^{n_c}\f$ vector of the lower part of the
  * right hand side of the system
  * \param lambda result: constraint forces
- * \param A work-space for the matrix of the linear system 
+ * \param A work-space for the matrix of the linear system
  * \param b work-space for the right-hand-side of the linear system
  * \param x work-space for the solution of the linear system
  * \param linear_solver type of solver that should be used to solve the system
  */
 RBDL_DLLAPI
-void SolveConstrainedSystemDirect (
-  Math::MatrixNd &H, 
-  const Math::MatrixNd &G, 
-  const Math::VectorNd &c, 
-  const Math::VectorNd &gamma, 
-  Math::VectorNd &lambda, 
-  Math::MatrixNd &A, 
-  Math::VectorNd &b,
-  Math::VectorNd &x,
-  Math::LinearSolver &linear_solver
-);
+void SolveConstrainedSystemDirect(Math::MatrixNd &H, const Math::MatrixNd &G,
+                                  const Math::VectorNd &c,
+                                  const Math::VectorNd &gamma,
+                                  Math::VectorNd &lambda, Math::MatrixNd &A,
+                                  Math::VectorNd &b, Math::VectorNd &x,
+                                  Math::LinearSolver &linear_solver);
 
-/** \brief Solves the contact system by first solving for the the joint 
- *  accelerations and then the contact forces using a sparse matrix 
+/** \brief Solves the contact system by first solving for the the joint
+ *  accelerations and then the contact forces using a sparse matrix
  *  decomposition of the joint space inertia matrix.
  *
  * This method exploits the branch-induced sparsity by the structure
@@ -1869,33 +1772,26 @@ void SolveConstrainedSystemDirect (
  * \param model rigid body model
  * \param H the joint space inertia matrix
  * \param G the constraint Jacobian
- * \param c the \f$ \mathbb{R}^{n_\textit{dof}}\f$ vector of the upper part of 
+ * \param c the \f$ \mathbb{R}^{n_\textit{dof}}\f$ vector of the upper part of
  * the right hand side of the system
- * \param gamma the \f$ \mathbb{R}^{n_c}\f$ vector of the lower part of the 
+ * \param gamma the \f$ \mathbb{R}^{n_c}\f$ vector of the lower part of the
  * right hand side of the system
  * \param qddot result: joint accelerations
  * \param lambda result: constraint forces
  * \param K work-space for the matrix of the constraint force linear system
- * \param a work-space for the right-hand-side of the constraint force linear 
+ * \param a work-space for the right-hand-side of the constraint force linear
  * system
- * \param linear_solver type of solver that should be used to solve the 
+ * \param linear_solver type of solver that should be used to solve the
  * constraint force system
  */
 RBDL_DLLAPI
-void SolveConstrainedSystemRangeSpaceSparse (
-  Model &model, 
-  Math::MatrixNd &H, 
-  const Math::MatrixNd &G, 
-  const Math::VectorNd &c, 
-  const Math::VectorNd &gamma, 
-  Math::VectorNd &qddot, 
-  Math::VectorNd &lambda, 
-  Math::MatrixNd &K, 
-  Math::VectorNd &a,
-  Math::LinearSolver linear_solver
-);
+void SolveConstrainedSystemRangeSpaceSparse(
+    Model &model, Math::MatrixNd &H, const Math::MatrixNd &G,
+    const Math::VectorNd &c, const Math::VectorNd &gamma, Math::VectorNd &qddot,
+    Math::VectorNd &lambda, Math::MatrixNd &K, Math::VectorNd &a,
+    Math::LinearSolver linear_solver);
 
-/** \brief Solves the contact system by first solving for the joint 
+/** \brief Solves the contact system by first solving for the joint
  *  accelerations and then for the constraint forces.
  *
  * This methods requires a \f$n_\textit{dof} \times n_\textit{dof}\f$
@@ -1905,9 +1801,9 @@ void SolveConstrainedSystemRangeSpaceSparse (
  *
  * \param H the joint space inertia matrix
  * \param G the constraint Jacobian
- * \param c the \f$ \mathbb{R}^{n_\textit{dof}}\f$ vector of the upper part of 
+ * \param c the \f$ \mathbb{R}^{n_\textit{dof}}\f$ vector of the upper part of
  * the right hand side of the system
- * \param gamma the \f$ \mathbb{R}^{n_c}\f$ vector of the lower part of the 
+ * \param gamma the \f$ \mathbb{R}^{n_c}\f$ vector of the lower part of the
  * right hand side of the system
  * \param qddot result: joint accelerations
  * \param lambda result: constraint forces
@@ -1918,23 +1814,13 @@ void SolveConstrainedSystemRangeSpaceSparse (
  * \param linear_solver type of solver that should be used to solve the system
  */
 RBDL_DLLAPI
-void SolveConstrainedSystemNullSpace (
-  Math::MatrixNd &H, 
-  const Math::MatrixNd &G, 
-  const Math::VectorNd &c, 
-  const Math::VectorNd &gamma, 
-  Math::VectorNd &qddot, 
-  Math::VectorNd &lambda,
-  Math::MatrixNd &Y,
-  Math::MatrixNd &Z,
-  Math::VectorNd &qddot_y,
-  Math::VectorNd &qddot_z,
-  Math::LinearSolver &linear_solver
-);
+void SolveConstrainedSystemNullSpace(
+    Math::MatrixNd &H, const Math::MatrixNd &G, const Math::VectorNd &c,
+    const Math::VectorNd &gamma, Math::VectorNd &qddot, Math::VectorNd &lambda,
+    Math::MatrixNd &Y, Math::MatrixNd &Z, Math::VectorNd &qddot_y,
+    Math::VectorNd &qddot_z, Math::LinearSolver &linear_solver);
 
-
-
-} 
+}  // namespace RigidBodyDynamics
 
 /* namespace RigidBodyDynamics */
 

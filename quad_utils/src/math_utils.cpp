@@ -183,17 +183,28 @@ std::vector<double> centralDiff(std::vector<double> data, double dt) {
 }
 
 std::vector<double> unwrap(std::vector<double> data) {
+  // Generally to make yaw angle continuous
   std::vector<double> data_unwrapped = data;
-  //std::cout << "M_PI: " << M_PI << std::endl; // Output: 3.14
   for (int i = 1; i < data.size(); i++) {
     double diff = data[i] - data[i - 1];
+    // std::cout << "diff: " << diff*180/M_PI << std::endl;
     if (diff > M_PI) {
+      // std::cout << "data[" << i << "]: " << data[i] << "\tdata[" << i-1 <<
+      // "]: " << data[i-1] << std::endl; std::cout << "diff > M_PI @ " << i <<
+      // " | diff: " << diff*180/M_PI << std::endl;
       for (int j = i; j < data.size(); j++) {
         data_unwrapped[j] = data_unwrapped[j] - 2 * M_PI;
+        // std::cout << "data_unwrapped[" << j << "]: " <<
+        // data_unwrapped[j]*180/M_PI << std::endl;
       }
     } else if (diff < -M_PI) {
+      // std::cout << "data[" << i << "]: " << data[i] << "\tdata[" << i-1 <<
+      // "]: " << data[i-1] << std::endl; std::cout << "diff < -M_PI @ " << i <<
+      // " | diff: " << diff*180/M_PI << std::endl;
       for (int j = i; j < data.size(); j++) {
         data_unwrapped[j] = data_unwrapped[j] + 2 * M_PI;
+        // std::cout << "data_unwrapped[" << j << "]: " <<
+        // data_unwrapped[j]*180/M_PI << std::endl;
       }
     }
   }

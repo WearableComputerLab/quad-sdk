@@ -118,8 +118,8 @@ void LocalPlanner::initLocalBodyPlanner() {
   } else if (robot_name_ == "a1") {
     type = A1;
   } else if (robot_name_ == "go1") {
-    type = A1; // A1 for now since will be too difficult to create own
-    std::cout << "robot_name is A1" << std::endl;
+    type = GO1;
+    std::cout << "robot_name is GO1 with type: " << type << std::endl;
   } else {
     ROS_WARN("WRONG ROBOT TYPE");
   }

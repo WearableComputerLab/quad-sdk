@@ -69,12 +69,12 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
                            sit_joint_angles_);
   quad_utils::loadROSParam(nh_, "robot_driver/torque_limit", torque_limits_);
 
-
   // ================ Testing Area =================
-  //ROS_INFO("Single Joint Command!!!!!!!!!!!!!!!!! %s", single_joint_cmd_topic);
-  // std::cout << "Single Joint Command: " << single_joint_cmd_topic << std::endl;
-  // std::cout << "robot_name: " << robot_name << std::endl;
-  
+  // ROS_INFO("Single Joint Command!!!!!!!!!!!!!!!!! %s",
+  // single_joint_cmd_topic);
+  // std::cout << "Single Joint Command: " << single_joint_cmd_topic <<
+  // std::endl; std::cout << "robot_name: " << robot_name << std::endl;
+
   // Setup pubs and subs
   local_plan_sub_ =
       nh_.subscribe(local_plan_topic, 1, &RobotDriver::localPlanCallback, this,
@@ -136,8 +136,11 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
   control_mode_ = SIT;
   remote_heartbeat_received_time_ = std::numeric_limits<double>::max();
 
-  // std::cout << "remote_heartbeat_received_time_: " << remote_heartbeat_received_time_ << std::endl;
-  last_state_time_ = std::numeric_limits<double>::max(); // Why initialize to be max... makes no sense
+  // std::cout << "remote_heartbeat_received_time_: " <<
+  // remote_heartbeat_received_time_ << std::endl;
+  last_state_time_ =
+      std::numeric_limits<double>::max();  // Why initialize to be max... makes
+                                           // no sense
 
   // Initialize timing
   last_robot_state_msg_.header.stamp = ros::Time::now();
@@ -210,7 +213,8 @@ void RobotDriver::initStateControlStructs() {
 
 void RobotDriver::controlModeCallback(const std_msgs::UInt8::ConstPtr &msg) {
   // Wait if transitioning
-  std::cout << "In control mode callback" << std::endl; // Calls when publishing to topic..
+  std::cout << "In control mode callback"
+            << std::endl;  // Calls when publishing to topic..
   if ((control_mode_ == SIT_TO_READY) || (control_mode_ == READY_TO_SIT))
     return;
   if ((msg->data == READY) &&
@@ -364,7 +368,8 @@ bool RobotDriver::updateControl() {
   // Check if state machine should be skipped
   bool valid_cmd = true;
   if (leg_controller_->overrideStateMachine()) {
-    // std::cout << "State machine overridden..." << std::endl; // Overriden for joint controller
+    // std::cout << "State machine overridden..." << std::endl; // Overriden for
+    // joint controller
     valid_cmd = leg_controller_->computeLegCommandArray(
         last_robot_state_msg_, leg_command_array_msg_, grf_array_msg_);
     return valid_cmd;
@@ -400,8 +405,7 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } 
-  else if (control_mode_ == SIT) {
+  } else if (control_mode_ == SIT) {
     for (int i = 0; i < num_feet_; ++i) {
       leg_command_array_msg_.leg_commands.at(i).motor_commands.resize(3);
       for (int j = 0; j < 3; ++j) {
@@ -410,9 +414,9 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } 
-  else if (control_mode_ == READY) {
-    // std::cout << "Control  mode is READY" << std::endl; // When standing -> Mode is READY
+  } else if (control_mode_ == READY) {
+    // std::cout << "Control  mode is READY" << std::endl; // When standing ->
+    // Mode is READY
     if (leg_controller_->computeLegCommandArray(last_robot_state_msg_,
                                                 leg_command_array_msg_,
                                                 grf_array_msg_) == false) {
@@ -426,19 +430,20 @@ bool RobotDriver::updateControl() {
               leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
         }
       }
-    } 
-    else { // This else statement states that if it is true when checking for valid compute commandn array, you can also check the traj ref state
+    } else {  // This else statement states that if it is true when checking for
+              // valid compute commandn array, you can also check the traj ref
+              // state
       // std::cout << "Compute command array valid..." << std::endl;
       if (InverseDynamicsController *p =
               dynamic_cast<InverseDynamicsController *>(
-                  leg_controller_.get())) { // get() is a std::shared_pointer member
+                  leg_controller_
+                      .get())) {  // get() is a std::shared_pointer member
         // Uncomment to publish trajectory reference state
         // quad_msgs::RobotState ref_state_msg = p->getReferenceState();
         // trajectory_robot_state_pub_.publish(ref_state_msg);
       }
     }
-  } 
-  else if (control_mode_ == SIT_TO_READY) {
+  } else if (control_mode_ == SIT_TO_READY) {
     ros::Duration duration = ros::Time::now() - transition_timestamp_;
     double t_interp = duration.toSec() / transition_duration_;
     if (t_interp >= 1) {
@@ -458,8 +463,7 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } 
-  else if (control_mode_ == READY_TO_SIT) {
+  } else if (control_mode_ == READY_TO_SIT) {
     ros::Duration duration = ros::Time::now() - transition_timestamp_;
     double t_interp = duration.toSec() / transition_duration_;
 
@@ -480,8 +484,7 @@ bool RobotDriver::updateControl() {
             leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j));
       }
     }
-  } 
-  else {
+  } else {
     ROS_WARN_THROTTLE(0.5,
                       "Invalid control mode set in ID node, "
                       "exiting updateControl()");
@@ -497,8 +500,11 @@ bool RobotDriver::updateControl() {
       int joint_idx = 3 * i + j;
 
       // Add soft joint limit for knees
-      // std::cout << "joint_positions(" << joint_idx << "): " << joint_positions(joint_idx) << std::endl; // Just false w/ unitree go1 trying to stand
-      // std::cout << ((j == knee_idx && joint_positions(joint_idx) > knee_soft_ub)? "True": "False") << std::endl;
+      // std::cout << "joint_positions(" << joint_idx << "): " <<
+      // joint_positions(joint_idx) << std::endl; // Just false w/ unitree go1
+      // trying to stand std::cout << ((j == knee_idx &&
+      // joint_positions(joint_idx) > knee_soft_ub)? "True": "False") <<
+      // std::endl;
       if (j == knee_idx && joint_positions(joint_idx) > knee_soft_ub) {
         leg_command_array_msg_.leg_commands.at(i)
             .motor_commands.at(j)
@@ -508,13 +514,18 @@ bool RobotDriver::updateControl() {
                     .torque_ff -
                 knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub),
             -torque_limits_[j]);
-        // std::cout << "knee motor command ff torque: " << leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).torque_ff << std::endl;
-        // std::cout << "kd_ub(pos-pos_ub): " << knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
-        // std::cout << "ff torque & additional terms: " << leg_command_array_msg_.leg_commands.at(i)
+        // std::cout << "knee motor command ff torque: " <<
+        // leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).torque_ff
+        // << std::endl; std::cout << "kd_ub(pos-pos_ub): " << knee_soft_ub_kd *
+        // (joint_positions(joint_idx) - knee_soft_ub) << std::endl; std::cout
+        // << "ff torque & additional terms: " <<
+        // leg_command_array_msg_.leg_commands.at(i)
         //            .motor_commands.at(j)
         //            .torque_ff -
-        //        knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub) << std::endl;
-        // std::cout << "Neg Torque limit of knee: " << -torque_limits_[j] << std::endl; // Torque limit of knee is 32
+        //        knee_soft_ub_kd * (joint_positions(joint_idx) - knee_soft_ub)
+        //        << std::endl;
+        // std::cout << "Neg Torque limit of knee: " << -torque_limits_[j] <<
+        // std::endl; // Torque limit of knee is 32
       }
 
       quad_msgs::MotorCommand cmd =
@@ -525,14 +536,17 @@ bool RobotDriver::updateControl() {
           cmd.kd * (cmd.vel_setpoint - joint_velocities[joint_idx]);
       double fb_component = pos_component + vel_component;
       double effort = fb_component + cmd.torque_ff;
-      // std::cout << "leg idx: " << i << "\t joint_idx: " << joint_idx << std::endl;
-      // std::cout << "fb component: " << fb_component <<"\t ff component: " << cmd.torque_ff << std::endl; // With go1, fb component goes up to 20+... something is not updating
-      //std::cout << "fb_component: " << fb_component << std::endl;
-      //std::cout << "outside loop effort: " << effort << std::endl;
+      // std::cout << "leg idx: " << i << "\t joint_idx: " << joint_idx <<
+      // std::endl; std::cout << "fb component: " << fb_component <<"\t ff
+      // component: " << cmd.torque_ff << std::endl; // With go1, fb component
+      // goes up to 20+... something is not updating
+      // std::cout << "fb_component: " << fb_component << std::endl;
+      // std::cout << "outside loop effort: " << effort << std::endl;
       double fb_ratio =
           abs(fb_component) / (abs(fb_component) + abs(cmd.torque_ff));
 
-      //std::cout << "outside loop: " << cmd.torque_ff << std::endl; // updates too frequently... can't use as debug
+      // std::cout << "outside loop: " << cmd.torque_ff << std::endl; // updates
+      // too frequently... can't use as debug
 
       if (abs(cmd.torque_ff) >= torque_limits_[j]) {
         ROS_WARN(
@@ -564,8 +578,10 @@ bool RobotDriver::updateControl() {
       leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).fb_ratio =
           fb_ratio;
 
-      // std::cout << "leg idx: " << i << "\t joint_idx: " << joint_idx << std::endl;
-      // std::cout << "effort: " << leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).effort << std::endl;
+      // std::cout << "leg idx: " << i << "\t joint_idx: " << joint_idx <<
+      // std::endl; std::cout << "effort: " <<
+      // leg_command_array_msg_.leg_commands.at(i).motor_commands.at(j).effort
+      // << std::endl;
     }
   }
 

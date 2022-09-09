@@ -10,27 +10,23 @@
 
 namespace grid_map {
 
-GridMapPclConverter::GridMapPclConverter()
-{
-}
+GridMapPclConverter::GridMapPclConverter() {}
 
-GridMapPclConverter::~GridMapPclConverter()
-{
-}
+GridMapPclConverter::~GridMapPclConverter() {}
 
-bool GridMapPclConverter::initializeFromPolygonMesh(const pcl::PolygonMesh& mesh,
-                                                    const double resolution,
-                                                    grid_map::GridMap& gridMap)
-{
-  pcl::PointCloud < pcl::PointXYZ > cloud;
+bool GridMapPclConverter::initializeFromPolygonMesh(
+    const pcl::PolygonMesh& mesh, const double resolution,
+    grid_map::GridMap& gridMap) {
+  pcl::PointCloud<pcl::PointXYZ> cloud;
   pcl::fromPCLPointCloud2(mesh.cloud, cloud);
   pcl::PointXYZ minBound;
   pcl::PointXYZ maxBound;
   pcl::getMinMax3D(cloud, minBound, maxBound);
 
-  grid_map::Length length = grid_map::Length(maxBound.x - minBound.x, maxBound.y - minBound.y);
-  grid_map::Position position = grid_map::Position((maxBound.x + minBound.x) / 2.0,
-                                                   (maxBound.y + minBound.y) / 2.0);
+  grid_map::Length length =
+      grid_map::Length(maxBound.x - minBound.x, maxBound.y - minBound.y);
+  grid_map::Position position = grid_map::Position(
+      (maxBound.x + minBound.x) / 2.0, (maxBound.y + minBound.y) / 2.0);
   gridMap.setGeometry(length, resolution, position);
 
   return true;
@@ -38,12 +34,11 @@ bool GridMapPclConverter::initializeFromPolygonMesh(const pcl::PolygonMesh& mesh
 
 bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh,
                                                   const std::string& layer,
-                                                  grid_map::GridMap& gridMap)
-{
+                                                  grid_map::GridMap& gridMap) {
   // Adding a layer to the grid map to put data into
   gridMap.add(layer);
   // Converting out of binary cloud data
-  pcl::PointCloud <pcl::PointXYZ> cloud;
+  pcl::PointCloud<pcl::PointXYZ> cloud;
   pcl::fromPCLPointCloud2(mesh.cloud, cloud);
   // Direction and max height for projection ray
   const Eigen::Vector3f ray = -Eigen::Vector3f::UnitZ();
@@ -82,10 +77,13 @@ bool GridMapPclConverter::addLayerFromPolygonMesh(const pcl::PolygonMesh& mesh,
                               maxBound.z + 1.0);
         // Vertical ray/triangle intersection
         Eigen::Vector3f intersectionPoint;
-        if (rayTriangleIntersect(point, ray, triangleVertexMatrix, intersectionPoint)) {
-          // If data already present in this cell, taking the max, else setting the data
+        if (rayTriangleIntersect(point, ray, triangleVertexMatrix,
+                                 intersectionPoint)) {
+          // If data already present in this cell, taking the max, else setting
+          // the data
           if (gridMap.isValid(index, layer)) {
-            gridMap.at(layer, index) = std::max(gridMap.at(layer, index), intersectionPoint.z());
+            gridMap.at(layer, index) =
+                std::max(gridMap.at(layer, index), intersectionPoint.z());
           } else {
             gridMap.at(layer, index) = intersectionPoint.z();
           }
@@ -143,4 +141,4 @@ bool GridMapPclConverter::rayTriangleIntersect(
   return true;
 }
 
-} /* namespace */
+}  // namespace grid_map

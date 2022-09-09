@@ -31,11 +31,13 @@ void QuadKD::initModel(std::string ns) {
   }
 
   leg_idx_list_.resize(4);
-  std::iota(leg_idx_list_.begin(), leg_idx_list_.end(), 0); // Just initialize values for leg index.. not sure why
-  //std::cout << "leg index initial val: " <<  leg_idx_list_.at(2) << std::endl;
+  std::iota(leg_idx_list_.begin(), leg_idx_list_.end(),
+            0);  // Just initialize values for leg index.. not sure why
+  // std::cout << "leg index initial val: " <<  leg_idx_list_.at(2) <<
+  // std::endl;
 
-
-  // defining a function here.... to check it is in ascending order?? interesting
+  // defining a function here.... to check it is in ascending order??
+  // interesting
   std::sort(leg_idx_list_.begin(), leg_idx_list_.end(), [&](int i, int j) {
     return body_id_list_.at(i) < body_id_list_.at(j);
   });
@@ -593,7 +595,7 @@ void QuadKD::computeInverseDynamics(const Eigen::VectorXd &state_pos,
 
   q_dot.segment(3, 3) = state_vel.segment(15, 3);
 
-  //std::cout << "leg idx list size: " << leg_idx_list_.size() << "\n";
+  // std::cout << "leg idx list size: " << leg_idx_list_.size() << "\n";
   for (size_t i = 0; i < leg_idx_list_.size(); i++) {
     q.segment(6 + 3 * i, 3) = state_pos.segment(3 * leg_idx_list_.at(i), 3);
     q_dot.segment(6 + 3 * i, 3) = state_vel.segment(3 * leg_idx_list_.at(i), 3);
@@ -602,10 +604,11 @@ void QuadKD::computeInverseDynamics(const Eigen::VectorXd &state_pos,
   // Compute jacobians
   Eigen::MatrixXd jacobian = Eigen::MatrixXd::Zero(12, 18);
   jacobian.setZero();
-  //std::cout << "body id list size:  " << body_id_list_.size() << "\n"; // Still note sure about this body_id_list_
+  // std::cout << "body id list size:  " << body_id_list_.size() << "\n"; //
+  // Still note sure about this body_id_list_
   for (size_t i = 0; i < body_id_list_.size(); i++) {
-    //std::cout << "i: " << i << "\n";
-    //std::cout << "body id list: " << body_id_list_[i] << "\n";
+    // std::cout << "i: " << i << "\n";
+    // std::cout << "body id list: " << body_id_list_[i] << "\n";
     Eigen::MatrixXd jac_block(3, 18);
     jac_block.setZero();
     RigidBodyDynamics::CalcPointJacobian(*model_, q, body_id_list_.at(i),
@@ -613,11 +616,13 @@ void QuadKD::computeInverseDynamics(const Eigen::VectorXd &state_pos,
     jacobian.block(3 * i, 0, 3, 18) = jac_block;
   }
   /*
-  std::cout << "Jacobian block num coefficients: " << jacobian.size() << std::endl;
-  std::cout << "Jacobian rows: " << jacobian.rows() << " columns: " << jacobian.cols() << std::endl;
+  std::cout << "Jacobian block num coefficients: " << jacobian.size() <<
+  std::endl; std::cout << "Jacobian rows: " << jacobian.rows() << " columns: "
+  << jacobian.cols() << std::endl;
   */
   // Compute the equivalent force in generalized coordinates
-  Eigen::VectorXd tau_stance = -jacobian.transpose() * grf; // So this is for stance torque
+  Eigen::VectorXd tau_stance =
+      -jacobian.transpose() * grf;  // So this is for stance torque
   /*
   std::cout << "grf length: " << grf.size() << std::endl;
   std::cout << "tau_st length: " << tau_stance.size() << std::endl;
@@ -633,17 +638,19 @@ void QuadKD::computeInverseDynamics(const Eigen::VectorXd &state_pos,
   Eigen::VectorXd foot_acc_J_dot(12);
   for (size_t i = 0; i < 4; i++) {
     foot_acc_J_dot.segment(3 * i, 3) = RigidBodyDynamics::CalcPointAcceleration(
-        *model_, q, q_dot, Eigen::VectorXd::Zero(18), body_id_list_.at(i), // body id is toes... why is it called foot_acc_J_dot
+        *model_, q, q_dot, Eigen::VectorXd::Zero(18),
+        body_id_list_.at(
+            i),  // body id is toes... why is it called foot_acc_J_dot
         Eigen::Vector3d::Zero());
   }
 
   // Compute constraint Jacobian A and A_dot*q_dot
   int constraints_num =
       3 * std::count(contact_mode.begin(), contact_mode.end(), true);
-  //std::cout << "Number of constraints: " << constraints_num << std::endl;
+  // std::cout << "Number of constraints: " << constraints_num << std::endl;
   Eigen::MatrixXd A(constraints_num, 18);
   Eigen::VectorXd A_dotq_dot(constraints_num);
-  //std::cout << "A row: " << A.rows() << "cols: " << A.cols() << std::endl;
+  // std::cout << "A row: " << A.rows() << "cols: " << A.cols() << std::endl;
   int constraints_count = 0;
   for (size_t i = 0; i < 4; i++) {
     if (contact_mode.at(i)) {
@@ -656,14 +663,17 @@ void QuadKD::computeInverseDynamics(const Eigen::VectorXd &state_pos,
   }
 
   // Compute acceleration from J*q_ddot
-  Eigen::VectorXd foot_acc_q_ddot = foot_acc - foot_acc_J_dot; // what does this mean... foot acceleration relative to global???
-  //std::cout << "foot_acc_q_ddot: " << foot_acc_q_ddot.size() << std::endl;
+  Eigen::VectorXd foot_acc_q_ddot =
+      foot_acc - foot_acc_J_dot;  // what does this mean... foot acceleration
+                                  // relative to global???
+  // std::cout << "foot_acc_q_ddot: " << foot_acc_q_ddot.size() << std::endl;
 
   // Compuate damped jacobian inverser
   Eigen::MatrixXd jacobian_inv =
       math_utils::sdlsInv(jacobian.block(0, 6, 12, 12));
-  
-  //std::cout << "Jacobian inverse rows: " << jacobian_inv.rows() << " cols: " << jacobian_inv.cols() << std::endl;
+
+  // std::cout << "Jacobian inverse rows: " << jacobian_inv.rows() << " cols: "
+  // << jacobian_inv.cols() << std::endl;
 
   // In the EOM, we know M, N, tau_grf, and a = J_b*q_ddot_b + J_l*q_ddot_l, we
   // need to solve q_ddot_b and tau_swing

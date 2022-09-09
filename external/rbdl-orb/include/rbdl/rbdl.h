@@ -14,11 +14,11 @@
 #include "rbdl/Logging.h"
 
 #include "rbdl/Body.h"
-#include "rbdl/Model.h"
+#include "rbdl/Constraints.h"
 #include "rbdl/Dynamics.h"
 #include "rbdl/Joint.h"
 #include "rbdl/Kinematics.h"
-#include "rbdl/Constraints.h"
+#include "rbdl/Model.h"
 
 #include "rbdl/rbdl_utils.h"
 
@@ -55,7 +55,7 @@ RBDL_DLLAPI int rbdl_get_api_version();
  * \code
  *   rbdl_check_api_version(0x020A0C);
  * \endcode
- * 
+ *
  * Would abort if the API major version is not 2 (= 0x02), warn if the
  * linked minor version is not 10 (= 0x0A). The patch version 12 (= 0x12)
  * does not have an influence on compatibility.

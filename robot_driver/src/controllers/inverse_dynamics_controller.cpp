@@ -11,9 +11,10 @@ bool InverseDynamicsController::computeLegCommandArray(
        0.1)) {
     return false;
   } else {
-    //ROS_INFO("TIME NOW: %0.5f", ros::Time::now().toSec());
-    //ROS_INFO("last local plan msg: %0.5f", last_local_plan_msg_->header.stamp.toSec());
-    //ROS_INFO("TIME DIFF: %0.5f", (ros::Time::now() - last_local_plan_msg_->header.stamp).toSec());
+    // ROS_INFO("TIME NOW: %0.5f", ros::Time::now().toSec());
+    // ROS_INFO("last local plan msg: %0.5f",
+    // last_local_plan_msg_->header.stamp.toSec()); ROS_INFO("TIME DIFF: %0.5f",
+    // (ros::Time::now() - last_local_plan_msg_->header.stamp).toSec());
     leg_command_array_msg.leg_commands.resize(num_feet_);
 
     // Define vectors for joint positions and velocities
@@ -41,12 +42,15 @@ bool InverseDynamicsController::computeLegCommandArray(
     ros::Time t_first_state = last_local_plan_msg_->states.front().header.stamp;
     double t_now = (ros::Time::now() - last_local_plan_msg_->state_timestamp)
                        .toSec();  // Use time of state - RECOMMENDED
-    //ROS_INFO("t_now: %0.5f", t_now);
-    //ROS_INFO("last_local_plan_msg->state_timestamp %0.5f", last_local_plan_msg_->state_timestamp.toSec());
-    //ROS_INFO("t_first_state %0.5f", t_first_state.toSec());
-    //ROS_INFO("diff: %0.10f", (last_local_plan_msg_->states.front().header.stamp - t_first_state).toSec()); // This ensures condition of state machine is in the middle of original planner? thats why diff is 0
-    //ROS_INFO("Conditional statement: %s", (t_now <(last_local_plan_msg_->states.front().header.stamp - t_first_state).toSec()) ? "true" : "false");
-    //ROS_INFO("\n\n");
+    // ROS_INFO("t_now: %0.5f", t_now);
+    // ROS_INFO("last_local_plan_msg->state_timestamp %0.5f",
+    // last_local_plan_msg_->state_timestamp.toSec()); ROS_INFO("t_first_state
+    // %0.5f", t_first_state.toSec()); ROS_INFO("diff: %0.10f",
+    // (last_local_plan_msg_->states.front().header.stamp -
+    // t_first_state).toSec()); // This ensures condition of state machine is in
+    // the middle of original planner? thats why diff is 0 ROS_INFO("Conditional
+    // statement: %s", (t_now <(last_local_plan_msg_->states.front().header.stamp
+    // - t_first_state).toSec()) ? "true" : "false"); ROS_INFO("\n\n");
     // double t_now = (ros::Time::now() - last_local_plan_time_).toSec(); // Use
     // time of plan receipt double t_now = (ros::Time::now() -
     // t_first_state).toSec(); // Use time of first state in plan
@@ -63,11 +67,11 @@ bool InverseDynamicsController::computeLegCommandArray(
     // Interpolate the local plan to get the reference state and ff GRF
     for (int i = 0; i < last_local_plan_msg_->states.size() - 1; i++) {
       /** Need to debug still
-      std::cout << "In loop with states size: " <<  last_local_plan_msg_->states.size() << "\n";
-      ROS_INFO("t_now: %0.5f", t_now);
-      ROS_INFO("states traj num %d", i);
-      ROS_INFO("t_i: %0.5f", last_local_plan_msg_->states[i].header.stamp.toSec())
-      ROS_INFO("t_i+1: %0.5f", last_local_plan_msg_->states[i+1].header.stamp.toSec())
+      std::cout << "In loop with states size: " <<
+      last_local_plan_msg_->states.size() << "\n"; ROS_INFO("t_now: %0.5f",
+      t_now); ROS_INFO("states traj num %d", i); ROS_INFO("t_i: %0.5f",
+      last_local_plan_msg_->states[i].header.stamp.toSec()) ROS_INFO("t_i+1:
+      %0.5f", last_local_plan_msg_->states[i+1].header.stamp.toSec())
       **/
       if ((t_now >=
            (last_local_plan_msg_->states[i].header.stamp - t_first_state)
@@ -118,7 +122,7 @@ bool InverseDynamicsController::computeLegCommandArray(
     }
 
     // Compute joint torques
-    //ROS_INFO("Computing Inverse Dynamics");
+    // ROS_INFO("Computing Inverse Dynamics");
     // High level view: Convert grf to ff joint torques
     quadKD_->computeInverseDynamics(state_positions, state_velocities,
                                     ref_foot_acceleration, grf_array,
@@ -127,19 +131,20 @@ bool InverseDynamicsController::computeLegCommandArray(
     // Convert gains to eigen vectors for easier math
     Eigen::VectorXd swing_kp_cart_eig, swing_kd_cart_eig,
         swing_cart_fb(3 * num_feet_);
-    //ROS_INFO("AT VECTORTOEIGEN"); // All kp and kd are set to 0 I believe
+    // ROS_INFO("AT VECTORTOEIGEN"); // All kp and kd are set to 0 I believe
     quad_utils::vectorToEigen(swing_kp_cart_, swing_kp_cart_eig);
     quad_utils::vectorToEigen(swing_kd_cart_, swing_kd_cart_eig);
 
     // Compute PD feedback in cartesian space
-    // ROS_INFO("state position size: %ld", state_positions.size()); // expected 18
+    // ROS_INFO("state position size: %ld", state_positions.size()); // expected
+    // 18
     Eigen::MatrixXd jacobian(3 * num_feet_, state_positions.size());
     swing_cart_fb = swing_kp_cart_eig.replicate<4, 1>().cwiseProduct(
                         ref_foot_positions - foot_positions) +
                     swing_kd_cart_eig.replicate<4, 1>().cwiseProduct(
                         ref_foot_velocities - foot_velocities);
-    
-    //std::cout << "swing cart fb: " << swing_cart_fb << std::endl; // 0
+
+    // std::cout << "swing cart fb: " << swing_cart_fb << std::endl; // 0
 
     // Transform PD into joint space
     quadKD_->getJacobianBodyAngVel(state_positions, jacobian);
@@ -178,7 +183,8 @@ bool InverseDynamicsController::computeLegCommandArray(
         }
       }
     }
-    //ROS_INFO("swing_cart_fb index 0: %lf", swing_cart_fb(0)); // Gives me 0, idk why
+    // ROS_INFO("swing_cart_fb index 0: %lf", swing_cart_fb(0)); // Gives me 0,
+    // idk why
 
     last_grf_array_ = grf_array;
     return true;

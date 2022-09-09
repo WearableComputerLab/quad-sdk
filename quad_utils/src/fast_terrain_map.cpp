@@ -425,7 +425,7 @@ Eigen::Vector3d FastTerrainMap::getSurfaceNormalFilteredEigen(
       1.0 / ((x2 - x1) * (y2 - y1)) *
       (fz_x1y1 * (x2 - x) * (y2 - y) + fz_x2y1 * (x - x1) * (y2 - y) +
        fz_x1y2 * (x2 - x) * (y - y1) + fz_x2y2 * (x - x1) * (y - y1));
-  //std::cout << "surf_norm:\n" << surf_norm << std::endl;
+  // std::cout << "surf_norm:\n" << surf_norm << std::endl;
   return surf_norm;
 }
 

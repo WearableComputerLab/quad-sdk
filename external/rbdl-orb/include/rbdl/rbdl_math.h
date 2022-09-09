@@ -10,10 +10,10 @@
 
 #include "rbdl/rbdl_config.h"
 
-#include <Eigen/Dense>
 #include <Eigen/Core>
-#include <Eigen/StdVector>
+#include <Eigen/Dense>
 #include <Eigen/QR>
+#include <Eigen/StdVector>
 
 #include "rbdl/rbdl_eigenmath.h"
 
@@ -37,9 +37,9 @@ typedef Matrix63_t Matrix63;
 typedef Matrix43_t Matrix43;
 typedef VectorN_t VectorNd;
 typedef MatrixN_t MatrixNd;
-} /* Math */
+}  // namespace Math
 
-} /* RigidBodyDynamics */
+}  // namespace RigidBodyDynamics
 
 #include "rbdl/Quaternion.h"
 #include "rbdl/SpatialAlgebraOperators.h"
@@ -50,8 +50,10 @@ EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(RigidBodyDynamics::Math::SpatialVector)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(RigidBodyDynamics::Math::SpatialMatrix)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(RigidBodyDynamics::Math::Matrix63)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(RigidBodyDynamics::Math::Matrix43)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(RigidBodyDynamics::Math::SpatialTransform)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(RigidBodyDynamics::Math::SpatialRigidBodyInertia)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(
+    RigidBodyDynamics::Math::SpatialTransform)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(
+    RigidBodyDynamics::Math::SpatialRigidBodyInertia)
 
-  /* RBDL_MATH_H_H */
+/* RBDL_MATH_H_H */
 #endif
