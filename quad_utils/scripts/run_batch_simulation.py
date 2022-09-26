@@ -1,10 +1,11 @@
+#!/usr/bin/env python
 import roslaunch
 import rospy
 import numpy as np
 
 vel = 1.0
 period = 0.36
-num = 25
+num = 5
 sample = 25
 time_init = 3.5/4*10
 time_stand = 7.5/4*10
