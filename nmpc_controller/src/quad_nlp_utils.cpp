@@ -257,6 +257,14 @@ void quadNLP::loadCasadiFuncs() {
       const casadi_int* row = sp_i + ncol + 1;
       casadi_int nnz = sp_i[ncol];
 
+      // Print out meta data
+      std::cout << "nrow: " << nrow << std::endl;
+      std::cout << "ncol: " << ncol << std::endl;
+      // std::cout << "colind: " << colind << std::endl;
+      std::cout << "*colind: " << *colind << std::endl;
+      std::cout << "*row: " << *row << std::endl;
+      std::cout << "nnz: " << nnz << std::endl;
+
       nnz_mat_(sys_id, func_id) = nnz;
       nrow_mat_(sys_id, func_id) = nrow;
       ncol_mat_(sys_id, func_id) = ncol;
@@ -398,7 +406,15 @@ void quadNLP::loadConstraintNames() {
   // Load the correct slice of the constraint names into the veector
   for (int i = 0; i < num_sys_id_; i++) {
     int num_constr = nrow_mat_(i, FUNC);
+    // simple: xyz, rpy, time derivs, 16 lin friction constraints
+    // std::cout << "num_constr: " << num_constr << std::endl;  // 28 for simple
     constr_names_[i] = std::vector<std::string>(
         constr_names.begin(), constr_names.begin() + num_constr);
+
+    /*
+    std::for_each(constr_names.begin(), constr_names.end(),
+                  [](const std::string n) { std::cout << n << ' '; });
+    std::cout << "\n";
+    */
   }
 }

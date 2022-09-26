@@ -97,7 +97,7 @@ void OfflineGlobalBodyPlanner::setMiscPlans(
 
   // Lift from reduced plan into full body plan
   State start_state = state_sequence.at(
-      0);  // TODO(AZ): Start state should be obtain from gazebo sim 
+      0);  // TODO(AZ): Start state should be obtain from gazebo sim
   FullState start_state_ =
       stateToFullState(start_state, 0, M_PI + 14 * 180 / M_PI, 0, 0, 0,
                        0);  // TODO(AZ): Get from gazebo

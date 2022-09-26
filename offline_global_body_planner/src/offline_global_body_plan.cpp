@@ -153,7 +153,8 @@ bool OfflineGlobalBodyPlan::loadPlanData(double t0, double dt,
       // ROS_WARN("Global plan is off the map!!");
       plan_loaded_ = false;
     }
-    state_sequence.at(i).vel[2] = 0;  // TODO(AZ): Figure out what to do with v_z
+    // TODO(AZ): Figure out what to do with v_z
+    state_sequence.at(i).vel[2] = 0;
 
     // Add 3rd dim to inputs (i.e. fixed mg)
     addMG(grf_sequence.at(i), planner_config);

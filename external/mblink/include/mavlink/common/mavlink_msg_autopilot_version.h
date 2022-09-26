@@ -465,7 +465,7 @@ static inline void mavlink_msg_autopilot_version_send(
                    sizeof(uint8_t) * 8);
   mav_array_memcpy(packet.uid2, uid2, sizeof(uint8_t) * 18);
   _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION,
-                                  (const char*)&packet,
+                                  (const char *)&packet,
                                   MAVLINK_MSG_ID_AUTOPILOT_VERSION_MIN_LEN,
                                   MAVLINK_MSG_ID_AUTOPILOT_VERSION_LEN,
                                   MAVLINK_MSG_ID_AUTOPILOT_VERSION_CRC);
@@ -493,7 +493,7 @@ static inline void mavlink_msg_autopilot_version_send_struct(
       autopilot_version->uid2);
 #else
   _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_AUTOPILOT_VERSION,
-                                  (const char*)autopilot_version,
+                                  (const char *)autopilot_version,
                                   MAVLINK_MSG_ID_AUTOPILOT_VERSION_MIN_LEN,
                                   MAVLINK_MSG_ID_AUTOPILOT_VERSION_LEN,
                                   MAVLINK_MSG_ID_AUTOPILOT_VERSION_CRC);

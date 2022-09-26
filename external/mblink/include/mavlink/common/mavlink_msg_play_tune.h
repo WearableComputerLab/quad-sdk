@@ -255,13 +255,13 @@ static inline void mavlink_msg_play_tune_send_buf(
       chan, MAVLINK_MSG_ID_PLAY_TUNE, buf, MAVLINK_MSG_ID_PLAY_TUNE_MIN_LEN,
       MAVLINK_MSG_ID_PLAY_TUNE_LEN, MAVLINK_MSG_ID_PLAY_TUNE_CRC);
 #else
-  mavlink_play_tune_t *packet = (mavlink_play_tune_t *)msgbuf;
+  mavlink_play_tune_t* packet = (mavlink_play_tune_t*)msgbuf;
   packet->target_system = target_system;
   packet->target_component = target_component;
   mav_array_memcpy(packet->tune, tune, sizeof(char) * 30);
   mav_array_memcpy(packet->tune2, tune2, sizeof(char) * 200);
   _mav_finalize_message_chan_send(
-      chan, MAVLINK_MSG_ID_PLAY_TUNE, (const char *)packet,
+      chan, MAVLINK_MSG_ID_PLAY_TUNE, (const char*)packet,
       MAVLINK_MSG_ID_PLAY_TUNE_MIN_LEN, MAVLINK_MSG_ID_PLAY_TUNE_LEN,
       MAVLINK_MSG_ID_PLAY_TUNE_CRC);
 #endif

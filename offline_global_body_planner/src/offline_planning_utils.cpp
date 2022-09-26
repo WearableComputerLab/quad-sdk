@@ -71,7 +71,7 @@ void addFullStates(const FullState &start_state,
   // (often zero velocity)
   unwrapped_yaw[num_discrete_pts - 1] = unwrapped_yaw[num_discrete_pts - 2];
 
-  // Filter yaw (TODO(AZ): and compute its derivative via central difference method)
+  // Filter yaw and compute its derivative via central difference method)
   int window_size = 1;  // Original value: 25
   filtered_yaw = math_utils::movingAverageFilter(unwrapped_yaw, window_size);
   yaw_rate = math_utils::centralDiff(filtered_yaw, dt);

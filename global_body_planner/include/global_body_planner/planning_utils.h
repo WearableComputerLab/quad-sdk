@@ -75,6 +75,7 @@ struct PlannerConfig {
                                     // unless in flight
 
   bool enable_leaping = true;  // Leaping mode switch
+  int num_leaps = 0;  // TODO(AZ): Count number of valid leaps need more robust
   static const int num_reachability_points =
       4;  // Number of points on body used to check reachability
   static const int num_collision_points =

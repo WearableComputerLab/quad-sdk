@@ -152,9 +152,11 @@ void GlobalBodyPlanner::setStartState() {
     current_index = std::min(current_index, current_plan_.getSize() - 1);
     FullState current_state_in_plan_ =
         current_plan_.getStateFromIndex(current_index);
-    // std::cout << "Current state in plan xyz:\n" << current_state_in_plan_.pos
+    // std::cout << "Current state in plan xyz:\n"
+    // << current_state_in_plan_.pos
     // << std::endl; std::cout << "Robot State xyz:\n" << robot_state_.pos <<
-    // std::endl; // Robot state updates somewhere... robotStateCallback which is
+    // std::endl;
+    // Robot state updates somewhere... robotStateCallback which is
     // published from state estimator plugin... std::cout << "Euclidean Pos
     // Distance: " << poseDistance(robot_state_, current_state_in_plan_) <<
     // std::endl;
@@ -291,7 +293,7 @@ bool GlobalBodyPlanner::callPlanner() {
 
     newest_plan_.eraseAfterIndex(start_index_);
     // std::cout << "replan_start_time_: " << replan_start_time_ << std::endl;
-    // // Q: replan_start_time_ is initialized to 0 in reset mode, so how does it
+    // Q: replan_start_time_ is initialized to 0 in reset mode, so how does it
     // get current time
     // While in reset mode, replan_start_time_ is 0... but then it changes to
     // refine mode -> publish (I don't think so) Happens bc

@@ -155,7 +155,8 @@ class OfflineGlobalBodyPlanner2 {
   FullState start_state_;
 
   /// Goal state for planner
-  FullState goal_state_;  // TODO(AZ): Edit when want to change goal state mid-plan
+  // TODO(AZ): Edit when want to change goal state mid-plan
+  FullState goal_state_;
 
   /// Current robot state
   FullState robot_state_;
@@ -199,8 +200,9 @@ class OfflineGlobalBodyPlanner2 {
   int planner_status_;
 
   /// Index of activate plan from which to begin refinement
-  int start_index_;  // TODO(AZ): may need when online and some extra var for online
-                     // planning
+  // TODO(AZ): may need when online and some extra var for online
+  // planning
+  int start_index_;
 
   /// Timestamp for t=0 of global plan
   ros::Time global_plan_timestamp_;

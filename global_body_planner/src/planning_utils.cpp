@@ -576,6 +576,15 @@ bool getRandomLeapAction(const State &s, const Eigen::Vector3d &surf_norm,
   a.grf_f.setZero();
 
   bool is_valid = refineAction(s, a, planner_config);
+  // TODO(AZ): need to have a global num of leaps
+  /**
+  if (planner_config.num_leaps == 0 && is_valid) {
+    planner_config.num_leaps = planner_config.num_leaps + 1;
+    return is_valid;
+  } else {
+    return false;
+  }
+  */
 
   return is_valid;
 }

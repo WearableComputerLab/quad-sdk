@@ -248,7 +248,7 @@ struct RBDL_DLLAPI SpatialTransform {
     Vector3d En_rxf = E * (Vector3d(f_sp[0], f_sp[1], f_sp[2]) -
                            r.cross(Vector3d(f_sp[3], f_sp[4], f_sp[5])));
     //		Vector3d En_rxf = E * (Vector3d (f_sp[0], f_sp[1], f_sp[2]) -
-    //r.cross(Eigen::Map<Vector3d> (&(f_sp[3]))));
+    // r.cross(Eigen::Map<Vector3d> (&(f_sp[3]))));
 
     return SpatialVector(
         En_rxf[0], En_rxf[1], En_rxf[2],

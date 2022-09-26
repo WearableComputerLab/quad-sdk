@@ -263,13 +263,13 @@ static inline void mavlink_msg_debug_float_array_send_buf(
                                   MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY_LEN,
                                   MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY_CRC);
 #else
-  mavlink_debug_float_array_t *packet = (mavlink_debug_float_array_t *)msgbuf;
+  mavlink_debug_float_array_t* packet = (mavlink_debug_float_array_t*)msgbuf;
   packet->time_usec = time_usec;
   packet->array_id = array_id;
   mav_array_memcpy(packet->name, name, sizeof(char) * 10);
   mav_array_memcpy(packet->data, data, sizeof(float) * 58);
   _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY,
-                                  (const char *)packet,
+                                  (const char*)packet,
                                   MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY_MIN_LEN,
                                   MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY_LEN,
                                   MAVLINK_MSG_ID_DEBUG_FLOAT_ARRAY_CRC);

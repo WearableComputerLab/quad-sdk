@@ -119,7 +119,7 @@ void GlobalBodyPlan::convertToMsg(
   // Loop through the interpolated body plan and add to message
   for (int i = 0; i < body_plan_.size(); ++i) {
     // std::cout << "primitive_id_plan: " << primitive_id_plan_[i] << std::endl;
-    // // Just curious what primitive_id is for flat terrain. RESULT: 0 (CONNECT)
+    // Just curious what primitive_id is for flat terrain. RESULT: 0 (CONNECT)
     // and end index 1 (LEAP_STANCE)
     addStateAndGRFToMsg(t_plan_[i], i, body_plan_[i], grf_plan_[i],
                         primitive_id_plan_[i], robot_plan_msg);

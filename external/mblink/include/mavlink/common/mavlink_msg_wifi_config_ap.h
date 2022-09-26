@@ -176,7 +176,7 @@ static inline void mavlink_msg_wifi_config_ap_send(mavlink_channel_t chan,
   mav_array_memcpy(packet.ssid, ssid, sizeof(char) * 32);
   mav_array_memcpy(packet.password, password, sizeof(char) * 64);
   _mav_finalize_message_chan_send(
-      chan, MAVLINK_MSG_ID_WIFI_CONFIG_AP, (const char*)&packet,
+      chan, MAVLINK_MSG_ID_WIFI_CONFIG_AP, (const char *)&packet,
       MAVLINK_MSG_ID_WIFI_CONFIG_AP_MIN_LEN, MAVLINK_MSG_ID_WIFI_CONFIG_AP_LEN,
       MAVLINK_MSG_ID_WIFI_CONFIG_AP_CRC);
 #endif
@@ -194,7 +194,7 @@ static inline void mavlink_msg_wifi_config_ap_send_struct(
                                   wifi_config_ap->password);
 #else
   _mav_finalize_message_chan_send(
-      chan, MAVLINK_MSG_ID_WIFI_CONFIG_AP, (const char*)wifi_config_ap,
+      chan, MAVLINK_MSG_ID_WIFI_CONFIG_AP, (const char *)wifi_config_ap,
       MAVLINK_MSG_ID_WIFI_CONFIG_AP_MIN_LEN, MAVLINK_MSG_ID_WIFI_CONFIG_AP_LEN,
       MAVLINK_MSG_ID_WIFI_CONFIG_AP_CRC);
 #endif

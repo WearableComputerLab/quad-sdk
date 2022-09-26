@@ -133,9 +133,9 @@ bool OfflineGlobalBodyPlanner2::callPlanner() {
 
   // In this case, get plan from CSV
   loadCSVData(state_file_path_, ctrl_file_path_, 4, 2);  // Load from params
-  plan_status_ = plan_.loadPlanData(
-      0.0, dt_, start_state_, state_sequence_, grf_sequence_,
-      planner_config_);  // TODO(AZ): Should just be 0.0 as start, might delete t0
+  // TODO(AZ): Should just be 0.0 as start, might delete t0
+  plan_status_ = plan_.loadPlanData(0.0, dt_, start_state_, state_sequence_,
+                                    grf_sequence_, planner_config_);
 }
 
 void OfflineGlobalBodyPlanner2::loadCSVData(std::string state_file_path,

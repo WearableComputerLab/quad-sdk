@@ -32,12 +32,17 @@ void QuadKD::initModel(std::string ns) {
 
   leg_idx_list_.resize(4);
   std::iota(leg_idx_list_.begin(), leg_idx_list_.end(),
-            0);  // Just initialize values for leg index.. not sure why
-  // std::cout << "leg index initial val: " <<  leg_idx_list_.at(2) <<
+            0);  // Just initialize values 0,1,2 for leg index.. not sure why
+  // std::cout << "leg index initial val 0: " << leg_idx_list_.at(0) <<
   // std::endl;
+  // std::cout << "leg index initial val 1: " << leg_idx_list_.at(1)
+  // << std::endl;
+  // std::cout << "leg index initial val 2: " <<
+  // leg_idx_list_.at(2) << std::endl;
 
   // defining a function here.... to check it is in ascending order??
   // interesting
+  // lambda function for comparison
   std::sort(leg_idx_list_.begin(), leg_idx_list_.end(), [&](int i, int j) {
     return body_id_list_.at(i) < body_id_list_.at(j);
   });
@@ -53,15 +58,25 @@ void QuadKD::initModel(std::string ns) {
   std::vector<std::string> toe_name_list = {"toe0", "toe1", "toe2", "toe3"};
   RigidBodyDynamics::Math::SpatialTransform tform;
   for (size_t i = 0; i < 4; i++) {
+    // Transform to parent frame
+    // Ex: knee offset -> Translation is -0.206
+    // Lower leg origin is -0.206m (x-axis) from the upper leg origin
+    // i.e. Transformation from upper leg to lower leg w.r.t. lower leg
+    // i.e. Position of lower leg frame relative to upper leg frame
+
     // From body COM to abad
     tform =
         model_->GetJointFrame(model_->GetBodyId(hip_name_list.at(i).c_str()));
     legbase_offsets_[i] = tform.r;
+    // spirit: 0.2263 x 0.07 y
+    // std::cout << "legbase_offsets[" << i << "]: \n" << tform.r << std::endl;
 
     // From abad to hip
     tform =
         model_->GetJointFrame(model_->GetBodyId(upper_name_list.at(i).c_str()));
     l0_vec_[i] = tform.r(1);
+    // std::cout << "l0_vec_: " << tform.r << std::endl;  // 0.10098 y spirit
+    // std::cout << "abad to hip transform: \n" << tform.E << std::endl;
 
     // From hip to knee (we know they should be the same and the equation in IK
     // uses the magnitute of it)
@@ -69,6 +84,7 @@ void QuadKD::initModel(std::string ns) {
         model_->GetJointFrame(model_->GetBodyId(lower_name_list.at(i).c_str()));
     l1_ = tform.r.cwiseAbs().maxCoeff();
     knee_offset_ = tform.r;
+    // std::cout << "lower leg to knee: " << tform.r << std::endl;  // -.206 x
 
     // From knee to toe (we know they should be the same and the equation in IK
     // uses the magnitute of it)
@@ -76,6 +92,7 @@ void QuadKD::initModel(std::string ns) {
         model_->GetJointFrame(model_->GetBodyId(toe_name_list.at(i).c_str()));
     l2_ = tform.r.cwiseAbs().maxCoeff();
     foot_offset_ = tform.r;
+    // std::cout << "lower leg to toe: " << tform.r << std::endl;  // 0.206 x
   }
 
   // Abad offset from legbase
@@ -392,9 +409,12 @@ bool QuadKD::legbaseToFootIKLegbaseFrame(int leg_index,
   double q0;
   double q1;
   double q2;
+  // x: 0 y: 0.028 z: -0.2 (note values update to nom height when planning)
+  // std::cout << "x: " << x << " y: " << y << " z: " << z << std::endl;
 
   // Start IK, check foot pos is at least l0 away from leg base, clamp otherwise
   double temp = l0 / sqrt(z * z + y * y);
+  // std::cout << "temp: " << temp << std::endl;  //  0.5 initially
   if (abs(temp) > 1) {
     ROS_DEBUG_THROTTLE(0.5, "Foot too close, choosing closest alternative\n");
     is_exact = false;
@@ -404,9 +424,15 @@ bool QuadKD::legbaseToFootIKLegbaseFrame(int leg_index,
   // Compute both solutions of q0, use hip-above-knee if z<0 (preferred)
   // Store the inverted solution in case hip limits are exceeded
   if (z > 0) {
+    // std::cout << "z > 0!!!" << std::endl;
     q0 = -acos(temp) + atan2(z, y);
+    // std::cout << "q0: " << q0 * 180 / M_PI << std::endl;
   } else {
     q0 = acos(temp) + atan2(z, y);
+    // std::cout << "z < 0!!!" << std::endl;
+    // std::cout << "acos(temp): " << acos(temp) << std::endl;
+    // std::cout << "atan2(z,y): " << atan2(z, y) << std::endl;
+    // std::cout << "q0: " << q0 * 180 / M_PI << std::endl;
   }
 
   // Make sure abad is within joint limits, clamp otherwise

@@ -51,7 +51,8 @@ quadNLP::quadNLP(SystemID default_system, int N, double dt, double mu,
     quadKD_->worldToFootIKWorldFrame(
         i, initial_state.segment(0, 3), initial_state.segment(3, 3),
         foot_pos_world_.row(0).segment(3 * i, 3), joint_state);
-    x_null_nom_.segment<3>(3 * i) = joint_state;
+    // Seems like some nom joint angles w/ some hardcoded states
+    x_null_nom_.segment<3>(3 * i) = joint_state;  // nom null state var
   }
 
   // Define which constraints will be relaxed - hardcoded for now but could be
@@ -76,6 +77,12 @@ quadNLP::quadNLP(SystemID default_system, int N, double dt, double mu,
   loadConstraintNames();
 
   this->fixed_complexity_schedule_ = fixed_complexity_schedule;
+  /*
+  std::cout << "fixed_complexity_schedule: " << fixed_complexity_schedule
+            << std::endl;  // Full of zeros
+  // size is horizon length -> 26
+  std::cout << "size: " << fixed_complexity_schedule.size() << std::endl;
+  */
   this->adaptive_complexity_schedule_.setZero(N_);
   this->update_structure();
 
@@ -1598,9 +1605,10 @@ void quadNLP::update_structure() {
           fixed_complexity_schedule_.head(N_));
 
   // std::cout << "complexity_schedule = " << complexity_schedule.transpose()
-  //          << std::endl;
+  //          << std::endl; // 0 when not complex scheduling
 
   // Resize vectors appropriately
+  // std::cout << "N_: " << N_ << std::endl; // 26 for horizon length
   sys_id_schedule_.resize(N_ - 1);
   n_vec_.resize(N_);
   m_vec_.resize(N_ - 1);
@@ -1645,8 +1653,10 @@ void quadNLP::update_structure() {
     // Update the number of state vars and constraints for this fe
     n_vec_[i] = (complexity_schedule[i] == 1) ? config_.x_dim_complex
                                               : config_.x_dim_simple;
+    // std::cout << "n_vec_: " << n_vec_[i] << std::endl; // 12 -> xyz, rpy
     m_vec_[i] = (complexity_schedule[i] == 1) ? config_.u_dim_complex
                                               : config_.u_dim_simple;
+    // std::cout << "m_vec_: " << m_vec_[i] << std::endl;  // 12 -> 4feets*3
     n_cost_vec_[i] = (complexity_schedule[i + 1] == 1)
                          ? config_.x_dim_cost_complex
                          : config_.x_dim_cost_simple;
@@ -1667,29 +1677,37 @@ void quadNLP::update_structure() {
     curr_var_idx += n_vec_[i];
     u_idxs_[i] = curr_var_idx;
     curr_var_idx += m_vec_[i];
+    // std::cout << "curr_var_idx: " << curr_var_idx << std::endl; // 24->600
 
     // Update the indices for the constraints
     primal_constraint_idxs_[i] = curr_constr_idx;
     curr_constr_idx += g_vec_[i];
+    // std::cout << "g_vec_[i]: " << g_vec_[i] << std::endl; // 28 -> # rows
+    // std::cout << "curr_constr_idx: " << curr_constr_idx << std::endl;  // 28
 
     // Update the indices for the sparsity patterns
     dynamic_jac_var_idxs_[i] = curr_jac_var_idx;
     curr_jac_var_idx += nnz_mat_(sys_id_schedule_[i], JAC);
+    // curr_jac_var_idx: 129, 258, ..., 3225 (simple)
+    // std::cout << "curr_jac_var_idx: " << curr_jac_var_idx << std::endl;
     dynamic_hess_var_idxs_[i] = curr_hess_var_idx;
     curr_hess_var_idx += nnz_mat_(sys_id_schedule_[i], HESS);
+    // curr_hess_var_idx: 43, 86, .... (simple)
+    // std::cout << "curr_hess_var_idx: " << curr_hess_var_idx << std::endl;
   }
 
   n_vec_[N_ - 1] = (complexity_schedule[N_ - 1] == 1) ? config_.x_dim_complex
                                                       : config_.x_dim_simple;
   x_idxs_[N_ - 1] = curr_var_idx;
-  curr_var_idx += n_vec_[N_ - 1];
+  curr_var_idx += n_vec_[N_ - 1];  // 624 (simple)
 
   // Update the total number of primal variables
-  n_vars_primal_ = curr_var_idx;
+  n_vars_primal_ = curr_var_idx;  // 24*26 = 624 (simple)
 
   // Update the slack variable indices
   for (int i = 0; i < N_ - 1; i++) {
     int n_slack = n_slack_vec_[i];
+    // std::cout << "n_slack: " << n_slack << std::endl; // 12 (simple)
 
     // Log the index of first slack var in finite element and update the
     // current variable pointer with the number of state slack vars in this fe

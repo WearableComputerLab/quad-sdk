@@ -278,13 +278,13 @@ static inline void mavlink_msg_param_ext_ack_send_buf(
                                   MAVLINK_MSG_ID_PARAM_EXT_ACK_LEN,
                                   MAVLINK_MSG_ID_PARAM_EXT_ACK_CRC);
 #else
-  mavlink_param_ext_ack_t *packet = (mavlink_param_ext_ack_t *)msgbuf;
+  mavlink_param_ext_ack_t* packet = (mavlink_param_ext_ack_t*)msgbuf;
   packet->param_type = param_type;
   packet->param_result = param_result;
   mav_array_memcpy(packet->param_id, param_id, sizeof(char) * 16);
   mav_array_memcpy(packet->param_value, param_value, sizeof(char) * 128);
   _mav_finalize_message_chan_send(
-      chan, MAVLINK_MSG_ID_PARAM_EXT_ACK, (const char *)packet,
+      chan, MAVLINK_MSG_ID_PARAM_EXT_ACK, (const char*)packet,
       MAVLINK_MSG_ID_PARAM_EXT_ACK_MIN_LEN, MAVLINK_MSG_ID_PARAM_EXT_ACK_LEN,
       MAVLINK_MSG_ID_PARAM_EXT_ACK_CRC);
 #endif

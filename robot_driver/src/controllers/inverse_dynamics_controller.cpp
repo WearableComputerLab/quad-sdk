@@ -49,7 +49,8 @@ bool InverseDynamicsController::computeLegCommandArray(
     // (last_local_plan_msg_->states.front().header.stamp -
     // t_first_state).toSec()); // This ensures condition of state machine is in
     // the middle of original planner? thats why diff is 0 ROS_INFO("Conditional
-    // statement: %s", (t_now <(last_local_plan_msg_->states.front().header.stamp
+    // statement: %s",
+    // (t_now <(last_local_plan_msg_->states.front().header.stamp
     // - t_first_state).toSec()) ? "true" : "false"); ROS_INFO("\n\n");
     // double t_now = (ros::Time::now() - last_local_plan_time_).toSec(); // Use
     // time of plan receipt double t_now = (ros::Time::now() -
