@@ -4,6 +4,9 @@ TailController::TailController(ros::NodeHandle nh) {
   nh_ = nh;
 
   nh.param<int>("/tail_controller/tail_type", tail_type_, 0);
+  std::cout << "=========================" << std::endl;
+  std::cout << "TAIL TYPE: " << tail_type_ << std::endl;
+  std::cout << "=========================" << std::endl;
 
   switch (tail_type_) {
     case NONE:

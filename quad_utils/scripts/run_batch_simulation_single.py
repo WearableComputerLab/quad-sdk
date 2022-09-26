@@ -18,7 +18,7 @@ time_init = 3.5/4*10 * 2 # Change this if sim too long to run
 time_stand = 7.5/4*10
 time_walk = 27.5/4*10*0.75/1
 world = ['world:=step_25cm', 'world:=step_30cm', 'world:=step_35cm', 'world:=step_40cm',
-         'world:=step_45cm', 'world:=step_50cm', 'world:=step_55cm', 'world:=step_60cm',
+         'world:=step_45cm', 'world:=step_50cm', 'world:=step_55lcm', 'world:=step_60cm',
          'world:=step_65cm', 'world:=step_70cm', 'world:=step_75cm', 'world:=step_80cm']
 
 np.random.seed(0)
@@ -90,6 +90,7 @@ elif type_index == 1:
     launch_2.start()
     rospy.loginfo('Standing')
 
+    print("TIME TO STAND %0.2f" % time_stand)
     rospy.sleep(time_stand)
 
     launch_args = ['quad_utils', 'planning.launch',
@@ -119,6 +120,7 @@ elif type_index == 2:
     launch.start()
     rospy.loginfo('Gazebo running')
 
+    print("TIME TO INITIALIZE: %0.2f" % time_init)
     rospy.sleep(time_init)
 
     launch_args = ['quad_utils', 'standing.launch']
@@ -128,6 +130,7 @@ elif type_index == 2:
     launch_2.start()
     rospy.loginfo('Standing')
 
+    print("TIME TO STAND %0.2f" % time_stand)
     rospy.sleep(time_stand)
 
     launch_args = ['quad_utils', 'planning.launch',
@@ -138,6 +141,7 @@ elif type_index == 2:
     launch_3.start()
     rospy.loginfo('MPC running')
 
+    print("TIME FOR WALKING: %0.2d" % time_walk)
     rospy.sleep(time_walk)
 
     launch.shutdown()
