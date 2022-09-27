@@ -5,6 +5,7 @@
 #include "tail_controller/tail_planner.h"
 
 int main(int argc, char** argv) {
+  // ROS_WARN("TAIL PLANNER NODE INITIALIZED");
   ros::init(argc, argv, "tail_planner_node");
   ros::NodeHandle nh;
 

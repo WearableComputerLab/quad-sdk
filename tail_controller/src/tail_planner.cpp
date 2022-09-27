@@ -132,6 +132,9 @@ void TailPlanner::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
   cmd_vel_[4] = 0;
   cmd_vel_[5] = cmd_vel_scale_ * msg->angular.z;
 
+  std::cout << "tail cmd_vel_[0]: " << cmd_vel_[0] << std::endl;
+  std::cout << "tail cmd_vel_[1]: " << cmd_vel_[1] << std::endl;
+
   // Record when this was last reached for safety
   last_cmd_vel_msg_time_ = ros::Time::now();
 }
@@ -260,6 +263,7 @@ void TailPlanner::computeTailPlan() {
     }
   }
 
+  // ROS_WARN("Computing Distributed Tail Plan!!");
   if (!tail_planner_->computeDistributedTailPlan(
           current_state_, ref_body_plan_, foot_positions_body_,
           contact_schedule_, tail_current_state_, ref_tail_plan_, body_plan_,

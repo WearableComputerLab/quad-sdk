@@ -4,7 +4,7 @@
 
     <arg name="global_planner" default="twist" />
     <arg name="local_planner" default="full" />
-    <arg name="tail" default="false"/>
+    <arg name="tail" default="false" />
     <arg name="logging" default="false" />
     <arg name="parallel_index" default="0" />
     <arg name="twist_input" default="none" />
@@ -17,7 +17,7 @@
 
     <!-- Use twist input to local plan and no global plan -->
     <group if="$(eval arg('global_planner') == 'twist')">
-        <param name="local_planner/use_twist_input" value="true" />
+        <param name="local_planner/use_twist_input" value="true" /> <!-- Change value to false if don't want it to run twist command -->
 
         <group if="$(eval arg('twist_input') == 'keyboard')">
             <node name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" />
@@ -38,7 +38,7 @@
 
     <!-- Launch the node to publish the tail plan -->
     <group if="$(arg tail)">
-        <node name="tail_planner" pkg="tail_controller" type="tail_planner_node" output="screen"/>
+        <node name="tail_planner" pkg="tail_controller" type="tail_planner_node" output="screen" />
     </group>
 
     <group if="$(arg logging)">

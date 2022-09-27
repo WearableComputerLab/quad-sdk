@@ -311,6 +311,8 @@ void LocalPlanner::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
   cmd_vel_[3] = 0;
   cmd_vel_[4] = 0;
   cmd_vel_[5] = 0.95 * cmd_vel_[5] + 0.05 * cmd_vel_scale_ * msg->angular.z;
+  std::cout << "local plan cmd_vel_[0]: " << cmd_vel_[0] << std::endl;
+  std::cout << "local plan cmd_vel_[1]: " << cmd_vel_[1] << std::endl;
 
   // Record when this was last reached for safety
   last_cmd_vel_msg_time_ = ros::Time::now();
@@ -458,7 +460,8 @@ void LocalPlanner::getStateAndTwistInput() {
   // }
 
   // Assign a sidewalk velocity
-  cmd_vel_.at(1) = 1.0;
+  cmd_vel_.at(1) = 1.0;  // Edit here
+  cmd_vel_.at(0) = 1.0;
 
   // Compute estimated body height by flat terrain assumption, use the lowest
   // foot and exponential filter
