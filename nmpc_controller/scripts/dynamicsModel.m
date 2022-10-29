@@ -29,6 +29,7 @@ lambda = SX.sym('lambda', [parameter.n+16, 1]); % Constraint multipliers
 [M, h, J_u, q_dot] = legDynamics(x1, feet_location); % Backward Euler
 EOM = [(x1(1:parameter.n/2)-x0(1:parameter.n/2))-dt*q_dot;
     M*(x1(parameter.n/2+1:end)-x0(parameter.n/2+1:end))+dt*(h-J_u*u)]; % Equation of motion
+length(EOM)
 
 tmp = [1, 0, -mu;
     -1, 0, -mu;
@@ -77,19 +78,21 @@ R_wb = [cos(theta(3)), -sin(theta(3)), 0;
     -sin(theta(2)), 0, cos(theta(2))]*...
     [1, 0, 0;
     0, cos(theta(1)), -sin(theta(1));
-    0, sin(theta(1)), cos(theta(1))]; % Rotation matrix
+    0, sin(theta(1)), cos(theta(1))]; % Rotation matrix (r,p,y rotation) body -> world
 
 J_wb__b=jacobian(reshape(R_wb, 9, 1), theta);
+% Mapping J_wb__b: q_dot -> omega ([w]_x := R^T*R_dot ==
+% R^T*doh(R)/doh(q)*q_dot
 J_wb__b=[skew2angvel(R_wb'*reshape(J_wb__b(:, 1), 3, 3)), ...
     skew2angvel(R_wb'*reshape(J_wb__b(:, 2), 3, 3)), ...
-    skew2angvel(R_wb'*reshape(J_wb__b(:, 3), 3, 3))]; % Jacobian
+    skew2angvel(R_wb'*reshape(J_wb__b(:, 3), 3, 3))]; % Jacobian for R^T*doh(R)/doh(q)
 theta_dot=J_wb__b\omega; % Euler angle rates
 V_wb__b = [R_wb'*p_dot; omega]; % Body twist
 
 %% Dynamics
 M_b = blkdiag(diag(repmat(parameter.physics.mass_body, 3, 1)), parameter.physics.inertia_body); % Body inertia
 
-T = V_wb__b'*M_b*V_wb__b./2; % Kinematic energy
+T = V_wb__b'*M_b*V_wb__b./2; % Kinetic energy
 V = (parameter.physics.mass_body)*parameter.physics.gravitational_constant*p(3); % Potential energy
 
 L = T-V; % Lagrangian
@@ -102,12 +105,13 @@ velocities = [p_dot; omega];
 tmp = jacobian(L, velocities)*blkdiag(eye(3), J_wb__b);
 tmp = elementwiseSimplify(tmp);
 
-M = jacobian(tmp, velocities); % Inertia matrix
+M = jacobian(tmp, velocities); % Inertia matrix (i.e. M == doh^2(L)/(doh(w)doh(qdot))
 
 tmp2 = jacobian(reshape(J_wb__b, 9, 1), theta);
 tmp2 = [reshape(tmp2(:, 1), 3, 3)*theta_dot, ...
     reshape(tmp2(:, 2), 3, 3)*theta_dot, ...
     reshape(tmp2(:, 3), 3, 3)*theta_dot];
+tmp2(1,1)
 tmp2 = blkdiag(zeros(3, 3), tmp2);
 tmp2 = elementwiseSimplify(tmp2);
 

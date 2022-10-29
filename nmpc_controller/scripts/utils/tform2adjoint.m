@@ -9,7 +9,7 @@ p=g(1:3, 4);
 p_hat=angvel2skew(p);
 
 ret = [R, p_hat*R;
-    zeros(3, 3), R];
+    zeros(3, 3), R]; 
 
 end
 

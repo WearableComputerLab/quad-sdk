@@ -258,12 +258,12 @@ void quadNLP::loadCasadiFuncs() {
       casadi_int nnz = sp_i[ncol];
 
       // Print out meta data
-      std::cout << "nrow: " << nrow << std::endl;
-      std::cout << "ncol: " << ncol << std::endl;
+      // std::cout << "nrow: " << nrow << std::endl;
+      // std::cout << "ncol: " << ncol << std::endl;
       // std::cout << "colind: " << colind << std::endl;
-      std::cout << "*colind: " << *colind << std::endl;
-      std::cout << "*row: " << *row << std::endl;
-      std::cout << "nnz: " << nnz << std::endl;
+      // std::cout << "*colind: " << *colind << std::endl;
+      // std::cout << "*row: " << *row << std::endl;
+      // std::cout << "nnz: " << nnz << std::endl;
 
       nnz_mat_(sys_id, func_id) = nnz;
       nrow_mat_(sys_id, func_id) = nrow;

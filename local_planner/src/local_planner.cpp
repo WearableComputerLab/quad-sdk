@@ -1,4 +1,5 @@
 #include "local_planner/local_planner.h"
+#include <typeinfo>
 
 Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
@@ -157,6 +158,8 @@ void LocalPlanner::initLocalFootstepPlanner() {
 
   period = period_d / dt_;
 
+  // std::cout << "hip_clearance: " << hip_clearance << std::endl;
+
   // Confirm grf weight is valid
   if (grf_weight > 1 || grf_weight < 0) {
     grf_weight = std::min(std::max(grf_weight, 0.0), 1.0);
@@ -217,7 +220,11 @@ void LocalPlanner::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
 void LocalPlanner::getReference() {
   if (first_plan_) {
     first_plan_ = false;
+    std::cout << "Local planner acquired first plan" << std::endl;
     past_footholds_msg_ = robot_state_msg_->feet;
+    // std::cout << "type feet: " << typeid(past_footholds_msg_).name()
+    // << std::endl; // Type: quad_msg_MultiFootState
+    // std::cout << "feet size: " << past_footholds_msg_. << std::endl;
     past_footholds_msg_.traj_index = current_plan_index_;
     for (int i = 0; i < num_feet_; i++) {
       past_footholds_msg_.feet[i].header = past_footholds_msg_.header;
@@ -445,9 +452,17 @@ bool LocalPlanner::computeLocalPlan() {
   quad_utils::FunctionTimer timer(__FUNCTION__);
 
   // Compute the contact schedule
+
+  // Doesn't seem like compute contact schedule changes contact schedule
+  // std::cout << "contact schedule before compute contact schedule: "
+  // << std::endl;
+  // local_footstep_planner_->printContactSchedule(contact_schedule_);
   local_footstep_planner_->computeContactSchedule(
       current_plan_index_, body_plan_, ref_primitive_plan_, control_mode_,
       contact_schedule_);
+  // std::cout << "contact schedule after compute contact schedule: " <<
+  // std::endl;
+  // local_footstep_planner_->printContactSchedule(contact_schedule_);
 
   // Compute the new footholds if we have a valid existing plan (i.e. if
   // grf_plan is filled)

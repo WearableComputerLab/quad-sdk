@@ -141,7 +141,8 @@ NMPCController::NMPCController(ros::NodeHandle &nh, int robot_id) {
     }
   }
 
-  std::cout << "config_.g_dim_complex: " << config_.g_dim_complex << std::endl;
+  // std::cout << "config_.g_dim_complex: " << config_.g_dim_complex <<
+  // std::endl;
 
   config_.x_dim_null = config_.x_dim_complex - config_.x_dim_simple;
   config_.u_dim_null = config_.u_dim_complex - config_.u_dim_simple;

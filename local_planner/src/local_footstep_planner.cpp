@@ -18,6 +18,7 @@ void LocalFootstepPlanner::setTemporalParams(
 
   nominal_contact_schedule_.resize(period_);
 
+  //  std::cout << "nominal_contact_schedule: " << std::endl;
   for (int i = 0; i < period_; i++) {  // For each finite element
     nominal_contact_schedule_.at(i).resize(num_feet_);
     for (int leg_idx = 0; leg_idx < num_feet_; leg_idx++) {  // For each leg
@@ -31,7 +32,9 @@ void LocalFootstepPlanner::setTemporalParams(
       } else {
         nominal_contact_schedule_.at(i).at(leg_idx) = false;
       }
+      // std::cout << nominal_contact_schedule_.at(i).at(leg_idx) << " ";
     }
+    // std::cout << "\n";
   }
 }
 
