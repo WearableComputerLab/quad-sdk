@@ -84,9 +84,16 @@ void TailController::publishTailCommand() {
   quad_msgs::LegCommand msg;
   msg.motor_commands.resize(2);
 
+  // THIS IS WHERE I START RIGHT RANDOM FEEDFORWARD TAIL CONTROL
+  // TODO(AZ): WORK ON OPEN LOOP CONTROL
+  // SEEMS LIKE UNDERSTANDING THE STATE HERE IS THE BEST WAY
+  // CAN WORK WITH THIS
   if (param_ns_ == "decentralized_tail") {
     // Feedback tail
-    msg.motor_commands.at(0).pos_setpoint = -current_state_(3);
+    ROS_WARN_ONCE("DECENTRALIZED TAIL FB CONTROL");
+    ROS_WARN_THROTTLE(0.25, "Pos setpoint %0.2f", -current_state_(3));
+    msg.motor_commands.at(0).pos_setpoint =
+        -current_state_(3);  // Original: -current_state_(3);
     msg.motor_commands.at(0).vel_setpoint = 5 * current_state_(9);
     msg.motor_commands.at(0).torque_ff = 0;
     msg.motor_commands.at(0).kp = roll_kp_;
@@ -100,7 +107,7 @@ void TailController::publishTailCommand() {
 
   } else if (last_tail_plan_msg_ == NULL) {
     // No tail plan yet
-    msg.motor_commands.at(0).pos_setpoint = 0;
+    msg.motor_commands.at(0).pos_setpoint = 3.1415;
     msg.motor_commands.at(0).vel_setpoint = 0;
     msg.motor_commands.at(0).torque_ff = 0;
     msg.motor_commands.at(0).kp = roll_kp_;

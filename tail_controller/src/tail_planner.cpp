@@ -245,6 +245,7 @@ void TailPlanner::computeTailPlan() {
 
     // Tail cannot move the body linearly so we should not use the ground height
     // constraints here
+    // TODO(AZ): Look into this to see how to execute tail plan when falling...
     ref_ground_height_(i) = 2e-19;
 
     if (i < N_) {

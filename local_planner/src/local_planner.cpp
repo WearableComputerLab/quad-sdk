@@ -461,7 +461,7 @@ void LocalPlanner::getStateAndTwistInput() {
 
   // Assign a sidewalk velocity
   cmd_vel_.at(1) = 1.0;  // Edit here
-  cmd_vel_.at(0) = 1.0;
+  // cmd_vel_.at(0) = 1.0;
 
   // Compute estimated body height by flat terrain assumption, use the lowest
   // foot and exponential filter
