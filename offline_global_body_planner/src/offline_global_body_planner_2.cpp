@@ -279,6 +279,7 @@ void OfflineGlobalBodyPlanner2::spin() {
 
   // Wait until map and state data retrieved
   waitForData();
+  ROS_INFO("Finished waiting for data...");
 
   // Load data
   setStartState();

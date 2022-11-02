@@ -23,10 +23,11 @@ Publishes a offline global body plan to guide the lower level control to the goa
 Generally, the workflow as of right now is: 
 1. Use a double integrator system to generate motion trajectories (i.e. trajectory of states such as pos, vel, and acceleration in the 2D plane) in MATLAB
 2. Load into a CSV file using the load2DPlanToCSV.m
-3. Execute offline global body plan by running the following commands:
+3. Change the location to read state and control trajectory for global body plan in yaml file 
+4. Execute offline global body plan by running the following commands (ensure IC is the same when spawning):
 
 ```
-roslaunch quad_utils quad_gazebo.launch
+roslaunch quad_utils quad_gazebo.launch world:=flat_20_20
 rostopic pub /robot_1/control/mode std_msgs/UInt8 "data: 1"
 roslaunch quad_utils quad_plan.launch reference:=offl_gbpl_2
 ```
