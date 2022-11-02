@@ -513,7 +513,7 @@ bool LocalPlanner::computeLocalPlan() {
   compute_time_ = 1000.0 * timer.reportSilent();
   mean_compute_time_ = (filter_smoothing_constant_)*mean_compute_time_ +
                        (1 - filter_smoothing_constant_) * compute_time_;
-  ROS_INFO_THROTTLE(0.1, "LocalPlanner took %5.3f ms", compute_time_);
+  ROS_INFO_THROTTLE(1, "LocalPlanner took %5.3f ms", compute_time_);
 
   // Return true if made it this far
   return true;
@@ -578,6 +578,8 @@ void LocalPlanner::publishLocalPlan() {
     local_plan_msg.grfs.push_back(grf_array_msg);
     local_plan_msg.plan_indices.push_back(current_plan_index_ + i);
     local_plan_msg.primitive_ids.push_back(ref_primitive_plan_(i));
+
+    ROS_INFO_THROTTLE(1, "Current plan index: %d", current_plan_index_);
   }
 
   // Update timestamps to reflect when these messages were published
