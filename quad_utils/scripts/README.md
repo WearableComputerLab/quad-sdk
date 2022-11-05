@@ -4,10 +4,13 @@
 Run the shell file script in the following methods
 
 ```
-./run_batch_simulation_single.py 11 <batch_num> <tail_type>
+./run_batch_simulation_single.py <env_type> <batch_num> <tail_type>
 ```
 
-where batch_num is the batch it is ran (a way to keep up with the file) and tail type is whether to have no tail (0), nmpc tail (1), or simply feedback tail (2).
+where:
+- env_type is the environments with different elevation ranging from 0-11 (0 lowest, 11 highest)
+- batch_num is the batch it is ran (a way to keep up with the file)
+- tail type is whether to have no tail (0), nmpc tail (1), or simply feedback tail (2).
 
 
 # TODO
