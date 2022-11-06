@@ -43,14 +43,21 @@ SpiritController::~SpiritController() {
   tail_sub_command_.shutdown();
 }
 
-bool SpiritController::init(hardware_interface::EffortJointInterface* hw,
-                            ros::NodeHandle& n) {
+bool SpiritController::init(
+    hardware_interface::EffortJointInterface* hw,
+    ros::NodeHandle& n) {  // init called in non-realtime
   // List of controlled joints
   std::string param_name = "joints";
-  if (!n.getParam(param_name, joint_names_)) {
+  if (!n.getParam(param_name, joint_names_)) {  // Loaded from config yaml
     ROS_ERROR_STREAM("Failed to getParam '" << param_name << "' (namespace: "
                                             << n.getNamespace() << ").");
     return false;
+  }
+  // Does come here...
+  // std::cout << "=======HERE============" << std::endl;
+  // No need to loop here w/ size_t but just doing it cause practice
+  for (size_t i = 0; i < joint_names_.size(); i++) {
+    std::cout << "joint_names_: " << joint_names_[i] << std::endl;
   }
   n_joints_ = joint_names_.size();
 
@@ -60,22 +67,26 @@ bool SpiritController::init(hardware_interface::EffortJointInterface* hw,
   }
 
   // Get URDF
-  urdf::Model urdf;
+  urdf::Model urdf;  // Has a urdf header
+  // Load model given name of param on param server
   if (!urdf.initParam("robot_description")) {
     ROS_ERROR("Failed to parse urdf file");
     return false;
   }
 
+  // Loop through joint names and get the joint handles and urdf description
   for (unsigned int i = 0; i < n_joints_; i++) {
     const auto& joint_name = joint_names_[i];
-
+    // joints_: std vector of type HW interface joint handle
     try {
-      joints_.push_back(hw->getHandle(joint_name));
+      joints_.push_back(hw->getHandle(
+          joint_name));  // Gets joint handle of each joint by name
     } catch (const hardware_interface::HardwareInterfaceException& e) {
       ROS_ERROR_STREAM("Exception thrown: " << e.what());
       return false;
     }
 
+    // Return pointer to the joint
     urdf::JointConstSharedPtr joint_urdf = urdf.getJoint(joint_name);
     if (!joint_urdf) {
       ROS_ERROR("Could not find joint '%s' in urdf", joint_name.c_str());
@@ -84,10 +95,16 @@ bool SpiritController::init(hardware_interface::EffortJointInterface* hw,
     joint_urdfs_.push_back(joint_urdf);
   }
 
+  // For now, do not look into this... not sure why use writeFromNonRT
+  // Write from non-realtime data?? maybe...
+  // Buffertype is just a std vector  containing datatype quad_msgs::LegCommand
+  // Initialized data as 0
   int num_legs = 4;
   commands_buffer_.writeFromNonRT(BufferType(num_legs));
 
+  // Load ROS Params
   std::string joint_command_topic;
+  // From topics_global.yaml (currently control/joint_command)
   quad_utils::loadROSParam(n, "/topics/control/joint_command",
                            joint_command_topic);
 
@@ -95,6 +112,7 @@ bool SpiritController::init(hardware_interface::EffortJointInterface* hw,
       joint_command_topic, 1, &SpiritController::commandCB, this,
       ros::TransportHints().tcpNoDelay(true));
 
+  // HERE AZ: This would be changed
   int num_tail_motors = 2;
   tail_commands_buffer_.writeFromNonRT(TailBufferType(num_tail_motors));
 
@@ -102,12 +120,16 @@ bool SpiritController::init(hardware_interface::EffortJointInterface* hw,
   quad_utils::loadROSParam(n, "/topics/control/tail_command",
                            tail_command_topic);
 
+  // Lower latency connection
   tail_sub_command_ = n.subscribe<quad_msgs::LegCommand>(
       tail_command_topic, 1, &SpiritController::tailCommandCB, this,
       ros::TransportHints().tcpNoDelay(true));
 
+  // Retrieve indicated parameter value from the param server & store it, else
+  // use default value
   n.param<int>("/tail_controller/tail_type", tail_type_, 0);
 
+  std::cout << "FINISH INITIALIZING CONTROLLER" << std::endl;
   return true;
 }
 
