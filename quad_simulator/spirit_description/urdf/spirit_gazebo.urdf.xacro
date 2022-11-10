@@ -71,6 +71,19 @@ SOFTWARE.
 	<xacro:property name="jointSpeedLimit" value="30" />
 	<xacro:property name="jointEffortLimit" value="40" />
 
+
+	<!-- Plugins -->
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/spirit</robotNamespace>
+			<controlPeriod>0.002</controlPeriod>
+		</plugin>
+		<plugin name="ground_truth_estimator" filename="libground_truth_estimator.so">
+			<updateRateHz>500.0</updateRateHz>
+		</plugin>
+	</gazebo>
+
+
 	<!--link name="body_dummy">
 		<inertial>
 			<mass value="${bodyMass}" />
@@ -185,6 +198,7 @@ SOFTWARE.
 			</inertial>
 		</link>
 		<gazebo reference="upper${suffix}">
+			<self_collide>0</self_collide>
 			<material>Gazebo/DarkGrey</material>
 		</gazebo>
 
@@ -212,6 +226,7 @@ SOFTWARE.
 
 		<!-- Lower leg -->
 		<link name="lower${suffix}">
+			<self_collide>0</self_collide>
 			<visual>
 				<origin rpy="0 ${pi/2} 0" xyz="${lowerLegLength/2} 0 0" />
 				<geometry>
@@ -289,6 +304,7 @@ SOFTWARE.
 			</inertial>
 		</link>
 		<gazebo reference="toe${suffix}">
+			<self_collide>0</self_collide>
 			<material>Gazebo/Black</material>
 			<collision>
 				<surface>
@@ -335,13 +351,79 @@ SOFTWARE.
 	<!-- Our four legs -->
 	<xacro:leg suffix="0" hipJointName="0" kneeJointName="1" abductionJointName="8" front="1" left="1" hipJointLowerLimit="${-2*pi}" hipJointUpperLimit="${2*pi}" color="darkgray" />
 	<xacro:leg suffix="1" hipJointName="2" kneeJointName="3" abductionJointName="9" front="-1" left="1" hipJointLowerLimit="${-2*pi}" hipJointUpperLimit="${2*pi}" color="darkgray" />
-	<xacro:leg suffix="2" hipJointName="4" kneeJointName="5" abductionJointName="10" front="1" left="-1" hipJointLowerLimit="${-2*pi}" hipJointUpperLimit="${2*pi}" color="red" />
+	<xacro:leg suffix="2" hipJointName="4" kneeJointName="5" abductionJointName="10" front="1" left="-1" hipJointLowerLimit="${-2*pi}" hipJointUpperLimit="${2*pi}" color="darkgray" />
 	<xacro:leg suffix="3" hipJointName="6" kneeJointName="7" abductionJointName="11" front="-1" left="-1" hipJointLowerLimit="${-2*pi}" hipJointUpperLimit="${2*pi}" color="darkgray" />
 
-	<!-- Add ros_control plugin -->
-	<gazebo>
-		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-			<robotNamespace>/spirit</robotNamespace>
-		</plugin>
+	<!-- Toe Plugins -->
+	<gazebo reference="toe0">
+		<sensor name="toe0_contact" type="contact">
+			<plugin filename="libgazebo_ros_bumper.so" name="toe0_plugin">
+				<alwaysOn>true</alwaysOn>
+				<updateRate>500</updateRate>
+				<bumperTopicName>gazebo/toe0_contact_state</bumperTopicName>
+				<frameName>world</frameName>
+			</plugin>
+			<contact>
+				<collision>toe0_collision</collision>
+			</contact>
+			<update_rate>500</update_rate>
+		</sensor>
+	</gazebo>
+	<gazebo reference="toe1">
+		<sensor name="toe1_contact" type="contact">
+			<plugin filename="libgazebo_ros_bumper.so" name="toe1_plugin">
+				<alwaysOn>true</alwaysOn>
+				<updateRate>500</updateRate>
+				<bumperTopicName>gazebo/toe1_contact_state</bumperTopicName>
+				<frameName>world</frameName>
+			</plugin>
+			<contact>
+				<collision>toe1_collision</collision>
+			</contact>
+			<update_rate>500</update_rate>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="toe2">
+		<sensor name="toe2_contact" type="contact">
+			<plugin filename="libgazebo_ros_bumper.so" name="toe2_plugin">
+				<alwaysOn>true</alwaysOn>
+				<updateRate>500</updateRate>
+				<bumperTopicName>gazebo/toe2_contact_state</bumperTopicName>
+				<frameName>world</frameName>
+			</plugin>
+			<contact>
+				<collision>toe2_collision</collision>
+			</contact>
+			<update_rate>500</update_rate>
+		</sensor>
+	</gazebo>
+
+	<gazebo reference="toe3">
+		<sensor name="toe3_contact" type="contact">
+			<plugin filename="libgazebo_ros_bumper.so" name="toe3_plugin">
+				<alwaysOn>true</alwaysOn>
+				<updateRate>500</updateRate>
+				<bumperTopicName>gazebo/toe3_contact_state</bumperTopicName>
+				<frameName>world</frameName>
+			</plugin>
+			<contact>
+				<collision>toe3_collision</collision>
+			</contact>
+			<update_rate>500</update_rate>
+		</sensor>
+	</gazebo>
+	<!-- Preserve fixed joints -->
+	<gazebo reference='jtoe0'>
+		<preserveFixedJoint>true</preserveFixedJoint>
+	</gazebo>
+	<gazebo reference='jtoe1'>
+		<preserveFixedJoint>true</preserveFixedJoint>
+	</gazebo>
+	<gazebo reference='jtoe2'>
+		<preserveFixedJoint>true</preserveFixedJoint>
+	</gazebo>
+	<gazebo reference='jtoe3'>
+		<preserveFixedJoint>true</preserveFixedJoint>
 	</gazebo>
 </robot>

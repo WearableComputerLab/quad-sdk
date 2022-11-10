@@ -1,31 +1,4 @@
 <?xml version='1.0'?>
-
-<!-- 
-MIT License (modified)
-
-Copyright (c) 2020 The Trustees of the University of Pennsylvania
-Authors:
-Vasileios Vasilopoulos <vvasilo@seas.upenn.edu>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this **file** (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE. 
--->
-
 <sdf version='1.6'>
   <model name='spirit'>
     <link name='body'>
@@ -51,10 +24,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -63,7 +36,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Body_Mesh_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -73,7 +46,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <link name='hip0'>
@@ -100,10 +73,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -112,7 +85,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Hip_Module_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -122,7 +95,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='8' type='revolute'>
@@ -169,10 +142,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -181,7 +154,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Upper_leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -191,7 +164,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='0' type='revolute'>
@@ -239,14 +212,14 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
-<!--       <collision name='toe0_collision'>
+      <!--       <collision name='toe0_collision'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -294,7 +267,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Lower_Leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -303,7 +276,7 @@ SOFTWARE.
           </script>
         </material>
       </visual>
-<!--       <visual name='lower0_fixed_joint_lump__toe0_visual_1'>
+      <!--       <visual name='lower0_fixed_joint_lump__toe0_visual_1'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -317,9 +290,9 @@ SOFTWARE.
           </script>
         </material>
       </visual> -->
-      <velocity_decay/>
+      <velocity_decay />
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='1' type='revolute'>
@@ -367,10 +340,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -379,7 +352,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Hip_Module_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -389,7 +362,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='9' type='revolute'>
@@ -436,10 +409,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -448,7 +421,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Upper_leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -458,7 +431,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='2' type='revolute'>
@@ -506,14 +479,14 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
-<!--       <collision name='toe1_collision'>
+      <!--       <collision name='toe1_collision'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -561,7 +534,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Lower_Leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -570,7 +543,7 @@ SOFTWARE.
           </script>
         </material>
       </visual>
-<!--       <visual name='lower1_fixed_joint_lump__toe1_visual_1'>
+      <!--       <visual name='lower1_fixed_joint_lump__toe1_visual_1'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -584,9 +557,9 @@ SOFTWARE.
           </script>
         </material>
       </visual> -->
-      <velocity_decay/>
+      <velocity_decay />
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='3' type='revolute'>
@@ -610,7 +583,7 @@ SOFTWARE.
       </axis>
     </joint>
     <static>0</static>
-    
+
     <link name='hip2'>
       <pose frame=''>0.2263 -0.07 0 0 -0 0</pose>
       <inertial>
@@ -635,10 +608,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -647,7 +620,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Hip_Module_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -657,7 +630,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='10' type='revolute'>
@@ -704,10 +677,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -716,7 +689,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Upper_leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -726,7 +699,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='4' type='revolute'>
@@ -774,14 +747,14 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
-<!--       <collision name='toe2_collision'>
+      <!--       <collision name='toe2_collision'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -829,7 +802,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Lower_Leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -838,7 +811,7 @@ SOFTWARE.
           </script>
         </material>
       </visual>
-<!--       <visual name='lower2_fixed_joint_lump__toe2_visual_1'>
+      <!--       <visual name='lower2_fixed_joint_lump__toe2_visual_1'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -852,9 +825,9 @@ SOFTWARE.
           </script>
         </material>
       </visual> -->
-      <velocity_decay/>
+      <velocity_decay />
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='5' type='revolute'>
@@ -902,10 +875,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -914,7 +887,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Hip_Module_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -924,7 +897,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='11' type='revolute'>
@@ -971,10 +944,10 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
@@ -983,7 +956,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Upper_leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -993,7 +966,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='6' type='revolute'>
@@ -1041,14 +1014,14 @@ SOFTWARE.
         </geometry>
         <surface>
           <contact>
-            <ode/>
+            <ode />
           </contact>
           <friction>
-            <ode/>
+            <ode />
           </friction>
         </surface>
       </collision>
-<!--       <collision name='toe3_collision'>
+      <!--       <collision name='toe3_collision'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -1096,7 +1069,7 @@ SOFTWARE.
         <geometry>
           <mesh>
             <uri>model:///meshes/Spirit40_Lower_Leg_transformed.stl</uri>
-         </mesh>
+          </mesh>
         </geometry>
         <material>
           <script>
@@ -1105,7 +1078,7 @@ SOFTWARE.
           </script>
         </material>
       </visual>
-<!--       <visual name='lower3_fixed_joint_lump__toe3_visual_1'>
+      <!--       <visual name='lower3_fixed_joint_lump__toe3_visual_1'>
         <pose frame=''>0.206 0 0 0 -0 0</pose>
         <geometry>
           <sphere>
@@ -1119,11 +1092,11 @@ SOFTWARE.
           </script>
         </material>
       </visual> -->
-      <velocity_decay/>
+      <velocity_decay />
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
-    
+
     <joint name='7' type='revolute'>
       <child>lower3</child>
       <parent>upper3</parent>
@@ -1222,7 +1195,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
     <joint name='jtoe0' type='fixed'>
       <child>toe0</child>
@@ -1306,7 +1279,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
     <joint name='jtoe1' type='fixed'>
       <child>toe1</child>
@@ -1390,7 +1363,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
     <joint name='jtoe2' type='fixed'>
       <child>toe2</child>
@@ -1474,7 +1447,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
     <joint name='jtoe3' type='fixed'>
       <child>toe3</child>
@@ -1535,7 +1508,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
     <link name='tail_link_1'>
       <pose frame=''>0 0 0.4928 0 -0 0</pose>
@@ -1570,7 +1543,7 @@ SOFTWARE.
       </collision> -->
       <visual name='tail_link_1_visual'>
         <pose frame=''>0 0 0 0 -0 0</pose>
-         <geometry>
+        <geometry>
           <cylinder>
             <radius>0.02</radius>
             <length>0.8816</length>
@@ -1592,7 +1565,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
     <link name='tail_mass'>
       <pose frame=''>0 0 0.9336 0 -0 0</pose>
@@ -1647,7 +1620,7 @@ SOFTWARE.
         </material>
       </visual>
       <gravity>1</gravity>
-      <velocity_decay/>
+      <velocity_decay />
     </link>
 
     <joint name='body_tail_joint_0' type='revolute'>
