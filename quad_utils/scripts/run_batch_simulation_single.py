@@ -34,7 +34,7 @@ if type_index == 0:
     uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
     roslaunch.configure_logging(uuid)
 
-    launch_args = ['quad_utils', 'quad_gazebo.launch', 'paused:=false', 'rviz_gui:=true',
+    launch_args = ['quad_utils', 'quad_gazebo.launch', 'paused:=false', 'rviz_gui:=true', 'gui:=true',
                    world[world_index], 'x_init:='+str(init_pos[batch_index])]
     launch_pars = [(roslaunch.rlutil.resolve_launch_arguments(
         launch_args)[0], launch_args[2:])]

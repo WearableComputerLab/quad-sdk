@@ -94,8 +94,8 @@ SOFTWARE.
       <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail.yaml" command="load" />
     </group>
     <group unless="$(arg tail)">
-      <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail.urdf" /> <!-- Original spirit_tail.urdf -->
-      <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail.sdf" /> <!-- Original: spirit.sdf -->
+      <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_2.urdf" /> <!-- Original spirit.urdf --> <!-- URDF for rviz -->
+      <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_2.sdf" /> <!-- Original: spirit.sdf --> <!-- SDF for Gazebo -->
       <rosparam file="$(find gazebo_scripts)/config/spirit_control.yaml" command="load" />
     </group>
   </group>

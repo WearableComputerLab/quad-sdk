@@ -46,7 +46,10 @@ void QuadEstimatorGroundTruth::Load(physics::ModelPtr _parent,
   // simulation iteration.
   updateConnection_ = event::Events::ConnectWorldUpdateBegin(
       std::bind(&QuadEstimatorGroundTruth::OnUpdate, this));
+
+  std::cout << "Finished loading ground truth state estimator" << std::endl;
 }
+
 void QuadEstimatorGroundTruth::OnUpdate() {
   common::Time current_time = model_->GetWorld()->SimTime();
 
@@ -55,10 +58,12 @@ void QuadEstimatorGroundTruth::OnUpdate() {
     return;
 
   // Extract all relevant information from simulator
+  // std::cout << "Obtain link information from simulator...\n" << std::endl;
   physics::LinkPtr body_link = model_->GetChildLink("body");
 
   ignition::math::Vector3d toe_offset(0.206, 0, 0);
 
+  // Why do we need just information from lower and toe? What about upper?
   physics::LinkPtr lower0 = model_->GetChildLink("lower0");
   physics::LinkPtr lower1 = model_->GetChildLink("lower1");
   physics::LinkPtr lower2 = model_->GetChildLink("lower2");
@@ -75,7 +80,50 @@ void QuadEstimatorGroundTruth::OnUpdate() {
         "the sdf.");
     return;
   }
+  // All of these are found from the sdf... no issues
+  /*
+  if (!lower0) {
+    ROS_ERROR("Can't find lower0 in sdf");
+    return;
+  }
 
+  if (!lower1) {
+    ROS_ERROR("Can't find lower1 in sdf");
+    return;
+  }
+
+  if (!lower2) {
+    ROS_ERROR("Can't find lower2 in sdf");
+    return;
+  }
+
+  if (!lower3) {
+    ROS_ERROR("Can't find lower3 in sdf");
+    return;
+  }
+
+  if (!toe0) {
+    ROS_ERROR("Can't find toe0 in sdf");
+    return;
+  }
+
+  if (!toe1) {
+    ROS_ERROR("Can't find toe1 in sdf");
+    return;
+  }
+
+  if (!toe2) {
+    ROS_ERROR("Can't find toe2 in sdf");
+    return;
+  }
+
+  if (!toe3) {
+    ROS_ERROR("Can't find toe3 in sdf");
+    return;
+  }
+  */
+
+  // std::cout << "Getting position of links wrt world" << std::endl;
   ignition::math::Pose3d pose = body_link->WorldPose();
   ignition::math::Vector3d lin_pos = pose.Pos();
   ignition::math::Quaternion<double> ang_pos = pose.Rot();
@@ -99,6 +147,8 @@ void QuadEstimatorGroundTruth::OnUpdate() {
   ignition::math::Vector3d toe3_pos = toe3_pose.Pos();
   ignition::math::Vector3d toe3_vel = toe3->WorldLinearVel();
 
+  // std::cout << "Finished getting position wrt to world" << std::endl;
+
   // Update and publish state estimate message
   quad_msgs::RobotState state;
   state.body.pose.position.x = lin_pos.X();
@@ -115,9 +165,12 @@ void QuadEstimatorGroundTruth::OnUpdate() {
   state.body.twist.angular.y = ang_vel.Y();
   state.body.twist.angular.z = ang_vel.Z();
 
+  // Return a standard vector of JointPtr
   physics::Joint_V joint_vec = model_->GetJoints();
 
   if (tail_type_ != NONE) {
+    // std::cout << "THERE EXISTS A TAIL" << std::endl; // Does not go here for
+    // tail_type 0
     std::vector<std::string> model_joint_name;
 
     // Record all joint names
@@ -155,18 +208,26 @@ void QuadEstimatorGroundTruth::OnUpdate() {
                        "10", "4", "5", "11", "6", "7"};
 
   for (int i = 0; i < state.joints.name.size(); i++) {
-    // std::cout << joint->GetName() << std::endl;
-    // std::cout << joint->Position() << std::endl;
-    // std::cout << joint->GetVelocity(0) << std::endl;
-
-    physics::JointPtr joint = joint_vec[i];
+    physics::JointPtr joint =
+        model_->GetJoint(state.joints.name[i]);  // Original: joint_vec[i];
     // physics::JointWrench wrench = joint->GetForceTorque(0);
     double torque = 0;  // wrench.body1Torque.Z(); // Note that this doesn't
                         // seem to work but at least will populate with zeros
 
-    state.joints.position.push_back(joint->Position());
-    state.joints.velocity.push_back(joint->GetVelocity(0));
     state.joints.effort.push_back(torque);
+    if (joint->GetMsgType() == 8) {  // ENUM type for fixed
+      // Joint type of 0 does not work
+      state.joints.position.push_back(0 /*joint->Position()*/);
+      state.joints.velocity.push_back(0 /*joint->GetVelocity(0)*/);
+    } else {
+      state.joints.position.push_back(/*0*/ joint->Position());
+      state.joints.velocity.push_back(/*0*/ joint->GetVelocity(0));
+    }
+    // std::cout << "joint name: " << state.joints.name[i] << std::endl;
+    // std::cout << "joint type: " << joint->GetMsgType() << std::endl;
+    // std::cout << "joint name again: " << joint->GetName() << std::endl;
+    // std::cout << joint->Position() << std::endl;
+    // std::cout << joint->GetVelocity(0) << std::endl;
   }
 
   int num_feet = 4;
@@ -220,7 +281,9 @@ void QuadEstimatorGroundTruth::OnUpdate() {
   }
 
   state.header.stamp = ros::Time::now();
+  // std::cout << "Publishing to ground truth state pub" << std::endl;
   ground_truth_state_pub_.publish(state);
+  // std::cout << "Finish publishing ground truth state pub" << std::endl;
 
   quad_msgs::RobotState state_body_frame = state;
   state_body_frame.body.pose.orientation.x = 0;
@@ -230,8 +293,10 @@ void QuadEstimatorGroundTruth::OnUpdate() {
   state_body_frame.body.pose.position.x = 0;
   state_body_frame.body.pose.position.y = 0;
   state_body_frame.body.pose.position.z = 0;
+  // std::cout << "Publishing to state body frame" << std::endl;
   ground_truth_state_body_frame_pub_.publish(state_body_frame);
-
+  // std::cout << "Finish publishing to state body frame" << std::endl;
+  // ROS_WARN("Updated joint states");
   last_time_ = current_time;
 }
 }  // namespace gazebo

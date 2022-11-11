@@ -59,6 +59,7 @@ bool SpiritController::init(
   for (size_t i = 0; i < joint_names_.size(); i++) {
     std::cout << "joint_names_: " << joint_names_[i] << std::endl;
   }
+
   n_joints_ = joint_names_.size();
 
   if (n_joints_ == 0) {
@@ -73,7 +74,7 @@ bool SpiritController::init(
     ROS_ERROR("Failed to parse urdf file");
     return false;
   }
-
+  std::cout << "Parsed URDF file" << std::endl;
   // Loop through joint names and get the joint handles and urdf description
   for (unsigned int i = 0; i < n_joints_; i++) {
     const auto& joint_name = joint_names_[i];
@@ -94,6 +95,11 @@ bool SpiritController::init(
     }
     joint_urdfs_.push_back(joint_urdf);
   }
+  // I AM HERE DEBUGGING WHY THERE IS A ASSERTION PX != 0
+  // https://answers.gazebosim.org//question/7173/gazebo-crashes-assertion-px-0-failed/
+  // How does non-tail one work...??? Something is missing.... why do I try to
+  // get tail stuff
+  // std::cout << "Got joint names and joint handles" << std::endl;
 
   // For now, do not look into this... not sure why use writeFromNonRT
   // Write from non-realtime data?? maybe...
@@ -101,6 +107,7 @@ bool SpiritController::init(
   // Initialized data as 0
   int num_legs = 4;
   commands_buffer_.writeFromNonRT(BufferType(num_legs));
+  // std::cout << "Initialized command buffer for legs..." << std::endl;
 
   // Load ROS Params
   std::string joint_command_topic;
@@ -115,15 +122,17 @@ bool SpiritController::init(
   // HERE AZ: This would be changed
   int num_tail_motors = 2;
   tail_commands_buffer_.writeFromNonRT(TailBufferType(num_tail_motors));
+  // std::cout << "Initialized tail command buffer..." << std::endl;
 
   std::string tail_command_topic;
   quad_utils::loadROSParam(n, "/topics/control/tail_command",
                            tail_command_topic);
-
+  std::cout << "tail_command_topic: " << tail_command_topic << std::endl;
   // Lower latency connection
   tail_sub_command_ = n.subscribe<quad_msgs::LegCommand>(
       tail_command_topic, 1, &SpiritController::tailCommandCB, this,
       ros::TransportHints().tcpNoDelay(true));
+  // std::cout << "Subscribed to " << tail_command_topic << std::endl;
 
   // Retrieve indicated parameter value from the param server & store it, else
   // use default value
