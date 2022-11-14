@@ -12,6 +12,12 @@ where:
 - batch_num is the batch it is ran (a way to keep up with the file)
 - tail type is whether to have no tail (0), nmpc tail (1), or simply feedback tail (2).
 
+To run without script:
+```
+roslaunch quad_utils quad_gazebo.launch tail:=true tail_type:=1
+roslaunch quad_utils standing.launch
+```
+
 
 # TODO
 Currently need to:

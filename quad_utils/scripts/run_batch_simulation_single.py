@@ -42,6 +42,7 @@ if type_index == 0:
     launch.start()
     rospy.loginfo('Gazebo running')
 
+    print("NO TAIL SCENARIO")
     print("SLEEPING FOR %d" % time_init)
     rospy.sleep(time_init)
 
@@ -91,6 +92,7 @@ elif type_index == 1:
     launch_2.start()
     rospy.loginfo('Standing')
 
+    print("TAIL MPC SCENARIO")
     print("TIME TO STAND %0.2f" % time_stand)
     rospy.sleep(time_stand)
 
@@ -121,6 +123,50 @@ elif type_index == 2:
     launch.start()
     rospy.loginfo('Gazebo running')
 
+    print("FEEDBACK/DECENTRALIZED TAIL SCENARIO")
+    print("TIME TO INITIALIZE: %0.2f" % time_init)
+    rospy.sleep(time_init)
+
+    launch_args = ['quad_utils', 'standing.launch']
+    launch_pars = [(roslaunch.rlutil.resolve_launch_arguments(
+        launch_args)[0], launch_args[2:])]
+    launch_2 = roslaunch.parent.ROSLaunchParent(uuid, launch_pars)
+    launch_2.start()
+    rospy.loginfo('Standing')
+
+    print("TIME TO STAND %0.2f" % time_stand)
+    rospy.sleep(time_stand)
+
+    launch_args = ['quad_utils', 'planning.launch',
+                   'logging:=true', 'tail:=false', 'parallel_index:='+str(batch_index)]
+    launch_pars = [(roslaunch.rlutil.resolve_launch_arguments(
+        launch_args)[0], launch_args[2:])]
+    launch_3 = roslaunch.parent.ROSLaunchParent(uuid, launch_pars)
+    launch_3.start()
+    rospy.loginfo('MPC running')
+
+    print("TIME FOR WALKING: %0.2d" % time_walk)
+    rospy.sleep(time_walk)
+
+    launch.shutdown()
+    launch_2.shutdown()
+    launch_3.shutdown()
+
+
+elif type_index == 3:
+    # Feedback Tail
+    uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+    roslaunch.configure_logging(uuid)
+
+    launch_args = ['quad_utils', 'quad_gazebo.launch', 'paused:=false', 'rviz_gui:=true',
+                   world[world_index], 'tail:=true', 'tail_type:=4', 'x_init:='+str(init_pos[batch_index])]
+    launch_pars = [(roslaunch.rlutil.resolve_launch_arguments(
+        launch_args)[0], launch_args[2:])]
+    launch = roslaunch.parent.ROSLaunchParent(uuid, launch_pars)
+    launch.start()
+    rospy.loginfo('Gazebo running')
+
+    print("OPEN LOOP TAIL SCENARIO")
     print("TIME TO INITIALIZE: %0.2f" % time_init)
     rospy.sleep(time_init)
 

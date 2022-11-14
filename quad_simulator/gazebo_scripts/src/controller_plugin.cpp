@@ -39,6 +39,8 @@ SpiritController::SpiritController() {
   torque_lims_ = {21, 21, 32};
 }
 SpiritController::~SpiritController() {
+  // Question... why do I need to explicitly shut these down?
+  // Or is it just good practice?
   sub_command_.shutdown();
   tail_sub_command_.shutdown();
 }
@@ -53,8 +55,7 @@ bool SpiritController::init(
                                             << n.getNamespace() << ").");
     return false;
   }
-  // Does come here...
-  // std::cout << "=======HERE============" << std::endl;
+
   // No need to loop here w/ size_t but just doing it cause practice
   for (size_t i = 0; i < joint_names_.size(); i++) {
     std::cout << "joint_names_: " << joint_names_[i] << std::endl;
@@ -93,10 +94,9 @@ bool SpiritController::init(
       ROS_ERROR("Could not find joint '%s' in urdf", joint_name.c_str());
       return false;
     }
+    // Store joint urdf info s.t. later get joint limit info
     joint_urdfs_.push_back(joint_urdf);
   }
-  // I AM HERE DEBUGGING WHY THERE IS A ASSERTION PX != 0
-  // https://answers.gazebosim.org//question/7173/gazebo-crashes-assertion-px-0-failed/
   // How does non-tail one work...??? Something is missing.... why do I try to
   // get tail stuff
   // std::cout << "Got joint names and joint handles" << std::endl;
@@ -120,7 +120,7 @@ bool SpiritController::init(
       ros::TransportHints().tcpNoDelay(true));
 
   // HERE AZ: This would be changed
-  int num_tail_motors = 2;
+  int num_tail_motors = 2;  // Change here | Original: 2
   tail_commands_buffer_.writeFromNonRT(TailBufferType(num_tail_motors));
   // std::cout << "Initialized tail command buffer..." << std::endl;
 
@@ -144,6 +144,7 @@ bool SpiritController::init(
 
 void SpiritController::update(const ros::Time& time,
                               const ros::Duration& period) {
+  // Update will be read from realtime
   BufferType& commands = *commands_buffer_.readFromRT();
   TailBufferType& tail_commands = *tail_commands_buffer_.readFromRT();
 
@@ -154,7 +155,8 @@ void SpiritController::update(const ros::Time& time,
   }
 
   if (tail_type_ != NONE) {
-    for (unsigned int i = 12; i < 14; i++) {
+    // Assign torque command for tail
+    for (unsigned int i = 12; i < n_joints_; i++) {
       // Tail control
       quad_msgs::MotorCommand motor_command = tail_commands.at(i - 12);
 
@@ -188,12 +190,15 @@ void SpiritController::update(const ros::Time& time,
       // << " Total Torque: " << torque_command << std::endl;
 
       // Update joint torque
-      joints_.at(i).setCommand(torque_command);
+      joints_.at(i).setCommand(
+          torque_command);  // Need to set command to HW interface jointhandle
     }
   }
 
+  // Assign torque command for rest of the joints
   for (unsigned int i = 0; i < 12; i++) {
     std::pair<int, int> ind = leg_map_[i];
+    // Need leg map b/c motor command msg setup differently
     quad_msgs::MotorCommand motor_command =
         commands.at(ind.first).motor_commands.at(ind.second);
 
@@ -228,7 +233,8 @@ void SpiritController::update(const ros::Time& time,
     // " Total Torque: " << torque_command << std::endl;
 
     // Update joint torque
-    joints_.at(i).setCommand(torque_command);
+    joints_.at(i).setCommand(
+        torque_command);  // setCommand a HW interface joint handle function
   }
 }
 
@@ -238,6 +244,16 @@ void SpiritController::commandCB(
 }
 
 void SpiritController::tailCommandCB(const quad_msgs::LegCommandConstPtr& msg) {
+  // Write from a non-realtime source
+  // LegCommandConst size is 2 atm
+  // LegCommand msg consist of motor_commands:
+  //    motor_commands: commands (pos, vel, gain, and ff torque cmd) &
+  //    diagnostics
+
+  // std::cout << "LegCommand msg size: " << msg->motor_commands.size()
+  //          << std::endl; // Size is 2
+
+  // Reads tail command consisting of 2 motors
   tail_commands_buffer_.writeFromNonRT(msg->motor_commands);
 }
 

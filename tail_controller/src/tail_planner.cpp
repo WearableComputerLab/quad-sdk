@@ -60,6 +60,10 @@ TailPlanner::TailPlanner(ros::NodeHandle nh) {
       // Decentralized tail controller
       param_ns = "decentralized_tail";
       break;
+    case OPEN_LOOP:
+      // Open loop tail controller
+      param_ns = "open_loop_tail";
+      break;
     default:
       param_ns = "leg";
       break;

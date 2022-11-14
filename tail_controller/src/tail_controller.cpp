@@ -25,6 +25,9 @@ TailController::TailController(ros::NodeHandle nh) {
       // Decentralized tail controller
       param_ns_ = "decentralized_tail";
       break;
+    case OPEN_LOOP:
+      param_ns_ = "open_loop_tail";
+      break;
     default:
       param_ns_ = "leg";
       break;
@@ -98,16 +101,32 @@ void TailController::publishTailCommand() {
     msg.motor_commands.at(0).torque_ff = 0;
     msg.motor_commands.at(0).kp = roll_kp_;
     msg.motor_commands.at(0).kd = roll_kd_;
-
+    // TODO(AZ): Make this robust depending on number of tail joints
     msg.motor_commands.at(1).pos_setpoint = -current_state_(4);
     msg.motor_commands.at(1).vel_setpoint = 5 * current_state_(10);
     msg.motor_commands.at(1).torque_ff = 0;
     msg.motor_commands.at(1).kp = pitch_kp_;
     msg.motor_commands.at(1).kd = pitch_kd_;
-
+  } else if (param_ns_ == "open_loop_tail") {
+    // Open Loop Tail
+    ROS_WARN_ONCE("OPENLOOP TAIL");
+    msg.motor_commands.at(0).pos_setpoint =
+        -current_state_(3);  // Original: -current_state_(3);
+    ROS_WARN_THROTTLE(0.25, "Pos setpoint %0.2f",
+                      msg.motor_commands.at(0).pos_setpoint);
+    msg.motor_commands.at(0).vel_setpoint = 5 * current_state_(9);
+    msg.motor_commands.at(0).torque_ff = 0;
+    msg.motor_commands.at(0).kp = roll_kp_;
+    msg.motor_commands.at(0).kd = roll_kd_;
+    // TODO(AZ): Make this robust depending on number of tail joints
+    msg.motor_commands.at(1).pos_setpoint = -current_state_(4);
+    msg.motor_commands.at(1).vel_setpoint = 5 * current_state_(10);
+    msg.motor_commands.at(1).torque_ff = 0;
+    msg.motor_commands.at(1).kp = pitch_kp_;
+    msg.motor_commands.at(1).kd = pitch_kd_;
   } else if (last_tail_plan_msg_ == NULL) {
     // No tail plan yet
-    msg.motor_commands.at(0).pos_setpoint = 3.1415;
+    msg.motor_commands.at(0).pos_setpoint = 0;
     msg.motor_commands.at(0).vel_setpoint = 0;
     msg.motor_commands.at(0).torque_ff = 0;
     msg.motor_commands.at(0).kp = roll_kp_;

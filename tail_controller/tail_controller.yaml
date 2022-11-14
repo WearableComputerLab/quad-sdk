@@ -13,3 +13,8 @@ tail_controller:
     roll_kd: 1
     pitch_kp: 10
     pitch_kd: 1
+  open_loop_tail:
+    roll_kp: 10
+    roll_kd: 1
+    pitch_kp: 10
+    pitch_kd: 1

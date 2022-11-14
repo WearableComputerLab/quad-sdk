@@ -180,6 +180,7 @@ void QuadEstimatorGroundTruth::OnUpdate() {
     }
 
     state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1"};
+    // state.tail_joints.name = {"body_tail_joint_0"};
 
     // With tail
     for (size_t i = 0; i < state.tail_joints.name.size(); i++) {
@@ -215,6 +216,7 @@ void QuadEstimatorGroundTruth::OnUpdate() {
                         // seem to work but at least will populate with zeros
 
     state.joints.effort.push_back(torque);
+    // If import urdf, could instead use urdf::Joint::FIXED
     if (joint->GetMsgType() == 8) {  // ENUM type for fixed
       // Joint type of 0 does not work
       state.joints.position.push_back(0 /*joint->Position()*/);
