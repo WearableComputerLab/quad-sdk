@@ -4,6 +4,8 @@
 Run the shell file script in the following methods
 
 ```
+roscd quad_utils/scripts
+chmod +x run_batch_simulation_single.py
 ./run_batch_simulation_single.py <env_type> <batch_num> <tail_type>
 ```
 
@@ -18,8 +20,15 @@ roslaunch quad_utils quad_gazebo.launch tail:=true tail_type:=1
 roslaunch quad_utils standing.launch
 ```
 
+## Run Double Pendulum Quadruped Tail Control Scheme
+```
+roscd quad_utils/scripts
+./run_batch_simulation_single.py <env_type> <batch_num> 3
+```
+
 
 # TODO
 Currently need to:
 1) Find out how to execute a open-loop control for multi-link tail
-2) Perhaps do some sort of feedback later
+2) Form dynamic model
+3) Get data & results
