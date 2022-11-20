@@ -34,11 +34,14 @@ TailController::TailController(ros::NodeHandle nh) {
   }
 
   quad_utils::loadROSParam(nh, "tail_controller/tail_num", tail_num_);
-  if (tail_num_ > 2) {
+  if (tail_num_ > 10) {
     ROS_ERROR_STREAM(
-        "Tail number exceeds available option. Tail num of 1 to 2 are "
-        "available");
+        "Tail number exceeds available option. Tail num of 1, 2, 3, 4, 5, 6 "
+        "and 10 are available");
   }
+  // Initialize std vector
+  ff_torque_.resize(tail_num_);
+  time_.resize(tail_num_);
 
   // Get rosparams
   std::string tail_plan_topic, tail_control_topic, robot_state_topic;
@@ -61,37 +64,36 @@ TailController::TailController(ros::NodeHandle nh) {
   // Extra params from open loop tail
 
   if (param_ns_ == "open_loop_tail") {
-    quad_utils::loadROSParam(
-        nh_, "tail_controller/" + param_ns_ + "/ff_torque_1", ff_torque_1);
-    quad_utils::loadROSParam(
-        nh_, "tail_controller/" + param_ns_ + "/ff_torque_2", ff_torque_2);
-    quad_utils::loadROSParam(nh_, "tail_controller/" + param_ns_ + "/time_1",
-                             time_1);
-    quad_utils::loadROSParam(nh_, "tail_controller/" + param_ns_ + "/time_2",
-                             time_2);
-
+    // Load parameters from tail_controller.yaml
+    for (int i = 0; i < tail_num_; i++) {
+      quad_utils::loadROSParam(
+          nh_,
+          "tail_controller/" + param_ns_ + "/ff_torque_" + std::to_string(i),
+          ff_torque_.at(i));
+      quad_utils::loadROSParam(
+          nh_, "tail_controller/" + param_ns_ + "/time_" + std::to_string(i),
+          time_.at(i));
+    }
     // If ran through quad_gazebo_dira, rewrite these params loaded from launch
     // file args
-    if (nh_.hasParam("tail_controller/" + param_ns_ + "/param_ff_torque_1")) {
-      quad_utils::loadROSParam(
-          nh_, "tail_controller/" + param_ns_ + "/param_ff_torque_1",
-          ff_torque_1);
-    }
+    for (int i = 0; i < tail_num_; i++) {
+      if (nh_.hasParam("tail_controller/" + param_ns_ + "/param_ff_torque_" +
+                       std::to_string(i))) {
+        quad_utils::loadROSParam(nh_,
+                                 "tail_controller/" + param_ns_ +
+                                     "/param_ff_torque_" + std::to_string(i),
+                                 ff_torque_.at(i));
+      }
 
-    if (nh_.hasParam("tail_controller/" + param_ns_ + "/param_ff_torque_2")) {
-      quad_utils::loadROSParam(
-          nh_, "tail_controller/" + param_ns_ + "/param_ff_torque_2",
-          ff_torque_2);
-    }
-
-    if (nh_.hasParam("tail_controller/" + param_ns_ + "/param_time_1")) {
-      quad_utils::loadROSParam(
-          nh_, "tail_controller/" + param_ns_ + "/param_time_1", time_1);
-    }
-
-    if (nh_.hasParam("tail_controller/" + param_ns_ + "/param_time_2")) {
-      quad_utils::loadROSParam(
-          nh_, "tail_controller/" + param_ns_ + "/param_time_2", time_2);
+      if (nh_.hasParam("tail_controller/" + param_ns_ + "/param_time_" +
+                       std::to_string(i))) {
+        quad_utils::loadROSParam(
+            nh_,
+            "tail_controller/" + param_ns_ + "/param_time_" + std::to_string(i),
+            time_.at(i));
+      }
+      std::cout << "ff_torque_" << i << " " << ff_torque_.at(i) << std::endl;
+      std::cout << "time_" << i << " " << time_.at(i) << std::endl;
     }
   }
 
@@ -126,20 +128,18 @@ void TailController::publishTailCommand() {
   }
 
   current_state_ = quad_utils::bodyStateMsgToEigen(robot_state_msg_->body);
-  tail_current_state_ = quad_utils::odomMsgToEigenForTail(*robot_state_msg_);
+  tail_current_state_ =
+      quad_utils::odomMsgToEigenForTail(*robot_state_msg_, tail_num_);
 
   quad_msgs::LegCommand msg;
-  msg.motor_commands.resize(2);
 
-  // THIS IS WHERE I START RIGHT RANDOM FEEDFORWARD TAIL CONTROL
-  // TODO(AZ): WORK ON OPEN LOOP CONTROL
-  // SEEMS LIKE UNDERSTANDING THE STATE HERE IS THE BEST WAY
-  // CAN WORK WITH THIS
-  // SOMEHOW GET THE SIM_TIME AND EXECUTE DURING SIM TIME WHEN FALLING
+  msg.motor_commands.resize(tail_num_);  // Change here
+
   if (param_ns_ == "decentralized_tail") {
     // Feedback tail
     ROS_WARN_ONCE("DECENTRALIZED TAIL FB CONTROL");
-    ROS_WARN_THROTTLE(0.25, "Pos setpoint %0.2f", -current_state_(3));
+    // These are feedback control on body state
+    // ROS_WARN_THROTTLE(0.25, "Pos setpoint %0.2f", -current_state_(3));
     msg.motor_commands.at(0).pos_setpoint =
         -current_state_(3);  // Original: -current_state_(3);
     msg.motor_commands.at(0).vel_setpoint = 5 * current_state_(9);
@@ -152,59 +152,72 @@ void TailController::publishTailCommand() {
     msg.motor_commands.at(1).torque_ff = 0;
     msg.motor_commands.at(1).kp = pitch_kp_;
     msg.motor_commands.at(1).kd = pitch_kd_;
+
   } else if (param_ns_ == "open_loop_tail") {
     // Open Loop Tail
     ROS_WARN_ONCE("OPENLOOP TAIL");
-    ROS_WARN_THROTTLE(0.25, "Pos setpoint %0.2f", -current_state_(3));
-    ROS_WARN_THROTTLE(0.25, "time: %0.2f", ros::Time::now().toSec());
 
-    msg.motor_commands.at(0).pos_setpoint =
-        -current_state_(3);  // Original: -current_state_(3);
-    msg.motor_commands.at(0).vel_setpoint = 5 * current_state_(9);
-    msg.motor_commands.at(0).torque_ff = 0;
-    msg.motor_commands.at(0).kp = roll_kp_;
-    msg.motor_commands.at(0).kd = roll_kd_;
-    msg.motor_commands.at(1).pos_setpoint = -current_state_(4);
-    msg.motor_commands.at(1).vel_setpoint = 5 * current_state_(10);
-    msg.motor_commands.at(1).torque_ff = 0;
-    msg.motor_commands.at(1).kp = pitch_kp_;
-    msg.motor_commands.at(1).kd = pitch_kd_;
+    // std::cout << "current_state_ size: " << current_state_.size() <<
+    // std::endl;
+    for (int i = 0; i < tail_num_; i++) {
+      // ROS_WARN_THROTTLE(0.25, "Pos setpoint %0.2f", -current_state_(3));
+      ROS_WARN_THROTTLE(0.25, "time: %0.2f", ros::Time::now().toSec());
+      if (tail_num_ <= 2) {
+        if (i == 0) {
+          msg.motor_commands.at(i).pos_setpoint =
+              -current_state_(3);  // Original: -current_state_(3);
+          msg.motor_commands.at(i).vel_setpoint = 5 * current_state_(9);
+          msg.motor_commands.at(i).torque_ff = 0;
+          msg.motor_commands.at(i).kp = roll_kp_;
+          msg.motor_commands.at(i).kd = roll_kd_;
+        } else {
+          // std::cout << "-current_state_(4): " << -current_state_(4) <<
+          // std::endl;
+          msg.motor_commands.at(i).pos_setpoint = -current_state_(4);
+          msg.motor_commands.at(i).vel_setpoint = 5 * current_state_(10);
+          msg.motor_commands.at(i).torque_ff = 0;
+          msg.motor_commands.at(i).kp = pitch_kp_;
+          msg.motor_commands.at(i).kd = pitch_kd_;
+        }
+      } else {
+        // Have tail in a "resting" position if number of links > 2
+        if (i == 0) {
+          msg.motor_commands.at(i).pos_setpoint =
+              -1.5707963;  // Original: -current_state_(3);
+          msg.motor_commands.at(i).vel_setpoint = 0;
+          msg.motor_commands.at(i).torque_ff = 0;
+          msg.motor_commands.at(i).kp = roll_kp_;
+          msg.motor_commands.at(i).kd = 0;  // roll_kd_;
+        } else if (i * 0.8816 / tail_num_ <= 0.335 / 2) {
+          // Condition if prev. tail link inside body
+          // Currently, the controllers don't stabilize, so have 0 control for
+          // now
+          msg.motor_commands.at(i).pos_setpoint = 0;
+          msg.motor_commands.at(i).vel_setpoint = 0;
+          msg.motor_commands.at(i).torque_ff = 0;
+          msg.motor_commands.at(i).kp = 0;  // roll_kp_;
+          msg.motor_commands.at(i).kd = 0;  // roll_kd_;
+        } else {
+          msg.motor_commands.at(i).pos_setpoint =
+              0;  // Original: -current_state_(3);
+          msg.motor_commands.at(i).vel_setpoint = 0;
+          msg.motor_commands.at(i).torque_ff = 0;
+          msg.motor_commands.at(i).kp = 0;  // roll_kp_;
+          msg.motor_commands.at(i).kd = 0;  // roll_kd_;
+        }
+      }
 
-    if (ros::Time::now().toSec() > time_1 &&
-        ros::Time::now().toSec() < (time_1 + 0.20)) {
-      ROS_WARN_ONCE("FF TORQUE of %0.2f", ff_torque_1);
-      msg.motor_commands.at(0).torque_ff = ff_torque_1;
-      msg.motor_commands.at(1).torque_ff = 0;
-
-      msg.motor_commands.at(0).pos_setpoint = 0;
-      msg.motor_commands.at(0).vel_setpoint = 0;
-      msg.motor_commands.at(0).kp = 0;
-      msg.motor_commands.at(0).kd = 0;
-      // TODO(AZ): Make this robust depending on number of tail joints
-      // Seems like no need... works anyways... idk why & don't need to figure
-      // out for this project
-      msg.motor_commands.at(1).pos_setpoint = 0;
-      msg.motor_commands.at(1).vel_setpoint = 0;
-      msg.motor_commands.at(1).kp = 0;
-      msg.motor_commands.at(1).kd = 0;
+      if (ros::Time::now().toSec() > time_[i] &&
+          ros::Time::now().toSec() < (time_[i] + 0.20)) {
+        ROS_WARN_THROTTLE(0.2, "FF TORQUE %d of %0.2f", i, ff_torque_[i]);
+        msg.motor_commands.at(i).torque_ff = ff_torque_[i];
+        msg.motor_commands.at(i).pos_setpoint = 0;
+        msg.motor_commands.at(i).vel_setpoint = 0;
+        msg.motor_commands.at(i).kp = 0;
+        msg.motor_commands.at(i).kd = 0;
+      }
     }
 
-    if (ros::Time::now().toSec() > time_2 &&
-        ros::Time::now().toSec() < (time_2 + 0.20)) {
-      ROS_WARN_ONCE("FF TORQUE of %0.2f", ff_torque_2);
-      msg.motor_commands.at(0).torque_ff = 0;
-      msg.motor_commands.at(1).torque_ff = ff_torque_2;
-
-      msg.motor_commands.at(0).pos_setpoint = 0;
-      msg.motor_commands.at(0).vel_setpoint = 0;
-      msg.motor_commands.at(0).kp = 0;
-      msg.motor_commands.at(0).kd = 0;
-      // TODO(AZ): Make this robust depending on number of tail joints
-      msg.motor_commands.at(1).pos_setpoint = 0;
-      msg.motor_commands.at(1).vel_setpoint = 0;
-      msg.motor_commands.at(1).kp = 0;
-      msg.motor_commands.at(1).kd = 0;
-    }
   } else if (last_tail_plan_msg_ == NULL) {
     // No tail plan yet
     msg.motor_commands.at(0).pos_setpoint = 0;
@@ -321,20 +334,23 @@ void TailController::publishTailCommand() {
     }
   }
 
+  // std::cout << "Recording control history" << std::endl;
   // Record control history
-  for (size_t i = 0; i < 2; i++) {
+  for (size_t i = 0; i < tail_num_; i++) {
+    // std::cout << "i : " << i << std::endl;
+    // std::cout << "tail_current_state_ size: " << tail_current_state_.size()
+    //          << std::endl;
     double pos_component =
         msg.motor_commands.at(i).kp *
         (msg.motor_commands.at(i).pos_setpoint - tail_current_state_(i));
     double vel_component =
         msg.motor_commands.at(i).kd *
-        (msg.motor_commands.at(i).vel_setpoint - tail_current_state_(2 + i));
+        (msg.motor_commands.at(i).vel_setpoint - tail_current_state_(1 + i));
     double fb_component = pos_component + vel_component;
     double effort = fb_component + msg.motor_commands.at(i).torque_ff;
     double fb_ratio =
         abs(fb_component) /
         (abs(fb_component) + abs(msg.motor_commands.at(i).torque_ff));
-
     msg.motor_commands.at(i).pos_component = pos_component;
     msg.motor_commands.at(i).vel_component = vel_component;
     msg.motor_commands.at(i).fb_component = fb_component;
@@ -344,6 +360,7 @@ void TailController::publishTailCommand() {
 
   msg.header.stamp = ros::Time::now();
   tail_control_pub_.publish(msg);
+  // std::cout << "Published tail command" << std::endl;
 }
 
 void TailController::spin() {

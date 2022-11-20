@@ -18,7 +18,7 @@ if len(sys.argv) > 4:
     dira_version = sys.argv[4]
     tail_num = int(sys.argv[5])  # 1 or 2 tails
 else:
-    dira_version = 'false'
+    dira_version = 'true'
     tail_num = '2'
 
 if len(sys.argv) > 6:
@@ -32,6 +32,10 @@ else:
     time_1 = '4.75'
     time_2 = '5.00'
 
+live_plot = "False"
+
+
+print("live plot %s" % live_plot)
 print("world index: %d, batch_index: %d, type_index: %d" %
       (world_index, batch_index, type_index))
 
@@ -187,7 +191,9 @@ elif type_index == 3:
     launch_args = ['quad_utils', 'quad_gazebo_dira.launch', 'paused:=false', 'rviz_gui:=true', 'gui:=true', 'dira:=' + dira_version,
                    world[world_index], 'tail:=true', 'tail_type:=4', 'tail_num:=' +
                    str(tail_num), 'x_init:='+str(init_pos[batch_index]),
-                   'param_ff_torque_1:='+ff_torque_1, 'param_ff_torque_2:='+ff_torque_2, 'param_time_1:='+time_1, 'param_time_2:='+time_2]
+                   'param_ff_torque_1:='+ff_torque_1, 'param_ff_torque_2:=' +
+                   ff_torque_2, 'param_time_1:='+time_1, 'param_time_2:='+time_2,
+                   'live_plot:=' + live_plot]
     launch_pars = [(roslaunch.rlutil.resolve_launch_arguments(
         launch_args)[0], launch_args[2:])]
     launch = roslaunch.parent.ROSLaunchParent(uuid, launch_pars)

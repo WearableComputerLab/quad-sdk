@@ -1310,13 +1310,13 @@
     <link name='tail_link_0'>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0.878422 0 -0 0</pose>
+        <pose frame=''>0 0 0.880011 0 -0 0</pose>
         <mass>0.2774</mass>
         <inertia>
-          <ixx>0.00115082</ixx>
+          <ixx>0.000570004</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.00115082</iyy>
+          <iyy>0.000570004</iyy>
           <iyz>0</iyz>
           <izz>0.0003764</izz>
         </inertia>
@@ -1362,8 +1362,8 @@
         <limit>
           <lower>-1.57</lower>
           <upper>1.57</upper>
-          <effort>35</effort>
-          <velocity>1e+06</velocity>
+          <effort>50</effort>
+          <velocity>40</velocity>
         </limit>
         <dynamics>
           <damping>0</damping>

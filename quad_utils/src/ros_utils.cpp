@@ -544,6 +544,16 @@ Eigen::VectorXd odomMsgToEigenForTail(const quad_msgs::RobotState &msg) {
   return state;
 }
 
+Eigen::VectorXd odomMsgToEigenForTail(const quad_msgs::RobotState &msg,
+                                      int tail_num) {
+  Eigen::VectorXd state = Eigen::VectorXd::Zero(tail_num * 2);
+  for (int i = 0; i < tail_num; i++) {
+    state(2 * i) = msg.tail_joints.position[2 * i];
+    state(2 * i + 1) = msg.tail_joints.position[2 * i + 1];
+  }
+  return state;
+}
+
 void eigenToGRFArrayMsg(Eigen::VectorXd grf_array,
                         quad_msgs::MultiFootState multi_foot_state_msg,
                         quad_msgs::GRFArray &grf_msg) {

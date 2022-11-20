@@ -40,18 +40,20 @@ SOFTWARE.
     <arg name="tail_num" default="0" /> <!-- Tail num should be 1 or 2 if tail:=true -->
     <arg name="x_init" default="6.0" />
 
-    <arg name="param_ff_torque_1" default="30" />
-    <arg name="param_ff_torque_2" default="-30" />
-    <arg name="param_time_1" default="4.5" />
-    <arg name="param_time_2" default="4.7" />
+    <!-- Assigned through user -->
+    <arg name="param_ff_torque_0" default="30" />
+    <arg name="param_ff_torque_1" default="-30" />
+    <arg name="param_time_0" default="4.5" />
+    <arg name="param_time_1" default="4.7" />
 
     <param name="tail_controller/tail_type" value="$(arg tail_type)" />
     <param name="tail_controller/tail_num" value="$(arg tail_num)" />
 
+    <!-- Initialize to param server -->
+    <param name="tail_controller/open_loop_tail/param_ff_torque_0" value="$(arg param_ff_torque_0)" type="double" />
     <param name="tail_controller/open_loop_tail/param_ff_torque_1" value="$(arg param_ff_torque_1)" type="double" />
-    <param name="tail_controller/open_loop_tail/param_ff_torque_2" value="$(arg param_ff_torque_2)" type="double" />
+    <param name="tail_controller/open_loop_tail/param_time_0" value="$(arg param_time_0)" type="double" />
     <param name="tail_controller/open_loop_tail/param_time_1" value="$(arg param_time_1)" type="double" />
-    <param name="tail_controller/open_loop_tail/param_time_2" value="$(arg param_time_2)" type="double" />
 
 
     <include file="$(find quad_utils)/launch/mapping.launch">
@@ -113,6 +115,36 @@ SOFTWARE.
                     <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_2.urdf" />
                     <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_2.sdf" />
                     <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail_dira_2.yaml" command="load" />
+                </group>
+                <!-- After tail_num > 2, control is simply a limp tail.. stabilization of tail difficult & will be worked on in the future -->
+                <group if="$(eval arg('tail_num') == 3)">
+                    <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_3.urdf" />
+                    <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_3.sdf" />
+                    <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail_dira_3.yaml" command="load" />
+                </group>
+
+                <group if="$(eval arg('tail_num') == 4)">
+                    <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_4.urdf" />
+                    <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_4.sdf" />
+                    <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail_dira_4.yaml" command="load" />
+                </group>
+
+                <group if="$(eval arg('tail_num') == 5)">
+                    <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_5.urdf" />
+                    <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_5.sdf" />
+                    <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail_dira_5.yaml" command="load" />
+                </group>
+
+                <group if="$(eval arg('tail_num') == 6)">
+                    <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_6.urdf" />
+                    <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_6.sdf" />
+                    <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail_dira_6.yaml" command="load" />
+                </group>
+
+                <group if="$(eval arg('tail_num') == 10)">
+                    <param name="robot_description" textfile="$(find spirit_description)/urdf/spirit_tail_10.urdf" />
+                    <param name="robot_description_sdf" textfile="$(find spirit_description)/sdf_mesh/spirit_tail_10.sdf" />
+                    <rosparam file="$(find gazebo_scripts)/config/spirit_control_tail_dira_10.yaml" command="load" />
                 </group>
             </group>
             <group unless="$(arg dira)">

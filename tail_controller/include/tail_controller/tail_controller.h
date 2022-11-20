@@ -58,13 +58,11 @@ class TailController {
 
   double pitch_kd_;
 
-  double ff_torque_1;
+  // Vector of open-loop ff torque
+  std::vector<double> ff_torque_;
 
-  double ff_torque_2;
-
-  double time_1;
-
-  double time_2;
+  // Vector of time to execute ff torque
+  std::vector<double> time_;
 
   ros::Publisher tail_control_pub_;
 

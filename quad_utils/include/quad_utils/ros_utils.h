@@ -270,6 +270,15 @@ Eigen::VectorXd bodyStateMsgToEigen(const quad_msgs::BodyState &body);
 Eigen::VectorXd odomMsgToEigenForTail(const quad_msgs::RobotState &msg);
 
 /**
+ * @brief Convert robot state message to tail state in Eigen
+ * @param[in] body Odometry msg with body state data
+ * @param[in] tail_num_ Number of tails
+ * @return Eigen vector with tail state data
+ */
+Eigen::VectorXd odomMsgToEigenForTail(const quad_msgs::RobotState &msg,
+                                      int tail_num);
+
+/**
  * @brief Convert Eigen vector of GRFs to GRFArray msg
  * @param[in] grf_array Eigen vector with grf data in leg order
  * @param[in] multi_foot_state_msg MultiFootState msg containing foot position

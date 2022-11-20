@@ -70,7 +70,9 @@ SOFTWARE.
 	<xacro:property name="abEffortLimit" value="21" /> <!-- Original: 40 -->
 	<xacro:property name="jointSpeedLimit" value="37.7" /> <!-- Original: 30 -->
 	<xacro:property name="jointEffortLimit" value="21" /> <!-- Original: 40 -->
-	<xacro:property name="tailLength" value="${0.8816/2}" />
+	<xacro:property name="tailNum" value="2" />
+	<xacro:property name="tailLength" value="${0.8816/tailNum}" />
+	<xacro:property name="tailLinkMass" value="${1e-03}" />
 
 
 	<!-- Plugins -->
@@ -442,6 +444,7 @@ SOFTWARE.
 	</gazebo>
 
 	<!-- TAIL -->
+	<!-- Remark: Need to incorporate reasonable mass & inertia calc wrt tailLength -->
 	<!-- Tail Links -->
 	<link name="tail_link_0">
 		<visual>
@@ -452,14 +455,18 @@ SOFTWARE.
 			<material name="gray" />
 		</visual>
 		<inertial>
-			<mass value="1e-03" />
-			<inertia ixx="1e-04" ixy="0" ixz="0" iyy="1e-04" iyz="0.0" izz="1e-04" />
+			<origin xyz="0 0 ${tailLength/2}" rpy="0 0 0" />
+			<mass value="${tailLinkMass}" />
+			<!--<inertia ixx="${tailLinkMass/12*(3*0.02*0.02 + tailLength*tailLength)}" ixy="0" ixz="0" iyy="${tailLinkMass/12*(3*0.02*0.02 + tailLength*tailLength)}" iyz="0.0" izz="${tailLinkMass*(0.02*0.02)/2}" /> -->
+			<!-- Assume inertia of a sphere & scale base of 2/5MR^2 -->
+			<inertia ixx="${1e-04/(tailNum*tailNum)}" ixy="0" ixz="0" iyy="${1e-04/(tailNum*tailNum)}" iyz="0" izz="${1e-04/(tailNum*tailNum)}" />
 		</inertial>
 		<!-- No need to add collision boxes for this -->
 	</link>
 	<gazebo reference="tail_link_0">
 		<material>Gazebo/Gray</material>
 	</gazebo>
+
 
 	<link name="tail_link_1">
 		<visual>
@@ -470,15 +477,16 @@ SOFTWARE.
 			<material name="gray" />
 		</visual>
 		<inertial>
-			<mass value="1e-03" />
-			<inertia ixx="1e-04" ixy="0" ixz="0" iyy="1e-04" iyz="0.0" izz="1e-04" />
+			<origin xyz="0 0 ${tailLength/2}" rpy="0 0 0" />
+			<mass value="${tailLinkMass}" />
+			<inertia ixx="${1e-04/(tailNum*tailNum)}" ixy="0" ixz="0" iyy="${1e-04/(tailNum*tailNum)}" iyz="0" izz="${1e-04/(tailNum*tailNum)}" />
 		</inertial>
-		<!-- No need to add collision boxes for this -->
 	</link>
 
 	<gazebo reference="tail_link_1">
 		<material>Gazebo/Gray</material>
 	</gazebo>
+
 
 	<link name="tail_mass">
 		<visual>
@@ -498,12 +506,13 @@ SOFTWARE.
 	</gazebo>
 
 	<!-- Tail Joints -->
+	<!-- Non-planar Tail -->
 	<joint name="body_tail_joint_0" type="revolute">
 		<parent link="body" />
 		<child link="tail_link_0" />
 		<axis xyz="1 0 0" />
 		<origin xyz="0 0 0" rpy="0 0 0" />
-		<limit effort="50" lower="-1.57" upper="1.57" velocity="1000000" />
+		<limit effort="50" lower="-1.57" upper="1.57" velocity="40" />
 		<dynamics damping="0.0" friction="0.0" />
 	</joint>
 
@@ -512,9 +521,10 @@ SOFTWARE.
 		<child link="tail_link_1" />
 		<axis xyz="0 1 0" />
 		<origin xyz="0 0 ${tailLength}" rpy="0 0 0" />
-		<limit effort="50" lower="-1.57" upper="1.57" velocity="1000000" />
+		<limit effort="50" lower="-1.57" upper="1.57" velocity="40" />
 		<dynamics damping="0.0" friction="0.0" />
 	</joint>
+
 
 	<joint name="tail_link_mass_joint" type="fixed">
 		<parent link="tail_link_1" />

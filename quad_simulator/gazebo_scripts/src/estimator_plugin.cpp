@@ -181,13 +181,58 @@ void QuadEstimatorGroundTruth::OnUpdate() {
       model_joint_name.push_back(joint->GetName());
     }
 
-    if (tail_num_ == 2) {
-      state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1"};
-    } else if (tail_num_ == 1) {
-      state.tail_joints.name = {"body_tail_joint_0"};
-    } else {
-      ROS_ERROR_STREAM(
-          "Invalid tail number... Available tails (as of right now) is 1 or 2");
+    switch (tail_num_) {
+      case 1:
+        state.tail_joints.name = {"body_tail_joint_0"};
+        break;
+      case 2:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1"};
+        break;
+      case 3:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2"};
+        break;
+      case 4:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2", "body_tail_joint_3"};
+        break;
+      case 5:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2", "body_tail_joint_3",
+                                  "body_tail_joint_4"};
+        break;
+      case 6:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2", "body_tail_joint_3",
+                                  "body_tail_joint_4", "body_tail_joint_5"};
+        break;
+      case 7:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2", "body_tail_joint_3",
+                                  "body_tail_joint_4", "body_tail_joint_5",
+                                  "body_tail_joint_6"};
+        break;
+      case 8:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2", "body_tail_joint_3",
+                                  "body_tail_joint_4", "body_tail_joint_5",
+                                  "body_tail_joint_6", "body_tail_joint_7"};
+        break;
+      case 9:
+        state.tail_joints.name = {
+            "body_tail_joint_0", "body_tail_joint_1", "body_tail_joint_2",
+            "body_tail_joint_3", "body_tail_joint_4", "body_tail_joint_5",
+            "body_tail_joint_6", "body_tail_joint_7", "body_tail_joint_8"};
+        break;
+      case 10:
+        state.tail_joints.name = {"body_tail_joint_0", "body_tail_joint_1",
+                                  "body_tail_joint_2", "body_tail_joint_3",
+                                  "body_tail_joint_4", "body_tail_joint_5",
+                                  "body_tail_joint_6", "body_tail_joint_7",
+                                  "body_tail_joint_8", "body_tail_joint_9"};
+        break;
+      default:
+        ROS_ERROR_STREAM("Invalid tail number... Available tails 1 - 10");
     }
 
     // With tail

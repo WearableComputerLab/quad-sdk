@@ -75,7 +75,6 @@ bool SpiritController::init(
     ROS_ERROR("Failed to parse urdf file");
     return false;
   }
-  std::cout << "Parsed URDF file" << std::endl;
   // Loop through joint names and get the joint handles and urdf description
   for (unsigned int i = 0; i < n_joints_; i++) {
     const auto& joint_name = joint_names_[i];
@@ -97,8 +96,6 @@ bool SpiritController::init(
     // Store joint urdf info s.t. later get joint limit info
     joint_urdfs_.push_back(joint_urdf);
   }
-  // How does non-tail one work...??? Something is missing.... why do I try to
-  // get tail stuff
   // std::cout << "Got joint names and joint handles" << std::endl;
 
   // For now, do not look into this... not sure why use writeFromNonRT
@@ -119,15 +116,14 @@ bool SpiritController::init(
       joint_command_topic, 1, &SpiritController::commandCB, this,
       ros::TransportHints().tcpNoDelay(true));
 
-  // HERE AZ: This would be changed
-  int num_tail_motors = 1;  // Change here | Original: 2
+  // HERE AZ: Make more robust
+  int num_tail_motors = tail_num_;  // Change here | Original: 2
   tail_commands_buffer_.writeFromNonRT(TailBufferType(num_tail_motors));
   // std::cout << "Initialized tail command buffer..." << std::endl;
 
   std::string tail_command_topic;
   quad_utils::loadROSParam(n, "/topics/control/tail_command",
                            tail_command_topic);
-  std::cout << "tail_command_topic: " << tail_command_topic << std::endl;
   // Lower latency connection
   tail_sub_command_ = n.subscribe<quad_msgs::LegCommand>(
       tail_command_topic, 1, &SpiritController::tailCommandCB, this,
@@ -138,11 +134,12 @@ bool SpiritController::init(
   // use default value
   n.param<int>("/tail_controller/tail_type", tail_type_, 0);
   quad_utils::loadROSParam(n, "/tail_controller/tail_num", tail_num_);
-  if (tail_num_ > 2) {
-    ROS_ERROR_STREAM("Invalid tail number... Availabe tail num are 1 or 2");
+  if (tail_num_ > 10) {
+    ROS_ERROR_STREAM(
+        "Invalid tail number... Availabe tail num are 1, 2, 10 (atm)");
   }
 
-  std::cout << "FINISH INITIALIZING CONTROLLER" << std::endl;
+  std::cout << "FINISH INITIALIZING CONTROLLER PLUGIN" << std::endl;
   return true;
 }
 
@@ -198,7 +195,6 @@ void SpiritController::update(const ros::Time& time,
           torque_command);  // Need to set command to HW interface jointhandle
     }
   }
-
   // Assign torque command for rest of the joints
   for (unsigned int i = 0; i < 12; i++) {
     std::pair<int, int> ind = leg_map_[i];
@@ -254,8 +250,8 @@ void SpiritController::tailCommandCB(const quad_msgs::LegCommandConstPtr& msg) {
   //    motor_commands: commands (pos, vel, gain, and ff torque cmd) &
   //    diagnostics
 
-  // std::cout << "LegCommand msg size: " << msg->motor_commands.size()
-  //          << std::endl; // Size is 2
+  // std::cout << "Tail LegCommand msg size: " << msg->motor_commands.size()
+  //          << std::endl;  // Size is 2
 
   // Reads tail command consisting of 2 motors
   tail_commands_buffer_.writeFromNonRT(msg->motor_commands);

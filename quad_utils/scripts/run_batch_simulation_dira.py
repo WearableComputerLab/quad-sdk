@@ -5,24 +5,21 @@ import numpy as np
 import time
 
 vel = 1.0
-period = 0.48
 sample = 100
 time_init = 3.5/4*10 * 2  # Change this if sim/computer slow
 time_stand = 7.5/4*10
 time_walk = 27.5/4*10*0.75/1
 world = 'world:=step_80cm'
 # Set negative values to time not have torque
-batch_num = [0, 40, 40, 40, 40, 40]
-ff_torque_1 = ['20', '20', '30', '0', '30', '30']
-time_1 = ['4.50', '4.75', '4.75', '-2', '4.75', '5.1']
-ff_torque_2 = ['0', '0', '0', '0', '-45', '-15']
-time_2 = ['-2', '-2', '-2', '-2', '5.00', '5.3']
-tail_num = ['1', '1', '1', '2', '2', '2']
+period = [0.40, 0.40, 0.40, 0.40, 0.48, 0.48, 0.48]
+batch_num = [40, 0, 40, 40, 40, 40, 40]
+ff_torque_1 = ['0', '20', '20', '30', '0', '30']
+time_1 = ['-2', '4.50', '4.75', '4.75', '-2', '4.75']
+ff_torque_2 = ['0', '0', '0', '0', '0', '-45']
+time_2 = ['-2', '-2', '-2', '-2', '-2', '5.00']
+tail_num = ['1', '1', '1', '1', '2', '2']
 
 np.random.seed(0)
-
-init_pos = np.linspace(-vel*period/2, vel*period/2,
-                       sample, endpoint=False) + 5.0
 
 num_repeat = 10
 # init_pos = np.array([init_pos]*int(num/sample)).T.flatten()
@@ -32,8 +29,10 @@ num_repeat = 10
 
 for i in range(len(ff_torque_1)):
     for j in range(num_repeat):
-        print("tail_num: %s | ff_torque_1: %s | time_1: %s | ff_torque_2: %s | time_2: %s" %
-              (tail_num[i], ff_torque_1[i], time_1[i], ff_torque_2[i], time_2[i]))
+        init_pos = np.linspace(-vel*period[i]/2, vel*period[i]/2,
+                               sample, endpoint=False) + 5.0
+        print("scene %d, trial: %d | tail_num: %s | ff_torque_1: %s | time_1: %s | ff_torque_2: %s | time_2: %s" %
+              (i+1, j+1, tail_num[i], ff_torque_1[i], time_1[i], ff_torque_2[i], time_2[i]))
         time.sleep(5)
         uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
         roslaunch.configure_logging(uuid)

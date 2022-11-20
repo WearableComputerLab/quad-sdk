@@ -268,7 +268,7 @@ void TailPlanner::computeTailPlan() {
     }
   }
 
-  // ROS_WARN("Computing Distributed Tail Plan!!");
+  ROS_WARN("Computing Distributed Tail Plan!!");
   if (!tail_planner_->computeDistributedTailPlan(
           current_state_, ref_body_plan_, foot_positions_body_,
           contact_schedule_, tail_current_state_, ref_tail_plan_, body_plan_,
