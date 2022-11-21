@@ -18,7 +18,7 @@ To run the following program through a bash script file, run either:
 ```
 ./run_batch_simulation_single.py 11 0 3 true 2 # Option 1
 
-./run_batch_simulation_single.py 11 40 3 true 2 '30.0' '-30.0' '5.0' '5.2'
+./run_batch_simulation_single.py 11 40 3 true 2 '30.0' '-30.0' '5.0' '5.2' # Option 2
 ```
 where the following parameters are:
 1) world (e.g. 11 runs step_80cm world)
