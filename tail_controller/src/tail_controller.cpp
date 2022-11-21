@@ -191,13 +191,14 @@ void TailController::publishTailCommand() {
         } else if (i * 0.8816 / tail_num_ <= 0.335 / 2) {
           // Condition if prev. tail link inside body
           // Currently, the controllers don't stabilize, so have 0 control for
-          // now
+          // now (i.e. limp)
           msg.motor_commands.at(i).pos_setpoint = 0;
           msg.motor_commands.at(i).vel_setpoint = 0;
           msg.motor_commands.at(i).torque_ff = 0;
-          msg.motor_commands.at(i).kp = 0;  // roll_kp_;
+          msg.motor_commands.at(i).kp = 0.25 * roll_kp_;
           msg.motor_commands.at(i).kd = 0;  // roll_kd_;
         } else {
+          // If tail link outside body, go limp
           msg.motor_commands.at(i).pos_setpoint =
               0;  // Original: -current_state_(3);
           msg.motor_commands.at(i).vel_setpoint = 0;

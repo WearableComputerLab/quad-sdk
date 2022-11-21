@@ -661,6 +661,7 @@ SOFTWARE.
     </link>
     <gazebo reference="tail_mass">
         <material>Gazebo/Gray</material>
+        <self_collide>1</self_collide>
     </gazebo>
 
     <!-- Tail Joints -->

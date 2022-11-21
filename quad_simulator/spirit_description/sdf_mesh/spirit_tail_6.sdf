@@ -1629,6 +1629,7 @@
       <velocity_decay/>
       <gravity>1</gravity>
       <velocity_decay/>
+      <self_collide>1</self_collide>
     </link>
     <joint name='body_tail_joint_5' type='revolute'>
       <child>tail_link_5</child>

@@ -136,8 +136,8 @@ void TailPlanner::cmdVelCallback(const geometry_msgs::Twist::ConstPtr &msg) {
   cmd_vel_[4] = 0;
   cmd_vel_[5] = cmd_vel_scale_ * msg->angular.z;
 
-  std::cout << "tail cmd_vel_[0]: " << cmd_vel_[0] << std::endl;
-  std::cout << "tail cmd_vel_[1]: " << cmd_vel_[1] << std::endl;
+  // std::cout << "tail cmd_vel_[0]: " << cmd_vel_[0] << std::endl;
+  // std::cout << "tail cmd_vel_[1]: " << cmd_vel_[1] << std::endl;
 
   // Record when this was last reached for safety
   last_cmd_vel_msg_time_ = ros::Time::now();
