@@ -1,6 +1,6 @@
 # Multi-Link Tail Controller Branch
 
-This repository is inspired from the original repo taken from this https://www.andrew.cmu.edu/user/amj1/papers/Proprioception_and_Tail_Control_ICRA_WS.pdf
+This repository is inspired from the original repo taken from this paper: https://www.andrew.cmu.edu/user/amj1/papers/Proprioception_and_Tail_Control_ICRA_WS.pdf
 
 The following is a small project based off this paper where the following uses open loop controls to help re-orient quadruped walking off cliff
 
