@@ -42,6 +42,6 @@ Or, run a batch script of curated open-loop torque control
 Note, that tail_controller.yaml has the parameters to change the open-loop torque value and the time to execute these. Following can be accessed through the following directory as shown below:
 
 ```
-roscd tail_controller
+roscd tail_controller/
 gedit tail_controller.yaml
 ```
