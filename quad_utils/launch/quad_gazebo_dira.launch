@@ -34,10 +34,10 @@ SOFTWARE.
     <arg name="live_plot" default="false" />
     <arg name="world" default="flat" />
     <arg name="rotors" default="false" />
-    <arg name="tail" default="false" />
-    <arg name="tail_type" default="0" />
+    <arg name="tail" default="true" />
+    <arg name="tail_type" default="4" />
     <arg name="dira" default="true" />
-    <arg name="tail_num" default="0" /> <!-- Tail num should be 1 or 2 if tail:=true -->
+    <arg name="tail_num" default="2" /> <!-- Tail num should be 1 or 2 if tail:=true -->
     <arg name="x_init" default="6.0" />
 
     <!-- Assigned through user -->
