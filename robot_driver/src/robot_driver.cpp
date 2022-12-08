@@ -12,7 +12,7 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
       robot_heartbeat_topic, single_joint_cmd_topic, mocap_topic,
       control_restart_flag_topic;
   quad_utils::loadROSParamDefault(nh_, "robot_type", robot_name,
-                                  std::string("spirit"));
+                                  std::string("go1"));
   quad_utils::loadROSParam(nh_, "topics/state/imu", imu_topic);
   quad_utils::loadROSParam(nh_, "topics/state/joints", joint_state_topic);
   quad_utils::loadROSParam(nh_, "topics/local_plan", local_plan_topic);
@@ -113,6 +113,8 @@ RobotDriver::RobotDriver(ros::NodeHandle nh, int argc, char **argv) {
   if (is_hardware_) {
     if (robot_name == "spirit") {
       hardware_interface_ = std::make_shared<SpiritInterface>();
+    } else if (robot_name == "go1") {
+       hardware_interface_ = std::make_shared<Go1Interface>();
     } else {
       ROS_ERROR_STREAM("Invalid robot name " << robot_name
                                              << ", returning nullptr");

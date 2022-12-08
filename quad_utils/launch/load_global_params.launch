@@ -26,7 +26,6 @@
         <param name="robot_description" command="cat $(find a1_description)/urdf/a1.urdf" />
     </group>
 
-    <!-- Andrew added-->
     <group if="$(eval arg('robot_type') == 'go1')">
         <param name="robot_description_sdf" textfile="$(find go1_description)/sdf_mesh/go1.sdf" />
         <param name="robot_description" command="cat $(find go1_description)/urdf/go1.urdf" />

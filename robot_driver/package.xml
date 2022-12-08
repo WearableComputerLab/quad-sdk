@@ -10,7 +10,6 @@
   <maintainer email="jcnorby@gmail.com">Joe Norby</maintainer>
   <maintainer email="yanhaoy@andrew.cmu.edu">Yanhao Yang</maintainer>
 
-
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
@@ -48,7 +47,8 @@
   <exec_depend>quad_msgs</exec_depend>
   <exec_depend>quad_utils</exec_depend>
   <depend>eigen_conversions</depend>
-
+  <depend>unitree_legged_msgs</depend>
+  
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

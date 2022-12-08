@@ -1,0 +1,17 @@
+ QUAD-SDK JointState index	| UNITREE LowState.MotorState index
+--------------------------------|----------------
+8 - hip0   			| 3 - FL Hip
+0 - upper0 			| 4 - FL Thigh
+1 - lower0			| 5 - FL Calf
+				| 
+9 - hip1			| 9  - RL Hip
+2 - upper1			| 10 - RL Thigh
+3 - lower1			| 11 - RL Calf
+				|
+10 - hip2			| 0 - FR Hip
+4 - upper2			| 1 - FR Thigh
+5 - lower2			| 2 - FR Calf
+				|
+11 - hip3			| 6 - RR Hip
+6 - upper3			| 7 - RR Thigh
+7 - lower3			| 8 - RR Calf

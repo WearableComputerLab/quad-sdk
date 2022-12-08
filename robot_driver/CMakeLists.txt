@@ -21,6 +21,18 @@ else()
   set(GRMBLINK libgrmblink_linux.a)
 endif()
 
+if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "x86_64.*")
+  set(ARCH amd64)
+else()
+  set(ARCH arm64)
+endif()
+
+link_directories(/home/$ENV{USER}/catkin_ws/src/quad-sdk/external/unitree-packages/unitree_legged_sdk/lib/cpp/${ARCH})
+
+set(EXTRA_LIBS -pthread libunitree_legged_sdk.so)
+
+set(CMAKE_CXX_FLAGS "-O3 -fPIC")
+
 include_directories(${MBLINK_DIR}/include)
 link_directories(${MBLINK_DIR}/lib)
 
@@ -35,6 +47,7 @@ find_package(catkin REQUIRED COMPONENTS
   quad_msgs
   quad_utils
   eigen_conversions
+  unitree_legged_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -44,6 +57,7 @@ catkin_package(
   INCLUDE_DIRS include ${EIGEN3_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS}
   CATKIN_DEPENDS roscpp std_msgs quad_msgs quad_utils eigen_conversions
   DEPENDS EIGEN3
+  unitree_legged_msgs
 )
 
 ###########
@@ -55,6 +69,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  /home/$ENV{USER}/catkin_ws/src/quad-sdk/external/unitree-packages/unitree_legged_sdk/include
 )
 
 ## Declare a C++ library for control
@@ -67,8 +82,11 @@ add_library(robot_driver
 	src/controllers/joint_controller.cpp
   src/hardware_interfaces/hardware_interface.cpp
   src/hardware_interfaces/spirit_interface.cpp
+  src/hardware_interfaces/go1_interface.cpp
 )
+
 add_dependencies(robot_driver ${robot_driver_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(${PROJECT_NAME} unitree_legged_msgs_gencpp)
 
 target_link_libraries(robot_driver
   ${GRMBLINK}
